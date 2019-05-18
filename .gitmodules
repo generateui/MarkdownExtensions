@@ -1,0 +1,3 @@
+[submodule "CommonMark.NET"]
+	path = CommonMark.NET
+	url = https://github.com/Knagis/CommonMark.NET.git
