@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A55E3DFD-546D-43B4-ADA4-8B77DCD570E3}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MarkdownExtensions.Console</RootNamespace>
+    <AssemblyName>MarkdownExtensions.Console</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SimpleInjector, Version=4.6.0.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.4.6.0\lib\net45\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonMarkNet.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringBuilderExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Design.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SimpleInjector" Version="4.6.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonMark.NET\CommonMark\CommonMark.Base.csproj">
+      <Project>{07CD3DAE-F234-481A-951F-E0C7460A5C40}</Project>
+      <Name>CommonMark.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.Csharp\MarkdownExtension.Csharp.csproj">
+      <Project>{78daf1dc-b135-4062-aaee-4fe989e12c5c}</Project>
+      <Name>MarkdownExtension.Csharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.EnterpriseArchitect\MarkdownExtension.EnterpriseArchitect.csproj">
+      <Project>{2ad26007-fc70-408a-ad40-bae771551289}</Project>
+      <Name>MarkdownExtension.EnterpriseArchitect</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.Excel\MarkdownExtension.Excel.csproj">
+      <Project>{25a9e74b-7dcf-4b5c-8440-5c783735799c}</Project>
+      <Name>MarkdownExtension.Excel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.GitGraph.UnitTest\MarkdownExtension.GitGraph.UnitTest.csproj">
+      <Project>{aae0d36d-2c6e-4679-82ce-ed22108ae1db}</Project>
+      <Name>MarkdownExtension.GitGraph.UnitTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.GitGraph\MarkdownExtension.GitGraph.csproj">
+      <Project>{8902c1d8-62ff-412f-bd2f-f9e890a55a5c}</Project>
+      <Name>MarkdownExtension.GitGraph</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.GitHistory\MarkdownExtension.GitHistory.csproj">
+      <Project>{bffc77ef-f379-439d-9c8b-fe355c7fa786}</Project>
+      <Name>MarkdownExtension.GitHistory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.KeyboardKeys\MarkdownExtension.KeyboardKeys.csproj">
+      <Project>{ffff091b-863c-4473-a69b-f712c98aec14}</Project>
+      <Name>MarkdownExtension.KeyboardKeys</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.MsSql\MarkdownExtension.MsSql.csproj">
+      <Project>{37adb193-9e20-4565-85fb-4b20bd3c3566}</Project>
+      <Name>MarkdownExtension.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.PanZoomImage\MarkdownExtension.PanZoomImage.csproj">
+      <Project>{2eded4bb-3b38-4a1f-b20c-7dda872dfce8}</Project>
+      <Name>MarkdownExtension.PanZoomImage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtension.Snippet\MarkdownExtension.Snippet.csproj">
+      <Project>{41234c59-5231-4613-847a-7fa3a409df37}</Project>
+      <Name>MarkdownExtension.Snippet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkdownExtensions\MarkdownExtensions.csproj">
+      <Project>{3BA9CAA2-60AE-43A1-A90E-1B354E991E27}</Project>
+      <Name>MarkdownExtensions</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CheatSheet\Template.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CheatSheet\Template.html" />
+    <EmbeddedResource Include="vscode-markdown.css" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

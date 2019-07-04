@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>MarkdownExtension.KeyboardKeys</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="keyscss.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="keyscss.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarkdownExtensions\MarkdownExtensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CheatSheet.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
