@@ -53,14 +53,52 @@ namespace MarkdownExtensions.Console
                 typeof(ExcelTable),
                 typeof(KeyboardKeys)
             );
-            AggregateCheatSheet(container);
+            if (args.Length > 0)
+            {
+                File(args[0], container);
+            }
+            else
+            {
+                AggregateCheatSheet(container);
+            }
+        }
 
+        private static void File(string fileName, Container container)
+        {
+            var sb = new StringBuilder();
+            int i = 1;
+            var scripts = new StringBuilder();
+            var csss = new StringBuilder();
+            csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
+            string body = null;
             using (ThreadScopedLifestyle.BeginScope(container))
             {
-                //var converter = container.GetInstance<IMarkdownConverter>();
-                //Folder(converter);
-                //Ea(converter);
+                var converter = container.GetInstance<IMarkdownConverter>();
+                string isChecked = i == 1 ? "checked" : "";
+                var md = System.IO.File.ReadAllText(fileName);
+                body = converter.Convert(md);
+                csss.AppendCode(converter.GetCss());
+                scripts.AppendCode(converter.GetJs());
             }
+            i += 1;
+            var document = $@"
+<html>
+    <head>
+        <link rel='stylesheet' type='text/css' href='Template.css'>
+        <script type='text/javascript'>
+            {scripts}
+        </script>
+        <style>
+            {csss}
+        </style>
+    </head>
+    <body>
+        {body}
+    </body>
+</html>
+";
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            System.IO.File.WriteAllText($@"{fileNameWithoutExtension}.html", document);
         }
 
         private static void AggregateCheatSheet(Container container)
@@ -79,7 +117,7 @@ namespace MarkdownExtensions.Console
                 //    continue;
                 //}
                 string name = folder.Replace("MarkdownExtension.", string.Empty);
-                cheatSheetByExtensionName[name] = File.ReadAllText(file);
+                cheatSheetByExtensionName[name] = System.IO.File.ReadAllText(file);
             }
             var sb = new StringBuilder();
             int i = 1;
@@ -127,7 +165,7 @@ namespace MarkdownExtensions.Console
     </body>
 </html>
 ";
-            File.WriteAllText("CheatSheet.html", document);
+            System.IO.File.WriteAllText("CheatSheet.html", document);
         }
     }
 }
