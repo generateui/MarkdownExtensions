@@ -26,7 +26,7 @@ namespace MarkdownExtensions.Console
         {
             var formatSettings = new FormatSettings
             {
-                ForceRefreshData = true
+                ForceRefreshData = false
             };
             var container = new Container();
             var scope = new ThreadScopedLifestyle();

@@ -17,6 +17,9 @@ Representation examples:
 - diagram image
 - list (i.e. a package)
 
+## table-notes:
+Show a list of tables with their fields, relations, indexes and their notes. Ensure the notes are markdown-ified.
+
 ## Link
 [ea-link:req_arch:Primary keys must be named Id]
 

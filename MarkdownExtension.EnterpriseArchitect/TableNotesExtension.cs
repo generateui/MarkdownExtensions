@@ -97,6 +97,7 @@ namespace MarkdownExtension.EnterpriseArchitect
                     {
                         hasTableNotes = true;
                         sb.AppendLine(table.Notes);
+                        sb.AppendLine();
                     }
                     bool hasFieldNotes = false;
                     foreach (var attribute in table.Attributes)
@@ -106,6 +107,7 @@ namespace MarkdownExtension.EnterpriseArchitect
                             hasFieldNotes = true;
                             sb.AppendLine($@"### {attribute.Name}");
                             sb.AppendLine(attribute.Notes);
+                            sb.AppendLine();
                         }
                     }
                     bool hasNotes = hasTableNotes || hasFieldNotes;
