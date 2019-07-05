@@ -52,7 +52,7 @@ namespace MarkdownExtensions
         // TODO: markdown ast
         // TODO: html ast
         public static FormatResult FromHtml(string html) => new FormatResult { Html = html };
-        public static FormatResult FromMd(string markdown) => new FormatResult { Markdown = markdown };
+        public static FormatResult FromMarkdown(string markdown) => new FormatResult { Markdown = markdown };
     }
 
     public sealed class Html
@@ -225,6 +225,10 @@ namespace MarkdownExtensions
     public class ValidationFailure : IErrors
     {
         public ValidationFailure(params IError[] errors)
+        {
+            Errors = errors;
+        }
+        public ValidationFailure(IEnumerable<IError> errors)
         {
             Errors = errors;
         }

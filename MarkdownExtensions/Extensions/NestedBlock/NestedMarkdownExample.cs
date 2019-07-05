@@ -21,7 +21,7 @@
             public FormatResult Format(object root, IFormatState state)
             {
                 var example = root as Example;
-                return FormatResult.FromMd(example.Markdown);
+                return FormatResult.FromMarkdown(example.Markdown);
             }
         }
 

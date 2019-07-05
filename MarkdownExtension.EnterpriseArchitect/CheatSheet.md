@@ -1,6 +1,7 @@
 ﻿# Enterprise Architect markdown
 
 ```ea-table-notes:
+package: ARS T&TT.Products.SOSPES Permit.DBDD SOSPES Permit.Detailed design of the database.tenant-tables
 User
 Customer
 ```

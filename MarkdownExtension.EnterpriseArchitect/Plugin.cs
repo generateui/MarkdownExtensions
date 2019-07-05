@@ -22,7 +22,14 @@ namespace MarkdownExtension.EnterpriseArchitect
                     if (_repository == null)
                     {
                         _repository = new RepositoryClass();
-                        _repository.OpenFile(@"c:\Users\Ruud\Desktop\EaTest.eapx");
+                        try
+                        {
+                            _repository.OpenFile(@"c:\Users\RuudP\Desktop\Ars.EAP");
+                        }
+                        catch (Exception)
+                        {
+                            return null;
+                        }
                     }
                     return _repository;
                 }

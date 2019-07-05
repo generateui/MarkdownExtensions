@@ -144,12 +144,12 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public Package GetElementsByPackage(Path path)
         {
-            if (File.Exists("ea.json"))
+            if (File.Exists($@"GetElementsByPackage-{path}.json"))
             {
                 Package package;
                 try
                 {
-                    package = _jsonSerializer.Value.DeserializeFromFile<Package>("ea.json");
+                    package = _jsonSerializer.Value.DeserializeFromFile<Package>($@"GetElementsByPackage-{path}.json");
                 }
                 catch (JsonReaderException jre)
                 {
@@ -215,7 +215,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             EA.Package rootPackage = (EA.Package)_repository.Models.GetAt(0);
             EA.Package eaPackage = rootPackage.GetPackage(path);
             Package package = FromEaPackage(eaPackage);
-            _jsonSerializer.Value.SerializeToFile(package, "ea.json");
+            _jsonSerializer.Value.SerializeToFile(package, $@"GetElementsByPackage-{path}.json");
             return package;
         }
 
@@ -231,14 +231,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             foreach (var e in eaPackage.Elements)
             {
                 var eaElement = e as EA.Element;
-                var element = new Element
-                {
-                    Id = eaElement.ElementID,
-                    Name = eaElement.Name,
-                    Notes = eaElement.Notes,
-                    Stereotype = eaElement.Stereotype
-                };
-                package.Elements.Add(element);
+                package.Elements.Add(CreateElement(eaElement));
             }
             foreach (var p in eaPackage.Packages)
             {
@@ -281,31 +274,33 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         {
             _repository = _repository ?? _getRepository();
             var package = (EA.Package)_repository.Models.GetAt(0);
-            Attribute CreateAttribute(EA.Attribute a) =>
-                new Attribute
-                {
-                    Id = a.AttributeID,
-                    Name = a.Name,
-                    Notes = a.Notes
-                };
-            Element CreateElement(EA.Element e) =>
-                new Element
-                {
-                    Id = e.ElementID,
-                    Name = e.Name,
-                    Notes = e.Notes,
-                    Stereotype = e.Stereotype,
-                    Attributes = e.Attributes
-                        .Cast<EA.Attribute>()
-                        .Select(CreateAttribute)
-                        .ToList()
-                };
             var elements = package.GetElements(e => true).Select(CreateElement).ToList();
             var elementsList = new ElementList { Elements = elements };
             _jsonSerializer.Value.SerializeToFile(elementsList, "elementList.json");
             var element = elements.FirstOrDefault(e => Equals(elementName, e.Name));
             return element;
         }
+
+        private static Element CreateElement(EA.Element e) =>
+                        new Element
+                        {
+                            Id = e.ElementID,
+                            Name = e.Name,
+                            Notes = e.Notes,
+                            Stereotype = e.Stereotype,
+                            Attributes = e.Attributes
+                                .Cast<EA.Attribute>()
+                                .Select(CreateAttribute)
+                                .ToList()
+                        };
+
+        private static Attribute CreateAttribute(EA.Attribute a) =>
+                        new Attribute
+                        {
+                            Id = a.AttributeID,
+                            Name = a.Name,
+                            Notes = a.Notes
+                        };
 
         private IEnumerable<Element> GetElements()
         {
@@ -446,5 +441,19 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         [JsonProperty("name")]
         public string Name { get; internal set; }
+    }
+
+    public static class PackageExtensions
+    {
+        public static IEnumerable<Element> GetElementsRecursively(this Package package, List<Element> elements = null)
+        {
+            elements = elements ?? new List<Element>();
+            elements.AddRange(package.Elements);
+            foreach(var childPackage in package.Packages)
+            {
+                GetElementsRecursively(childPackage, elements);
+            }
+            return elements;
+        }
     }
 }

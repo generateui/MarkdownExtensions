@@ -178,12 +178,15 @@ namespace MarkdownExtensions
                 sb.AppendLine("<ul class='error-list'>");
                 foreach (var error in _parsed.Errors)
                 {
-                    var e = error.Error as IParseError;
+                    IParseError parseError = error.Error as IParseError;
                     sb.AppendLine("<li class='error'>");
                     var extensionName = error.Extension.GetType().Name;
-                    sb.Append($@"<span class='Range'>{e.Range}</span> ");
-                    sb.Append($@"<span class='extension-name'>{extensionName}:</span> <span class='message'>{e.Message}</span> ");
-                    sb.Append($@"<span class='message'>{e.Message}</span>");
+                    if (parseError != null)
+                    {
+                        sb.Append($@"<span class='Range'>{parseError.Range}</span> ");
+                    }
+                    sb.Append($@"<span class='extension-name'>{extensionName}:</span> <span class='message'>{error.Error.Message}</span> ");
+                    sb.Append($@"<span class='message'>{error.Error.Message}</span>");
                     sb.AppendLine("</li>");
                 }
                 sb.AppendLine("</ul>");
@@ -328,7 +331,7 @@ namespace MarkdownExtensions
                             IErrors validationResult = null;
                             if (validator != null)
                             {
-                                validator.Validate(extensionObject.ParseResult.Object);
+                                validationResult = validator.Validate(extensionObject.ParseResult.Object);
                             }
                             if (validationResult != null && validationResult.Errors != null && validationResult.Errors.Any())
                             {

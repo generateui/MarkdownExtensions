@@ -65,10 +65,6 @@
       <Project>{07CD3DAE-F234-481A-951F-E0C7460A5C40}</Project>
       <Name>CommonMark.Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MarkdownExtension.Csharp\MarkdownExtension.Csharp.csproj">
-      <Project>{78daf1dc-b135-4062-aaee-4fe989e12c5c}</Project>
-      <Name>MarkdownExtension.Csharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.EnterpriseArchitect\MarkdownExtension.EnterpriseArchitect.csproj">
       <Project>{2ad26007-fc70-408a-ad40-bae771551289}</Project>
       <Name>MarkdownExtension.EnterpriseArchitect</Name>

@@ -26,7 +26,7 @@ namespace MarkdownExtensions.Console
         {
             var formatSettings = new FormatSettings
             {
-                ForceRefreshData = false
+                ForceRefreshData = true
             };
             var container = new Container();
             var scope = new ThreadScopedLifestyle();
@@ -65,8 +65,6 @@ namespace MarkdownExtensions.Console
 
         private static void File(string fileName, Container container)
         {
-            var sb = new StringBuilder();
-            int i = 1;
             var scripts = new StringBuilder();
             var csss = new StringBuilder();
             csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
@@ -74,13 +72,11 @@ namespace MarkdownExtensions.Console
             using (ThreadScopedLifestyle.BeginScope(container))
             {
                 var converter = container.GetInstance<IMarkdownConverter>();
-                string isChecked = i == 1 ? "checked" : "";
                 var md = System.IO.File.ReadAllText(fileName);
                 body = converter.Convert(md);
                 csss.AppendCode(converter.GetCss());
                 scripts.AppendCode(converter.GetJs());
             }
-            i += 1;
             var document = $@"
 <html>
     <head>
@@ -97,13 +93,15 @@ namespace MarkdownExtensions.Console
     </body>
 </html>
 ";
+            var folder = Path.GetDirectoryName(fileName);
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-            System.IO.File.WriteAllText($@"{fileNameWithoutExtension}.html", document);
+            var fullFilePath = Path.Combine(folder, $@"{fileNameWithoutExtension}.html");
+            System.IO.File.WriteAllText(fullFilePath, document);
         }
 
         private static void AggregateCheatSheet(Container container)
         {
-            var files = Directory.EnumerateFiles(@"C:\Users\Ruud\Desktop\MarkdownExtensions", "CheatSheet.md", SearchOption.AllDirectories);
+            var files = Directory.EnumerateFiles(@"C:\Users\RuudP\Desktop\Github\MarkdownExtensions", "CheatSheet.md", SearchOption.AllDirectories);
             var cheatSheetByExtensionName = new Dictionary<string, string>();
             foreach (var file in files)
             {

@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>Design.md</StartArguments>
+    <StartArguments>c:\users\ruudp\desktop\SOSPES\DatamodelFromEa.md</StartArguments>
   </PropertyGroup>
 </Project>

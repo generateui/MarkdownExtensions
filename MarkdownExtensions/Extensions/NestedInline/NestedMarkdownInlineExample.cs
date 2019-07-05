@@ -21,7 +21,7 @@
             public FormatResult Format(object root, IFormatState state)
             {
                 var example = root as Example;
-                return FormatResult.FromMd("[link to HackerNews](https://news.ycombinator.com/)");
+                return FormatResult.FromMarkdown("[link to HackerNews](https://news.ycombinator.com/)");
             }
         }
 
