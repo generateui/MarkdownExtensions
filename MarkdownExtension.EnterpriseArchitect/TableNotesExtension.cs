@@ -73,9 +73,10 @@ namespace MarkdownExtension.EnterpriseArchitect
             {
                 var tableNotes = root as TableNotesModel;
                 IEnumerable<Element> tables = null;
+                Package package = null;
                 if (tableNotes.PackagePath != null)
                 {
-                    var package = _provider.GetElementsByPackage(tableNotes.PackagePath);
+                    package = _provider.GetElementsByPackage(tableNotes.PackagePath);
                     tables = package
                         .GetElementsRecursively()
                         .Where(e => TableNotesModel.Include(tableNotes, e));
@@ -86,8 +87,23 @@ namespace MarkdownExtension.EnterpriseArchitect
                         .GetElements(e => e.Stereotype == "table")
                         .Where(e => TableNotesModel.Include(tableNotes, e));
                 }
-
                 var all = new StringBuilder();
+                if (package != null)
+                {
+                    //var sb = new StringBuilder();
+                    //foreach (var diagram in package.Diagrams)
+                    //{
+                    //    sb.AppendLine($@"## {diagram.Name}");
+                    //    var filePath = _provider.GetDiagramFilePath(diagram);
+                    //    if (System.IO.File.Exists(filePath.Value))
+                    //    {
+                    //        var bytes = System.IO.File.ReadAllBytes(filePath.Value);
+                    //        var base64 = Convert.ToBase64String(bytes);
+                    //        sb.Append($@"![diagram.Name](data:image/png;base64,{base64}");
+                    //    }
+                    //}
+                    //all.AppendLine(sb.ToString());
+                }
                 foreach (var table in tables)
                 {
                     var sb = new StringBuilder();
@@ -100,15 +116,21 @@ namespace MarkdownExtension.EnterpriseArchitect
                         sb.AppendLine();
                     }
                     bool hasFieldNotes = false;
+
+                    var sba = new StringBuilder();
+                    sba.AppendLine($@"### Attributes");
                     foreach (var attribute in table.Attributes)
                     {
                         if (!string.IsNullOrEmpty(attribute.Notes))
                         {
                             hasFieldNotes = true;
-                            sb.AppendLine($@"### {attribute.Name}");
-                            sb.AppendLine(attribute.Notes);
-                            sb.AppendLine();
+                            sba.AppendLine($@"- **{attribute.Name}** {attribute.Notes}");
                         }
+                    }
+                    sba.AppendLine();
+                    if (hasFieldNotes)
+                    {
+                        sb.AppendLine(sba.ToString());
                     }
                     bool hasNotes = hasTableNotes || hasFieldNotes;
                     if (hasNotes)
@@ -116,7 +138,7 @@ namespace MarkdownExtension.EnterpriseArchitect
                         all.Append(sb);
                     }
                 }
-                return FormatResult.FromMarkdown(all.ToString());
+                return FormatResult.FromMarkdown(all.ToString().FixNewlines());
             }
 
             public ICodeByName GetCss() => null;

@@ -13,6 +13,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
     {
         Package GetElementsByPackage(Path path);
         FilePath GetDiagramFilePath(string diagramName);
+        FilePath GetDiagramFilePath(Diagram diagram);
         Element GetElementByName(string elementName);
         IEnumerable<Element> GetElements(Func<Element, bool> filter);
     }
@@ -48,6 +49,19 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                 }
             }
             return _eaProvider.GetDiagramFilePath(diagramName);
+        }
+
+        public FilePath GetDiagramFilePath(Diagram diagram)
+        {
+            if (!_formatSettings.ForceRefreshData)
+            {
+                var result = _jsonProvider.GetDiagramFilePath(diagram);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return _eaProvider.GetDiagramFilePath(diagram);
         }
 
         public Element GetElementByName(string elementName)
@@ -191,6 +205,16 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             }
             return null;
         }
+
+        public FilePath GetDiagramFilePath(Diagram diagram)
+        {
+            var filePath = System.IO.Path.GetTempPath() + diagram.Guid.ToString() + ".png";
+            if (File.Exists(filePath))
+            {
+                return new FilePath(filePath);
+            }
+            return null;
+        }
     }
     internal class EaProvider : IEaProvider
     {
@@ -214,19 +238,22 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             _repository = _repository ?? _getRepository();
             EA.Package rootPackage = (EA.Package)_repository.Models.GetAt(0);
             EA.Package eaPackage = rootPackage.GetPackage(path);
-            Package package = FromEaPackage(eaPackage);
+            Package package = FromEaPackage(eaPackage, path);
             _jsonSerializer.Value.SerializeToFile(package, $@"GetElementsByPackage-{path}.json");
             return package;
         }
 
-        public Package FromEaPackage(EA.Package eaPackage)
+        public Package FromEaPackage(EA.Package eaPackage, Path parentPath = null)
         {
+            parentPath = parentPath ?? eaPackage.ToPath(_repository);
             var package = new Package
             {
                 Id = eaPackage.PackageID,
                 Name = eaPackage.Name,
                 Elements = new List<Element>(),
-                Packages = new List<Package>()
+                Packages = new List<Package>(),
+                Diagrams = new List<Diagram>(),
+                Path = parentPath,
             };
             foreach (var e in eaPackage.Elements)
             {
@@ -236,8 +263,14 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             foreach (var p in eaPackage.Packages)
             {
                 var eaChildPackage = p as EA.Package;
-                var childPackage = FromEaPackage(eaChildPackage);
+                var childPackage = FromEaPackage(eaChildPackage, package.Path);
                 package.Packages.Add(childPackage);
+            }
+            foreach (var d in eaPackage.Diagrams)
+            {
+                var eaDiagram = d as EA.Diagram;
+                var diagram = CreateDiagram(eaDiagram, package.Path);
+                package.Diagrams.Add(diagram);
             }
             return package;
         }
@@ -286,7 +319,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                         {
                             Id = e.ElementID,
                             Name = e.Name,
-                            Notes = e.Notes,
+                            Notes = e.Notes.FixNewlines(),
                             Stereotype = e.Stereotype,
                             Attributes = e.Attributes
                                 .Cast<EA.Attribute>()
@@ -299,8 +332,16 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                         {
                             Id = a.AttributeID,
                             Name = a.Name,
-                            Notes = a.Notes
+                            Notes = a.Notes.FixNewlines()
                         };
+        private static Diagram CreateDiagram(EA.Diagram d, Path parentPath) =>
+            new Diagram
+            {
+                Id = d.DiagramID,
+                Name = d.Name,
+                Notes = d.Notes.FixNewlines(),
+                Path = parentPath.CreateChild(d.Name)
+            };
 
         private IEnumerable<Element> GetElements()
         {
@@ -315,14 +356,14 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                 {
                     Id = a.AttributeID,
                     Name = a.Name,
-                    Notes = a.Notes
+                    Notes = a.Notes.FixNewlines()
                 };
             Element CreateElement(EA.Element e) =>
                 new Element
                 {
                     Id = e.ElementID,
                     Name = e.Name,
-                    Notes = e.Notes,
+                    Notes = e.Notes.FixNewlines(),
                     Stereotype = e.Stereotype,
                     Attributes = e.Attributes
                         .Cast<EA.Attribute>()
@@ -336,6 +377,18 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         {
             var elements = GetElements();
             return elements.Where(filter);
+        }
+
+        public FilePath GetDiagramFilePath(Diagram diagram)
+        {
+            _repository = _repository ?? _getRepository();
+            var eaDiagram = _repository.GetDiagramByID(diagram.Id);
+            var filePath = System.IO.Path.GetTempPath() + eaDiagram.DiagramGUID.ToString() + ".png";
+            var project = _repository.GetProjectInterface();
+            project.PutDiagramImageToFile(eaDiagram.DiagramGUID, filePath, 1);
+            var diagrams = new DiagramList { Diagrams = new List<Diagram> { diagram } };
+            _jsonSerializer.Value.SerializeToFile(diagrams, "diagramList.json");
+            return new FilePath(filePath);
         }
     }
 
@@ -362,6 +415,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public IEnumerable<string> Parts => _parts;
         public override string ToString() => _path;
+        public Path CreateChild(string name) => new Path(new List<string>(_parts) { name });
     }
     public class PathConverter : JsonConverter
     {
@@ -384,6 +438,9 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("notes")]
+        public string Notes { get; set; }
 
         [JsonProperty("path")]
         [JsonConverter(typeof(PathConverter))]
@@ -439,8 +496,15 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("packages")]
         public List<Package> Packages { get; internal set; }
 
+        [JsonProperty("diagrams")]
+        public List<Diagram> Diagrams { get; internal set; }
+
         [JsonProperty("name")]
         public string Name { get; internal set; }
+
+        [JsonProperty("path")]
+        [JsonConverter(typeof(PathConverter))]
+        public Path Path { get; set; }
     }
 
     public static class PackageExtensions
