@@ -1,1 +1,4 @@
 
+[submodule "markdig"]
+	path = markdig
+	url = https://github.com/lunet-io/markdig.git
