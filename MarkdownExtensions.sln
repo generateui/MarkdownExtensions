@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownExtensions", "MarkdownExtensions\MarkdownExtensions.csproj", "{3BA9CAA2-60AE-43A1-A90E-1B354E991E27}"
 EndProject
@@ -32,6 +32,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownExtension.GitGraph.UnitTest", "MarkdownExtension.GitGraph.UnitTest\MarkdownExtension.GitGraph.UnitTest.csproj", "{AAE0D36D-2C6E-4679-82CE-ED22108AE1DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownExtension.Csharp", "MarkdownExtension.Csharp\MarkdownExtension.Csharp.csproj", "{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{ED08523E-FC7C-4B46-B4ED-42BBB40649D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownExtensions.UnitTest", "MarkdownExtensions.UnitTest\MarkdownExtensions.UnitTest.csproj", "{E8A9EDCC-DC52-49F8-86A7-C92B9C98B4E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,14 @@ Global
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED08523E-FC7C-4B46-B4ED-42BBB40649D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED08523E-FC7C-4B46-B4ED-42BBB40649D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED08523E-FC7C-4B46-B4ED-42BBB40649D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED08523E-FC7C-4B46-B4ED-42BBB40649D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8A9EDCC-DC52-49F8-86A7-C92B9C98B4E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A9EDCC-DC52-49F8-86A7-C92B9C98B4E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A9EDCC-DC52-49F8-86A7-C92B9C98B4E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A9EDCC-DC52-49F8-86A7-C92B9C98B4E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,17 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.0.1",
+    "tasks": [
+        {
+            "label": "markdown",
+            "type": "shell",
+            "command": "\"C:\\Users\\Ruud\\Desktop\\MarkdownExtensions\\MarkdownExtensions.Console\\bin\\Release\\MarkdownExtensions.Console.exe\" ${file}",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

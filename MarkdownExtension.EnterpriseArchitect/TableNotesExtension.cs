@@ -131,7 +131,7 @@ namespace MarkdownExtension.EnterpriseArchitect
             {
                 _provider = provider;
             }
-            public IErrors Validate(object tree)
+            public IErrors Validate(object tree, SourceSettings sourceSettings = null)
             {
                 var tableNotes = tree as TableNotesModel;
                 if (tableNotes.PackagePath != null)

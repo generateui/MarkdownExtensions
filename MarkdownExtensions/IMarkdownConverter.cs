@@ -25,8 +25,16 @@ namespace MarkdownExtensions
 
     public interface IMarkdownConverter
     {
-        void Convert(TextReader source, TextWriter target, ConversionSettings settings = null);
-        void Convert(Block block, TextWriter target, ConversionSettings settings = null);
+        void Convert(TextReader source,
+            TextWriter target,
+            ConversionSettings settings = null,
+            SourceSettings sourceSettings = null);
+
+        void Convert(Block block,
+            TextWriter target,
+            ConversionSettings settings = null,
+            SourceSettings sourceSettings = null);
+
         ICodeByName GetCss();
         ICodeByName GetJs();
     }
@@ -36,13 +44,15 @@ namespace MarkdownExtensions
         public static string Convert(
             this IMarkdownConverter converter,
             string source,
-            ConversionSettings settings = null)
+            ConversionSettings settings = null,
+            SourceSettings sourceSettings = null)
         {
             settings = settings ?? new ConversionSettings { ReportErrorsInHtml = true };
+            sourceSettings = sourceSettings ?? new SourceSettings();
             using (var reader = new StringReader(source))
             using (var writer = new StringWriter(CultureInfo.CurrentCulture))
             {
-                converter.Convert(reader, writer, settings);
+                converter.Convert(reader, writer, settings, sourceSettings);
                 return writer.ToString();
             }
         }
@@ -218,15 +228,17 @@ namespace MarkdownExtensions
             _parseSettings.TrackSourcePosition = true;
         }
 
-        public void Convert(TextReader source, TextWriter target, ConversionSettings settings = null)
+        public void Convert(TextReader source, TextWriter target, ConversionSettings settings = null, SourceSettings sourceSettings = null)
         {
+            sourceSettings = sourceSettings ?? new SourceSettings();
             Block block = CommonMarkConverter.ProcessStage1(source, _parseSettings);
             CommonMarkConverter.ProcessStage2(block, _parseSettings);
-            Convert(block, target, settings);
+            Convert(block, target, settings, sourceSettings);
         }
 
-        public void Convert(Block block, TextWriter target, ConversionSettings settings = null)
+        public void Convert(Block block, TextWriter target, ConversionSettings settings = null, SourceSettings sourceSettings = null)
         {
+            sourceSettings = sourceSettings ?? new SourceSettings();
             var extensionsByPosition = new Dictionary<int, ExtensionObject>();
             var errors = new List<(IMarkdownExtension extension, IError error)>();
             var replacements = new List<(IMarkdownExtension extension, Block original, Block replacement)>();
@@ -273,7 +285,7 @@ namespace MarkdownExtensions
                             IErrors validationResult = null;
                             if (validator != null)
                             {
-                                validator.Validate(extensionObject.ParseResult.Object);
+                                validationResult = validator.Validate(extensionObject.ParseResult.Object, sourceSettings);
                             }
                             if (validationResult != null && validationResult.Errors != null && validationResult.Errors.Any())
                             {
@@ -331,7 +343,7 @@ namespace MarkdownExtensions
                             IErrors validationResult = null;
                             if (validator != null)
                             {
-                                validationResult = validator.Validate(extensionObject.ParseResult.Object);
+                                validationResult = validator.Validate(extensionObject.ParseResult.Object, sourceSettings);
                             }
                             if (validationResult != null && validationResult.Errors != null && validationResult.Errors.Any())
                             {

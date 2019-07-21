@@ -15,8 +15,18 @@ namespace MarkdownExtensions
 
         MarkdownExtensionName Name { get; }
 
+        /// <summary>
+        /// Produce html or markdown
+        /// </summary>
+        /// Html will be directly output to the resulting html document.
+        /// Markdown will be either be output as markdown or as html,
+        /// depending on the desired output of the document.
         Output Output { get; }
 
+        /// <summary>
+        /// <see cref="ElementType.Block"/>, <see cref="ElementType.Inline"/>
+        /// </summary>
+        /// <remarks><see cref="ElementType.Document"/> is not yet supported</remarks>
         IElementType Type { get; }
 
         /// <summary>
@@ -55,6 +65,9 @@ namespace MarkdownExtensions
         public static FormatResult FromMarkdown(string markdown) => new FormatResult { Markdown = markdown };
     }
 
+    /// <summary>
+    /// Represents a type-safe html string by wrapping a string
+    /// </summary>
     public sealed class Html
     {
         public string Value { get; }
@@ -65,6 +78,9 @@ namespace MarkdownExtensions
         public static implicit operator Html (string value) => new Html(value);
     }
 
+    /// <summary>
+    /// Represents a type-safe markdown string by wrapping a string
+    /// </summary>
     public sealed class Markdown
     {
         public string Value { get; }
@@ -159,7 +175,7 @@ namespace MarkdownExtensions
     }
     public interface IValidator
     {
-        IErrors Validate(object tree);
+        IErrors Validate(object tree, SourceSettings sourceSettings);
     }
     public interface IParseResult
     {

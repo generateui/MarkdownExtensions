@@ -46,6 +46,8 @@
 - Trello
 	- link to trello card with status?
 	- render trello card
+- Unicode
+	- refer to unicode codeblocks
 
 ## Engine
 - ~~internal Markdown representation~~
@@ -56,19 +58,33 @@
 - ~~errors~~
 - ~~cheat sheet aggregation~~
 - ~~example aggregation~~
-- introduce resolve/validate phase
-	1. parse
-	2. resolve (Ast -> Object)
-	3. format
+- ~~introduce resolve/validate phase~~
+	~~1. parse~~
+	~~2. resolve (Ast -> Object)~~
+	~~3. format~~
 - ~~when formatting, pass header level~~
 - progress
 - async
 - recursive markdown
-- parsing performance (single pass)
+- performance optimization (single pass)
 - performance measurement
-- side-by-side generated docs: markdown | html | rendered html
-- autocomplete discovery
 - separated input & output element types
+- services ouside C#/CLR providing extensions
+	- require async support
+	- require progress
+	- require performance benchmarking
+- correct lineno+characterno model
+	- support source markdown
+	- support second phase markdown
+	- support DOM references
+	- support sourcemaps
+
+## Editor
+- autocomplete discovery
+- windows-alike emoji inserter but then for all unicode charactersm or maybe block-specific inserters
+
+## UI
+- side-by-side generated docs: markdown | html | rendered html
 
 ## The ARS T&TT usecase
 - SSS should be generated from EA
@@ -99,6 +115,7 @@
 	2. if any, have them expand into markdown. Then add markdown to "ast"
 	3. generate markdown or generate html
 - assumption: CommonMark.Net is able to geenrate markdown from "ast"
+- add recursive markdown as option?
 
 ### Complete sequence
 1. Parse markdown. When encountering triple backtick or `[syntax:data]`, resolve markdown extension
@@ -115,4 +132,22 @@ Currently, step 1+2 are not combined (need to fork CommonMark.Net)
 ### TODO:
 - ~~release resources~~
 - ~~errors~~
-- 
+- newline handling
+	- output to markdown
+	- use
+		- environment
+		- \r\n
+		- \n
+- have cst parser
+
+# Idea list
+- https://thisdavej.com/build-an-amazing-markdown-editor-using-visual-studio-code-and-pandoc/
+- notable
+
+## Links
+- https://rmarkdown.rstudio.com/
+
+## Markdown-it as host renderer
+1. markdown-it extension has list of inline and block extension prefixes
+2. on rendering, when matching a prefix it asks for html
+3. supplied html is passed onto markdown-it

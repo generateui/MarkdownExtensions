@@ -1,0 +1,59 @@
+﻿**bold**
+␟
+*emphasis*
+␟
+~~strikethrough~~
+␟
+text
+␟
+- list
+␟
+- item 1
+	- item 1.1
+␟
+* item
+␟
+- item 1
+	* item 1.1
+␟
+# h1
+␟
+# h1
+with paragraph
+␟
+# h1
+## h2
+### h3
+#### h4
+##### h5
+###### h6
+␟
+# h1
+with h1 paragraph
+## h2
+with h2 paragraph
+␟
+# h1
+with h1 paragraph
+## h2
+with h2 paragraph
+### h3
+with h3 paragraph
+#### h4
+with h4 paragraph
+##### h5
+with h5 paragraph
+###### h6
+with h6 paragraph
+␟
+```
+fenced codeblock
+```
+␟
+text [with brackts]
+␟
+text [with an example link](example.com)
+␟
+![](image.png)
+␟
+![image](image.png)

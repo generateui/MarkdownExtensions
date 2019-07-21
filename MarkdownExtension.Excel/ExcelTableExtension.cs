@@ -1,6 +1,8 @@
 ﻿using ExcelDataReader;
 using MarkdownExtensions;
 using System.Collections.Generic;
+using System;
+using System.Data;
 using System.IO;
 using System.Text;
 
@@ -79,10 +81,31 @@ namespace MarkdownExtension.Excel
 
         private class ValidatorImpl : IValidator
         {
-            public IErrors Validate(object tree)
+            public IErrors Validate(object tree, SourceSettings sourceSettings)
             {
-                // check if file exists
-                // check if sheet exists
+                var excelSelection = tree as ExcelSelection;
+                var fullFilePath = Path.Combine(sourceSettings.Folder, excelSelection.FileName);
+                if (!File.Exists(fullFilePath))
+                {
+                    return new ValidationFailure(new Error($@"File [{excelSelection.FileName}] not found, tried looking at [{fullFilePath}]"));
+                }
+                try
+                {
+                    using (var stream = File.Open(fullFilePath, FileMode.Open, FileAccess.Read))
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        DataSet result = reader.AsDataSet();
+                        bool hasTable = result.Tables.Contains(excelSelection.Sheet);
+                        if (!hasTable)
+                        {
+                            return new ValidationFailure(new Error($@"The workbook [{excelSelection.FileName}] does not contain the sheet [{excelSelection.Sheet}]"));
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    new ValidationFailure(new Error($@"Something went wrong trying to open the excel workbook"));
+                }
                 // check if cellreferences are coorect
                 // check if cellreference go up (i.e. b2:a1)
                 return new Valid();
@@ -98,10 +121,10 @@ namespace MarkdownExtension.Excel
                 {
                     using (var reader = ExcelReaderFactory.CreateReader(stream))
                     {
-                        var result = reader.AsDataSet();
-                        var sheet = result.Tables[excelSelection.Sheet];
-                        var from = CellReference.Parse(excelSelection.CellsFrom);
-                        var to = CellReference.Parse(excelSelection.CellsTo);
+                        DataSet result = reader.AsDataSet();
+                        DataTable sheet = result.Tables[excelSelection.Sheet];
+                        CellReference from = CellReference.Parse(excelSelection.CellsFrom);
+                        CellReference to = CellReference.Parse(excelSelection.CellsTo);
                         for (int i = from.Row - 1; i <= to.Row - 1; i++)
                         {
                             //var row = sheet.Rows[i];

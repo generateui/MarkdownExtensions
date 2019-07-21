@@ -53,6 +53,7 @@ namespace MarkdownExtensions.Console
                 typeof(ExcelTable),
                 typeof(KeyboardKeys)
             );
+            System.Console.WriteLine("Marking down...");
             if (args.Length > 0)
             {
                 File(args[0], container);
@@ -73,7 +74,12 @@ namespace MarkdownExtensions.Console
             {
                 var converter = container.GetInstance<IMarkdownConverter>();
                 var md = System.IO.File.ReadAllText(fileName);
-                body = converter.Convert(md);
+                System.Console.WriteLine(md);
+                var sourceSettings = new SourceSettings
+                {
+                    Folder = Path.GetDirectoryName(fileName)
+                };
+                body = converter.Convert(md, sourceSettings: sourceSettings);
                 csss.AppendCode(converter.GetCss());
                 scripts.AppendCode(converter.GetJs());
             }

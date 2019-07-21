@@ -21,7 +21,7 @@ namespace MarkdownExtension.MsSql
         }
         class ValidatorImpl : IValidator
         {
-            public IErrors Validate(object tree)
+            public IErrors Validate(object tree, SourceSettings sourceSettings = null)
             {
                 var table = tree as TableName;
                 var scsb = new SqlConnectionStringBuilder();
