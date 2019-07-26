@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownExtensions", "MarkdownExtensions\MarkdownExtensions.csproj", "{3BA9CAA2-60AE-43A1-A90E-1B354E991E27}"
 EndProject
@@ -32,6 +32,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownExtension.GitGraph.UnitTest", "MarkdownExtension.GitGraph.UnitTest\MarkdownExtension.GitGraph.UnitTest.csproj", "{AAE0D36D-2C6E-4679-82CE-ED22108AE1DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownExtension.Csharp", "MarkdownExtension.Csharp\MarkdownExtension.Csharp.csproj", "{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownExtensions.EnterpriseArchitect.UnitTest", "MarkdoenExtensions.EnterpriseArchitect.UnitTest\MarkdownExtensions.EnterpriseArchitect.UnitTest.csproj", "{CCEDB40D-CAC7-41BD-AE59-0C0BCBC2BB16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,10 @@ Global
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCEDB40D-CAC7-41BD-AE59-0C0BCBC2BB16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCEDB40D-CAC7-41BD-AE59-0C0BCBC2BB16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCEDB40D-CAC7-41BD-AE59-0C0BCBC2BB16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCEDB40D-CAC7-41BD-AE59-0C0BCBC2BB16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{41234C59-5231-4613-847A-7FA3A409DF37} = {3390EEB3-F5D2-447E-AE14-91E1680DF761}
 		{AAE0D36D-2C6E-4679-82CE-ED22108AE1DB} = {3390EEB3-F5D2-447E-AE14-91E1680DF761}
 		{78DAF1DC-B135-4062-AAEE-4FE989E12C5C} = {3390EEB3-F5D2-447E-AE14-91E1680DF761}
+		{CCEDB40D-CAC7-41BD-AE59-0C0BCBC2BB16} = {3390EEB3-F5D2-447E-AE14-91E1680DF761}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {57F52065-3927-412E-93D8-D5B493EA3FCE}

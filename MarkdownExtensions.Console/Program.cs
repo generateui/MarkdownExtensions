@@ -17,6 +17,7 @@ using MarkdownExtension.Snippet;
 using MarkdownExtension.Excel;
 using MarkdownExtension.KeyboardKeys;
 using MarkdownExtension.MsSql;
+using MarkdownExtension.EnterpriseArchitect;
 
 namespace MarkdownExtensions.Console
 {
@@ -26,7 +27,7 @@ namespace MarkdownExtensions.Console
         {
             var formatSettings = new FormatSettings
             {
-                ForceRefreshData = false
+                ForceRefreshData = true
             };
             var container = new Container();
             var scope = new ThreadScopedLifestyle();
@@ -51,8 +52,9 @@ namespace MarkdownExtensions.Console
                 typeof(NestedBlockExample),
                 typeof(NestedInlineExample),
                 typeof(ExcelTable),
-                typeof(KeyboardKeys)
-            );
+                typeof(KeyboardKeys),
+                typeof(WorkflowNotesExtension)
+			);
             if (args.Length > 0)
             {
                 File(args[0], container);

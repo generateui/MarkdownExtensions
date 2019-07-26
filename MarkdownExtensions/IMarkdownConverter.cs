@@ -311,6 +311,10 @@ namespace MarkdownExtensions
                     var codeBlock = entry.Block;
                     var text = codeBlock.StringContent.ToString();
                     var prefix = codeBlock.FencedCodeData.Info.Trim();
+                    if (string.IsNullOrEmpty(prefix))
+                    {
+                        continue;
+                    }
                     prefix = prefix.Substring(0, prefix.Length - 1);
                     if (_blockExtensionByPrefix.ContainsKey(prefix))
                     {
