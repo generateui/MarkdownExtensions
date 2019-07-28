@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonMarkNet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,45 +59,29 @@
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommonMark.NET\CommonMark\CommonMark.Base.csproj">
-      <Project>{07CD3DAE-F234-481A-951F-E0C7460A5C40}</Project>
-      <Name>CommonMark.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MarkdownExtension.EnterpriseArchitect\MarkdownExtension.EnterpriseArchitect.csproj">
-      <Project>{2ad26007-fc70-408a-ad40-bae771551289}</Project>
-      <Name>MarkdownExtension.EnterpriseArchitect</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.Excel\MarkdownExtension.Excel.csproj">
-      <Project>{25a9e74b-7dcf-4b5c-8440-5c783735799c}</Project>
+      <Project>{25A9E74B-7DCF-4B5C-8440-5C783735799C}</Project>
       <Name>MarkdownExtension.Excel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MarkdownExtension.GitGraph.UnitTest\MarkdownExtension.GitGraph.UnitTest.csproj">
-      <Project>{aae0d36d-2c6e-4679-82ce-ed22108ae1db}</Project>
-      <Name>MarkdownExtension.GitGraph.UnitTest</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.GitGraph\MarkdownExtension.GitGraph.csproj">
-      <Project>{8902c1d8-62ff-412f-bd2f-f9e890a55a5c}</Project>
+      <Project>{8902C1D8-62FF-412F-BD2F-F9E890A55A5C}</Project>
       <Name>MarkdownExtension.GitGraph</Name>
     </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.GitHistory\MarkdownExtension.GitHistory.csproj">
-      <Project>{bffc77ef-f379-439d-9c8b-fe355c7fa786}</Project>
+      <Project>{BFFC77EF-F379-439D-9C8B-FE355C7FA786}</Project>
       <Name>MarkdownExtension.GitHistory</Name>
     </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.KeyboardKeys\MarkdownExtension.KeyboardKeys.csproj">
-      <Project>{ffff091b-863c-4473-a69b-f712c98aec14}</Project>
+      <Project>{FFFF091B-863C-4473-A69B-F712C98AEC14}</Project>
       <Name>MarkdownExtension.KeyboardKeys</Name>
     </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.MsSql\MarkdownExtension.MsSql.csproj">
-      <Project>{37adb193-9e20-4565-85fb-4b20bd3c3566}</Project>
+      <Project>{37ADB193-9E20-4565-85FB-4B20BD3C3566}</Project>
       <Name>MarkdownExtension.MsSql</Name>
     </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.PanZoomImage\MarkdownExtension.PanZoomImage.csproj">
-      <Project>{2eded4bb-3b38-4a1f-b20c-7dda872dfce8}</Project>
+      <Project>{2EDED4BB-3B38-4A1F-B20C-7DDA872DFCE8}</Project>
       <Name>MarkdownExtension.PanZoomImage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MarkdownExtension.Snippet\MarkdownExtension.Snippet.csproj">
-      <Project>{41234c59-5231-4613-847a-7fa3a409df37}</Project>
-      <Name>MarkdownExtension.Snippet</Name>
     </ProjectReference>
     <ProjectReference Include="..\MarkdownExtensions\MarkdownExtensions.csproj">
       <Project>{3BA9CAA2-60AE-43A1-A90E-1B354E991E27}</Project>

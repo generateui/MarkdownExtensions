@@ -1,21 +1,18 @@
-﻿using MarkdownExtensions.Extensions.Folder;
+﻿using MarkdownExtensions.Extensions.FolderModel;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace MarkdownExtensions.Extensions.FolderFromDisk
 {
-    internal class FolderFromDiskSyntax : ISyntax
+	// TODO: Support relative folders
+	internal class FolderFromDiskParser : IParser
     {
-        internal string Prefix => "folder";
-        // TODO: Support relative folders
-
         public IParseResult Parse(string text)
         {
             var path = text;
-            if (Directory.Exists(path))
+            if (System.IO.Directory.Exists(path))
             {
-                Model.Folder folder = EnumerateFolder(path);
+                Folder folder = EnumerateFolder(path);
                 return new ParseSuccess(folder);
             }
             else
@@ -25,21 +22,21 @@ namespace MarkdownExtensions.Extensions.FolderFromDisk
             throw new Exception();
         }
 
-        private static Model.Folder EnumerateFolder(string path)
+        private static Folder EnumerateFolder(string path)
         {
-            var files = new List<Model.File>();
-            foreach (var file in Directory.EnumerateFiles(path))
+            var files = new List<File>();
+            foreach (var file in System.IO.Directory.EnumerateFiles(path))
             {
-                files.Add(new Model.File(Path.GetFileName(file)));
+                files.Add(new File(System.IO.Path.GetFileName(file)));
             }
-            var subFolders = new List<Model.Folder>();
-            foreach (var subFolderPath in Directory.EnumerateDirectories(path))
+            var subFolders = new List<Folder>();
+            foreach (var subFolderPath in System.IO.Directory.EnumerateDirectories(path))
             {
                 var subFolder = EnumerateFolder(subFolderPath);
                 subFolders.Add(subFolder);
             }
-            var name = Path.GetFileName(path);
-            return new Model.Folder(name, subFolders, files);
+            var name = System.IO.Path.GetFileName(path);
+            return new Folder(name, subFolders, files);
         }
     }
 }

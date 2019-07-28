@@ -11,7 +11,7 @@ namespace MarkdownExtension.GitGraph.UnitTest
         public void TestMethod1()
         {
             var text = "herpy derp derp";
-            var history = (Syntax.History)new Syntax().Parse(text);
+            var history = (GitGraph)new Syntax().Parse(text);
 
             Assert.IsTrue(history.Commits.Count == 1);
             Assert.IsTrue(history.Commits[0].Title == text);
@@ -21,18 +21,18 @@ namespace MarkdownExtension.GitGraph.UnitTest
         public void TestMethod2()
         {
             var text = "[master]herpy derp derp";
-            var history = (Syntax.History)new Syntax().Parse(text);
+            var history = (GitGraph)new Syntax().Parse(text);
 
             Assert.IsTrue(history.Commits.Count == 1);
             Assert.AreEqual(history.Commits[0].Title, "herpy derp derp");
             Assert.AreEqual(history.Commits[0].BranchName.Name, "master");
         }
 
-        private class Tests : Dictionary<string, Syntax.History>
+        private class Tests : Dictionary<string, GitGraph>
         {
-            public void Add(string text, params Syntax.Commit[] commits)
+            public void Add(string text, params Commit[] commits)
             {
-                Add(text, new Syntax.History { Commits = commits.ToList() });
+                Add(text, new GitGraph { Commits = commits.ToList() });
             }
         }
 
@@ -61,17 +61,17 @@ namespace MarkdownExtension.GitGraph.UnitTest
                 //        Tag = new Tag("tag"),
                 //        CommitId = new CommitId("abcd1234") } },
                 { @"[branch1] -> [branch2] {abcd1234} #tag# first commit @""Ruud Poutsma""<rtimon@gmail.com>",
-                    new Syntax.Commit {
+                    new Commit {
                         Title = "first commit",
-                        BranchName = new Syntax.BranchName("branch1"),
-                        Branch = new Syntax.BranchName("branch2"),
-                        Tag = new Syntax.Tag("tag"),
-                        CommitId = new Syntax.CommitId("abcd1234"),
-                        Author = new Syntax.Author("Ruud Poutsma", "rtimon@gmail.com") } },
+                        BranchName = new BranchName("branch1"),
+                        Branch = new BranchName("branch2"),
+                        Tag = new Tag("tag"),
+                        CommitId = new CommitId("abcd1234"),
+                        Author = new Author("Ruud Poutsma", "rtimon@gmail.com") } },
             };
             foreach (var test in tests)
             {
-                var history = (Syntax.History)new Syntax().Parse(test.Key);
+                var history = (GitGraph)new Syntax().Parse(test.Key);
                 Assert.AreEqual(test.Value, history);
             }
         }
@@ -81,7 +81,7 @@ namespace MarkdownExtension.GitGraph.UnitTest
         {
             var authorText = "@\"Ruud Poutsma\"<rtimon@gmail.com>";
             int i = 1;
-            var author = Syntax.Author.Parse(authorText, ref i);
+            var author = Author.Parse(authorText, ref i);
             Assert.AreEqual(author.Name, "Ruud Poutsma");
             Assert.AreEqual(author.Email, "rtimon@gmail.com");
         }

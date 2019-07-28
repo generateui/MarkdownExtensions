@@ -5,11 +5,29 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Extensions\FolderFromDisk\CheatSheet.md" />
+    <None Remove="Extensions\FolderList\CheatSheet.md" />
+    <None Remove="Extensions\Snippet\CheatSheet.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Extensions\FolderFromDisk\CheatSheet.md" />
+    <EmbeddedResource Include="Extensions\FolderList\CheatSheet.md" />
+    <EmbeddedResource Include="Extensions\Snippet\CheatSheet.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
+    <PackageReference Include="Markdig" Version="0.17.1" />
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommonMark.NET\CommonMark\CommonMark.Base.csproj" />
+    <None Update="Extensions\Snippet\Snippet.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

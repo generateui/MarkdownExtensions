@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CheatSheet.md" />
     <None Remove="panzoom.min.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="CheatSheet.md" />
     <EmbeddedResource Include="panzoom.min.js" />
   </ItemGroup>
 

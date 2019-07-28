@@ -6,21 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CheatSheet.md" />
     <None Remove="keyscss.css" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="CheatSheet.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="keyscss.css" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MarkdownExtensions\MarkdownExtensions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="CheatSheet.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

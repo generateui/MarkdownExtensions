@@ -4,19 +4,19 @@ using SimpleInjector.Lifestyles;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
-using System;
-using MarkdownExtensions.Extensions.Folder;
+using Markdig;
+//using Ea = MarkdownExtension.EnterpriseArchitect;
 using MarkdownExtensions.Extensions.FolderFromDisk;
 using MarkdownExtensions.Extensions.NestedBlock;
-using MarkdownExtensions.Extensions.NestedInline;
-using Ea = MarkdownExtension.EnterpriseArchitect;
-using MarkdownExtension.GitGraph;
-using MarkdownExtension.GitHistory;
+using MarkdownExtensions.Extensions.Snippet;
+using MarkdownExtensions.Extensions.FolderList;
 using MarkdownExtension.PanZoomImage;
-using MarkdownExtension.Snippet;
-using MarkdownExtension.Excel;
 using MarkdownExtension.KeyboardKeys;
+using MarkdownExtension.Excel;
 using MarkdownExtension.MsSql;
+using MarkdownExtension.GitHistory;
+using MarkdownExtension.GitGraph;
+using System.Linq;
 
 namespace MarkdownExtensions.Console
 {
@@ -28,41 +28,81 @@ namespace MarkdownExtensions.Console
             {
                 ForceRefreshData = false
             };
-            var container = new Container();
-            var scope = new ThreadScopedLifestyle();
-            container.Options.DefaultScopedLifestyle = scope;
-            container.RegisterInstance(formatSettings);
-            container.Register<IMarkdownConverter, MarkdownExtensionConverter>(Lifestyle.Scoped);
-            container.Register<Func<IMarkdownConverter>>(() => container.GetInstance<IMarkdownConverter>, Lifestyle.Scoped);
-            container.Register<Ea.ObjectText>(scope);
-            Ea.Plugin.Register(container);
-            container.Collection.Register<IMarkdownExtension>(
-                typeof(FolderFromDisk),
-                typeof(Folder),
-                typeof(GitGraph),
-                typeof(GitHistory),
-                typeof(Ea.ObjectText),
-                typeof(Ea.DiagramImage),
-                typeof(Ea.TableNotes),
-                typeof(Ea.RequirementsTable),
-                typeof(PanZoomImage),
-                typeof(Snippet),
-                typeof(MsSqlTable),
-                typeof(NestedBlockExample),
-                typeof(NestedInlineExample),
-                typeof(ExcelTable),
-                typeof(KeyboardKeys)
-            );
-            System.Console.WriteLine("Marking down...");
+			var container = new Container();
+			var scope = new ThreadScopedLifestyle();
+			container.Options.DefaultScopedLifestyle = scope;
+			container.RegisterInstance(formatSettings);
+			//container.Register<IMarkdownConverter, MarkdownExtensionConverter>(Lifestyle.Scoped);
+			//container.Register<Ea.ObjectText>(scope);
+			//Ea.Plugin.Register(container);
+			container.Collection.Register<IMarkdownExtension>(
+				typeof(FolderFromDiskExtension),
+				typeof(SnippetExtension),
+				typeof(PanZoomImageExtension),
+				typeof(ExcelTableExtension),
+				typeof(MsSqlTableExtension),
+				typeof(GitHistoryExtension),
+				typeof(GitGraphExtension),
+				typeof(NestedBlockExtension)
+			);
+			container.Collection.Register<IExtensionInfo>(
+				typeof(FolderListExtensionInfo),
+				typeof(FolderFromDiskExtensionInfo),
+				typeof(MsSqlTableExtensionInfo),
+				typeof(PanZoomImageExtensionInfo),
+				typeof(GitGraphExtensionInfo),
+				typeof(GitHistoryExtensionInfo),
+				typeof(KeyboardKeysExtensionInfo),
+				typeof(ExcelTableExtensionInfo),
+				typeof(SnippetExtensionInfo)
+			);
+			//typeof(Ea.ObjectText),
+			//typeof(Ea.DiagramImage),
+			//typeof(Ea.TableNotes),
+			//typeof(Ea.RequirementsTable),
+
+			System.Console.WriteLine("Marking down...");
             if (args.Length > 0)
             {
-                File(args[0], container);
+                File(args[0], null);
             }
             else
             {
                 AggregateCheatSheet(container);
             }
         }
+
+		private static MarkdownPipeline CreatePipeline()
+		{
+			var pipelineBuilder = new MarkdownPipelineBuilder()
+				.UseAdvancedExtensions();
+			pipelineBuilder.Extensions.AddIfNotAlready<FolderFromDiskExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<NestedBlockExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<FolderListExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<SnippetExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<PanZoomImageExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<KeyboardKeysExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<ExcelTableExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<MsSqlTableExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
+			var pipeline = pipelineBuilder.Build();
+			return pipeline;
+		}
+		private static void RegisterBlocks(ExtensionHtmlRenderer renderer)
+		{
+			renderer.RegisterBlock<FolderFromDiskBlock, FolderFromDiskExtension>();
+			renderer.RegisterBlock<FolderListBlock, FolderListExtension>();
+			renderer.RegisterBlock<NestedBlockBlock, NestedBlockExtension>();
+			renderer.RegisterBlock<SnippetBlock, SnippetExtension>();
+			renderer.RegisterBlock<PanZoomImageBlock, PanZoomImageExtension>();
+			renderer.RegisterBlock<ExcelTableBlock, ExcelTableExtension>();
+			renderer.RegisterBlock<MsSqlTableBlock, MsSqlTableExtension>();
+			renderer.RegisterBlock<GitHistoryBlock, GitHistoryExtension>();
+			renderer.RegisterBlock<GitGraphBlock, GitGraphExtension>();
+
+			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
+		}
 
         private static void File(string fileName, Container container)
         {
@@ -72,33 +112,38 @@ namespace MarkdownExtensions.Console
             string body = null;
             using (ThreadScopedLifestyle.BeginScope(container))
             {
-                var converter = container.GetInstance<IMarkdownConverter>();
-                var md = System.IO.File.ReadAllText(fileName);
-                System.Console.WriteLine(md);
-                var sourceSettings = new SourceSettings
-                {
-                    Folder = Path.GetDirectoryName(fileName)
-                };
-                body = converter.Convert(md, sourceSettings: sourceSettings);
-                csss.AppendCode(converter.GetCss());
-                scripts.AppendCode(converter.GetJs());
-            }
-            var document = $@"
-<html>
-    <head>
-        <link rel='stylesheet' type='text/css' href='Template.css'>
-        <script type='text/javascript'>
-            {scripts}
-        </script>
-        <style>
-            {csss}
-        </style>
-    </head>
-    <body>
-        {body}
-    </body>
-</html>
-";
+				var writer = new StringWriter();
+				var pipeline = CreatePipeline();
+				var markdown = System.IO.File.ReadAllText(fileName);
+				var markdownDocument = Markdown.Parse(markdown, pipeline);
+				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument);
+				pipeline.Setup(renderer);
+				RegisterBlocks(renderer);
+				renderer.Parse(container);
+				// validate errors
+				renderer.Transform();
+				// run validations
+				renderer.Render(markdownDocument);
+				var css = renderer.CollectCss();
+				csss.Append(css);
+				writer.Flush();
+				var html = writer.ToString();
+			}
+			var document = $@"
+				<html>
+					<head>
+						<link rel='stylesheet' type='text/css' href='Template.css'>
+						<script type='text/javascript'>
+							{scripts}
+						</script>
+						<style>
+							{csss}
+						</style>
+					</head>
+					<body>
+						{body}
+					</body>
+				</html>";
             var folder = Path.GetDirectoryName(fileName);
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             var fullFilePath = Path.Combine(folder, $@"{fileNameWithoutExtension}.html");
@@ -107,22 +152,9 @@ namespace MarkdownExtensions.Console
 
         private static void AggregateCheatSheet(Container container)
         {
-            var files = Directory.EnumerateFiles(@"C:\Users\RuudP\Desktop\Github\MarkdownExtensions", "CheatSheet.md", SearchOption.AllDirectories);
-            var cheatSheetByExtensionName = new Dictionary<string, string>();
-            foreach (var file in files)
-            {
-                var folder = Path.GetFileName(Path.GetDirectoryName(file));
-                if (file.Contains("Debug"))
-                {
-                    continue;
-                }
-                //if (!folder.Contains("Nested"))
-                //{
-                //    continue;
-                //}
-                string name = folder.Replace("MarkdownExtension.", string.Empty);
-                cheatSheetByExtensionName[name] = System.IO.File.ReadAllText(file);
-            }
+			Dictionary<string, string> cheatSheetByExtensionName = container
+				.GetAllInstances<IExtensionInfo>()
+				.ToDictionary(x => x.Name, x => x.CheatSheet);
             var sb = new StringBuilder();
             int i = 1;
             var scripts = new StringBuilder();
@@ -131,45 +163,60 @@ namespace MarkdownExtensions.Console
             var body = new StringBuilder();
             foreach (var entry in cheatSheetByExtensionName)
             {
-                using (ThreadScopedLifestyle.BeginScope(container))
-                {
-                    var converter = container.GetInstance<IMarkdownConverter>();
-                    string isChecked = i == 1 ? "checked" : "";
-                    string name = entry.Key;
-                    var md = entry.Value;
-                    var html = converter.Convert(md);
-                    csss.AppendCode(converter.GetCss());
-                    scripts.AppendCode(converter.GetJs());
+				using (ThreadScopedLifestyle.BeginScope(container))
+				{
+					var markdown = entry.Value;
+					var writer = new StringWriter();
+					var pipeline = CreatePipeline();
+					var document = Markdown.Parse(markdown, pipeline);
+					var renderer = new ExtensionHtmlRenderer(writer, document);
+					pipeline.Setup(renderer);
+					RegisterBlocks(renderer);
+					renderer.Parse(container);
+					// validate errors
+					renderer.Transform();
+					// run validations
+					renderer.Render(document);
+					// do css + js collection
+					writer.Flush();
+					var css = renderer.CollectCss();
+					csss.Append(css);
+					var js = renderer.CollectJavascript();
+					scripts.Append(js);
 
-                    var tab = $@"
-                    <section>
-                        <input type='radio' name='sections' id='option{i}' {isChecked}>
-                        <label for='option{i}'>{name}</label>
-                        <article>{html}</article>
-                    </section>";
-                    body.AppendLine(tab);
-                }
+					string isChecked = i == 1 ? "checked" : "";
+					string name = entry.Key;
+					var md = entry.Value;
+					var html = writer.ToString();
+
+					var tab = $@"
+						<section>
+							<input type='radio' name='sections' id='option{i}' {isChecked}>
+							<label for='option{i}'>{name}</label>
+							<article>{html}</article>
+						</section>";
+					body.AppendLine(tab);
+				}
                 i += 1;
             }
-            var document = $@"
-<html>
-    <head>
-        <link rel='stylesheet' type='text/css' href='Template.css'>
-        <script type='text/javascript'>
-            {scripts}
-        </script>
-        <style>
-            {csss}
-        </style>
-    </head>
-    <body>
-        <div class='tabordion'>
-            {body}
-        </div>
-    </body>
-</html>
-";
-            System.IO.File.WriteAllText("CheatSheet.html", document);
+            var htmlDocument = $@"
+				<html>
+					<head>
+						<link rel='stylesheet' type='text/css' href='Template.css'>
+						<script type='text/javascript'>
+							{scripts}
+						</script>
+						<style>
+							{csss}
+						</style>
+					</head>
+					<body>
+						<div class='tabordion'>
+							{body}
+						</div>
+					</body>
+				</html>";
+            System.IO.File.WriteAllText("CheatSheet.html", htmlDocument);
         }
     }
 }

@@ -1,9 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>MarkdownExtension.GitHistory</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="CheatSheet.md" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
@@ -16,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CheatSheet.md">
+    <EmbeddedResource Include="CheatSheet.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -2,5 +2,7 @@
 [Bb]in/
 [Oo]bj/
 /packages
+/Backup
+/coverage
 /TestResults
 *.csproj.user

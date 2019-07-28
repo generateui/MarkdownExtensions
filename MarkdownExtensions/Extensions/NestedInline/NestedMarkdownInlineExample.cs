@@ -1,42 +1,50 @@
-﻿namespace MarkdownExtensions.Extensions.NestedInline
+﻿using Markdig;
+using Markdig.Renderers;
+
+namespace MarkdownExtensions.Extensions.NestedInline
 {
-    public class NestedInlineExample : IMarkdownExtension
+	public partial class NestedInlineExample : IExtension
     {
-        class Example
-        {
-            public string Markdown { get; set; }
-        }
-        class SyntaxImpl : ISyntax
+        class SyntaxImpl : IParser
         {
             public IParseResult Parse(string text)
             {
-                return new ParseSuccess(new Example { Markdown = text });
+                return new ParseSuccess(new NestedInlineInline { Markdown = text });
             }
         }
-        class FormatterImpl : IFormatter
-        {
-            public ICodeByName GetCss() => null;
-            public ICodeByName GetJs() => null;
+        //class FormatterImpl : IRenderer
+        //{
+        //    public ICodeByName GetCss() => null;
+        //    public ICodeByName GetJs() => null;
 
-            public FormatResult Format(object root, IFormatState state)
-            {
-                var example = root as Example;
-                return FormatResult.FromMarkdown("[link to HackerNews](https://news.ycombinator.com/)");
-            }
-        }
+        //    public FormatResult Format(object root, IFormatState state)
+        //    {
+        //        var example = root as NestedInlineInline;
+        //        return FormatResult.FromMarkdown("[link to HackerNews](https://news.ycombinator.com/)");
+        //    }
+        //}
 
         public NestedInlineExample()
         {
-            Formatter = new FormatterImpl();
-            Syntax = new SyntaxImpl();
+            //Renderer = new FormatterImpl();
+            Parser = new SyntaxImpl();
         }
 
         public string Prefix => "nested-inline-md";
-        public MarkdownExtensionName Name => "Nested markdown example";
-        public Output Output => Output.Markdown;
-        public IElementType Type => ElementType.Inline;
-        public ISyntax Syntax { get; }
+        public ExtensionName Name => "Nested markdown example";
+        public IParser Parser { get; }
         public IValidator Validator => null;
-        public IFormatter Formatter { get; }
-    }
+        public IRenderer Renderer { get; }
+		public ITransformer Transformer => null;
+
+		public void Setup(MarkdownPipelineBuilder pipeline)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
 }

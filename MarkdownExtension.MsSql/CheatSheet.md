@@ -1,11 +1,11 @@
 ﻿# Sql table
 
 <code>
-```sql-table:
+```sql-table
 Table1
 ```
 </code>
 
-```sql-table:
+```sql-table
 Table1
 ```
