@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using Markdig;
-//using Ea = MarkdownExtension.EnterpriseArchitect;
+using Ea = MarkdownExtension.EnterpriseArchitect;
 using MarkdownExtensions.Extensions.FolderFromDisk;
 using MarkdownExtensions.Extensions.NestedBlock;
 using MarkdownExtensions.Extensions.Snippet;
@@ -17,6 +17,7 @@ using MarkdownExtension.MsSql;
 using MarkdownExtension.GitHistory;
 using MarkdownExtension.GitGraph;
 using System.Linq;
+using MarkdownExtension.EnterpriseArchitect.WorkflowNotes;
 
 namespace MarkdownExtensions.Console
 {
@@ -32,9 +33,7 @@ namespace MarkdownExtensions.Console
 			var scope = new ThreadScopedLifestyle();
 			container.Options.DefaultScopedLifestyle = scope;
 			container.RegisterInstance(formatSettings);
-			//container.Register<IMarkdownConverter, MarkdownExtensionConverter>(Lifestyle.Scoped);
-			//container.Register<Ea.ObjectText>(scope);
-			//Ea.Plugin.Register(container);
+			Ea.Plugin.Register(container);
 			container.Collection.Register<IMarkdownExtension>(
 				typeof(FolderFromDiskExtension),
 				typeof(SnippetExtension),
@@ -43,6 +42,7 @@ namespace MarkdownExtensions.Console
 				typeof(MsSqlTableExtension),
 				typeof(GitHistoryExtension),
 				typeof(GitGraphExtension),
+				typeof(WorkflowNotesExtension),
 				typeof(NestedBlockExtension)
 			);
 			container.Collection.Register<IExtensionInfo>(
@@ -54,6 +54,7 @@ namespace MarkdownExtensions.Console
 				typeof(GitHistoryExtensionInfo),
 				typeof(KeyboardKeysExtensionInfo),
 				typeof(ExcelTableExtensionInfo),
+				typeof(WorkflowNotesExtensionInfo),
 				typeof(SnippetExtensionInfo)
 			);
 			//typeof(Ea.ObjectText),
@@ -72,7 +73,7 @@ namespace MarkdownExtensions.Console
             }
         }
 
-		private static MarkdownPipeline CreatePipeline()
+		private static MarkdownPipeline CreatePipeline(Container container)
 		{
 			var pipelineBuilder = new MarkdownPipelineBuilder()
 				.UseAdvancedExtensions();
@@ -86,6 +87,8 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<MsSqlTableExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
+			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
+			pipelineBuilder.Extensions.Add(workflowNotesExtension);
 			var pipeline = pipelineBuilder.Build();
 			return pipeline;
 		}
@@ -100,6 +103,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<MsSqlTableBlock, MsSqlTableExtension>();
 			renderer.RegisterBlock<GitHistoryBlock, GitHistoryExtension>();
 			renderer.RegisterBlock<GitGraphBlock, GitGraphExtension>();
+			renderer.RegisterBlock<WorkflowNotesBlock, WorkflowNotesExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}
@@ -113,7 +117,7 @@ namespace MarkdownExtensions.Console
             using (ThreadScopedLifestyle.BeginScope(container))
             {
 				var writer = new StringWriter();
-				var pipeline = CreatePipeline();
+				var pipeline = CreatePipeline(container);
 				var markdown = System.IO.File.ReadAllText(fileName);
 				var markdownDocument = Markdown.Parse(markdown, pipeline);
 				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument);
@@ -167,7 +171,7 @@ namespace MarkdownExtensions.Console
 				{
 					var markdown = entry.Value;
 					var writer = new StringWriter();
-					var pipeline = CreatePipeline();
+					var pipeline = CreatePipeline(container);
 					var document = Markdown.Parse(markdown, pipeline);
 					var renderer = new ExtensionHtmlRenderer(writer, document);
 					pipeline.Setup(renderer);

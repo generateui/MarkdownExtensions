@@ -59,6 +59,10 @@
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MarkdownExtension.EnterpriseArchitect\MarkdownExtension.EnterpriseArchitect.csproj">
+      <Project>{2AD26007-FC70-408A-AD40-BAE771551289}</Project>
+      <Name>MarkdownExtension.EnterpriseArchitect</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.Excel\MarkdownExtension.Excel.csproj">
       <Project>{25A9E74B-7DCF-4B5C-8440-5C783735799C}</Project>
       <Name>MarkdownExtension.Excel</Name>

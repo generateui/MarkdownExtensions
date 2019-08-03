@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EaProvider\**" />
+    <EmbeddedResource Remove="EaProvider\**" />
+    <None Remove="EaProvider\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="WorkflowNotes\CheatSheet.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="WorkflowNotes\CheatSheet.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.111" />
@@ -29,10 +43,9 @@
     <None Update="Design.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="EaProvider\" />
+    <None Update="EaTest.eapx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

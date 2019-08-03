@@ -2,6 +2,7 @@
 using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using SimpleInjector;
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace MarkdownExtension.EnterpriseArchitect
@@ -24,7 +25,12 @@ namespace MarkdownExtension.EnterpriseArchitect
                         _repository = new RepositoryClass();
                         try
                         {
-                            _repository.OpenFile(@"c:\Users\RuudP\Desktop\Ars.EAP");
+							var folder = Assembly.GetExecutingAssembly().CodeBase;
+							folder = System.IO.Path.GetDirectoryName(folder);
+							var file = "EaTest.eapx";
+							var filePath = System.IO.Path.Combine(folder, file);
+							//_repository.OpenFile(@"c:\Users\RuudP\Desktop\Ars.EAP");
+							_repository.OpenFile(new Uri(filePath).AbsolutePath);
                         }
                         catch (Exception)
                         {
