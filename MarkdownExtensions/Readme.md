@@ -6,25 +6,25 @@ Many markdown extensions provide customized parsers for basically any pattern. T
 
 The library proposed the following "standardized" extension syntax:
 Blocks:
-<code>
+<pre><code>
 ```syntax-name
 {InternalSyntax}
 ```
-</code>
+</pre></code>
 Inlines:
 `[syntax-name:{InternalSyntax}]`
 
 `syntax-name` is a prefix used to detect the extension. `InternalSyntax` is used by the extension to specify something that needs to be rendered.
 
 A simple example is the FolderList block extension, which uses the following syntax:
-<code>
+<pre><code>
 ```
 - [folder]
 	- [subfolder]
 	- file
 	- another_file.txt
 ```
-</code>
+</pre></code>
 rendering a folder-like tree. 
 
 A simple inline example is the MsSql extension, rendering a table from a database:
@@ -32,10 +32,11 @@ A simple inline example is the MsSql extension, rendering a table from a databas
 
 ## Ease of implementation
 Implementors therefore can focus first and foremost on the internal syntax. In the case of the MsSql extension, it may be that the implementer wants to add rendering hints. The implementer may then decide to move to a block extension, extend the syntax with a hint that relations/indices should not be rendered:
-<code>
+<pre><code>
 ```ms-sql-table
 database: Test
 table: Table1
 show-indexes: false
 show-relations: false
 ```
+</pre></code>
