@@ -7,7 +7,9 @@ Insert target heading with content recursively as child of current heading
 
 `[md-part:>Snippet.md:Header 1]`
 
-> [md-part:>Snippet.md:Header 1]
+```md-snippet
+>Extensions\Snippet\Snippet.md:Header 1
+```
 
 ### `=` As sibling
 Insert target heading with content recursively as sibling of current heading
