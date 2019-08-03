@@ -87,6 +87,27 @@
 - side-by-side generated docs: markdown | html | rendered html
 
 ## The ARS T&TT usecase
+
+### Iteration 3
+Datamodel document
+- per diagram the diagram and diagram notes under it
+- per table the table header + table notes
+	- per attribute the attribute as list item `**{attribute.Name}** {attribute.Notes}`
+	- per relation to other table the relation and notes
+	- list item normalization (insert notes as nested list item)
+	- broken CommonMark.NET tables
+- option to output document into folder with linked (instead of embedded images) content
+
+Redmine update script
+- markdown document
+- specify items from EA datamodel
+	- diagram image
+	- per used table/enum/class in diagram like TableNotes
+- specify items from requirement
+- html must be converted back to markdown
+- output in markdown for all required extensions
+
+### Iteration 2
 - SSS should be generated from EA
 	- Write requirements in html
 		- input:

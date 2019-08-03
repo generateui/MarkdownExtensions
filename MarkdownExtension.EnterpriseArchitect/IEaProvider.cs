@@ -13,8 +13,10 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
     {
         Package GetElementsByPackage(Path path);
         FilePath GetDiagramFilePath(string diagramName);
+        FilePath GetDiagramFilePath(Diagram diagram);
         Element GetElementByName(string elementName);
         IEnumerable<Element> GetElements(Func<Element, bool> filter);
+		(Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath);
     }
     public class FilePath
     {
@@ -37,7 +39,12 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             _formatSettings = formatSettings;
         }
 
-        public FilePath GetDiagramFilePath(string diagramName)
+		public (Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath)
+		{
+			return _eaProvider.GetBpmnElements(bpmnElementPath);
+		}
+
+		public FilePath GetDiagramFilePath(string diagramName)
         {
             if (!_formatSettings.ForceRefreshData)
             {
@@ -48,6 +55,19 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                 }
             }
             return _eaProvider.GetDiagramFilePath(diagramName);
+        }
+
+        public FilePath GetDiagramFilePath(Diagram diagram)
+        {
+            if (!_formatSettings.ForceRefreshData)
+            {
+                var result = _jsonProvider.GetDiagramFilePath(diagram);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return _eaProvider.GetDiagramFilePath(diagram);
         }
 
         public Element GetElementByName(string elementName)
@@ -191,7 +211,22 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             }
             return null;
         }
-    }
+
+        public FilePath GetDiagramFilePath(Diagram diagram)
+        {
+            var filePath = System.IO.Path.GetTempPath() + diagram.Guid.ToString() + ".png";
+            if (File.Exists(filePath))
+            {
+                return new FilePath(filePath);
+            }
+            return null;
+        }
+
+		public (Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath)
+		{
+			throw new NotImplementedException();
+		}
+	}
     internal class EaProvider : IEaProvider
     {
         private EA.RepositoryClass _repository;
@@ -214,19 +249,22 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             _repository = _repository ?? _getRepository();
             EA.Package rootPackage = (EA.Package)_repository.Models.GetAt(0);
             EA.Package eaPackage = rootPackage.GetPackage(path);
-            Package package = FromEaPackage(eaPackage);
+            Package package = FromEaPackage(eaPackage, path);
             _jsonSerializer.Value.SerializeToFile(package, $@"GetElementsByPackage-{path}.json");
             return package;
         }
 
-        public Package FromEaPackage(EA.Package eaPackage)
+        public Package FromEaPackage(EA.Package eaPackage, Path parentPath = null)
         {
+            parentPath = parentPath ?? eaPackage.ToPath(_repository);
             var package = new Package
             {
                 Id = eaPackage.PackageID,
                 Name = eaPackage.Name,
                 Elements = new List<Element>(),
-                Packages = new List<Package>()
+                Packages = new List<Package>(),
+                Diagrams = new List<Diagram>(),
+                Path = parentPath,
             };
             foreach (var e in eaPackage.Elements)
             {
@@ -236,8 +274,14 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             foreach (var p in eaPackage.Packages)
             {
                 var eaChildPackage = p as EA.Package;
-                var childPackage = FromEaPackage(eaChildPackage);
+                var childPackage = FromEaPackage(eaChildPackage, package.Path);
                 package.Packages.Add(childPackage);
+            }
+            foreach (var d in eaPackage.Diagrams)
+            {
+                var eaDiagram = d as EA.Diagram;
+                var diagram = CreateDiagram(eaDiagram, package.Path);
+                package.Diagrams.Add(diagram);
             }
             return package;
         }
@@ -286,7 +330,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                         {
                             Id = e.ElementID,
                             Name = e.Name,
-                            Notes = e.Notes,
+                            Notes = e.Notes.FixNewlines(),
                             Stereotype = e.Stereotype,
                             Attributes = e.Attributes
                                 .Cast<EA.Attribute>()
@@ -299,8 +343,16 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                         {
                             Id = a.AttributeID,
                             Name = a.Name,
-                            Notes = a.Notes
+                            Notes = a.Notes.FixNewlines()
                         };
+        private static Diagram CreateDiagram(EA.Diagram d, Path parentPath) =>
+            new Diagram
+            {
+                Id = d.DiagramID,
+                Name = d.Name,
+                Notes = d.Notes.FixNewlines(),
+                Path = parentPath.CreateChild(d.Name)
+            };
 
         private IEnumerable<Element> GetElements()
         {
@@ -315,14 +367,14 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                 {
                     Id = a.AttributeID,
                     Name = a.Name,
-                    Notes = a.Notes
+                    Notes = a.Notes.FixNewlines()
                 };
             Element CreateElement(EA.Element e) =>
                 new Element
                 {
                     Id = e.ElementID,
                     Name = e.Name,
-                    Notes = e.Notes,
+                    Notes = e.Notes.FixNewlines(),
                     Stereotype = e.Stereotype,
                     Attributes = e.Attributes
                         .Cast<EA.Attribute>()
@@ -337,7 +389,56 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             var elements = GetElements();
             return elements.Where(filter);
         }
-    }
+
+        public FilePath GetDiagramFilePath(Diagram diagram)
+        {
+            _repository = _repository ?? _getRepository();
+            var eaDiagram = _repository.GetDiagramByID(diagram.Id);
+            var filePath = System.IO.Path.GetTempPath() + eaDiagram.DiagramGUID.ToString() + ".png";
+            var project = _repository.GetProjectInterface();
+            project.PutDiagramImageToFile(eaDiagram.DiagramGUID, filePath, 1);
+            var diagrams = new DiagramList { Diagrams = new List<Diagram> { diagram } };
+            _jsonSerializer.Value.SerializeToFile(diagrams, "diagramList.json");
+            return new FilePath(filePath);
+        }
+
+		private EA.Package GetPackage(Path path)
+		{
+			string root = path.Parts.FirstOrDefault();
+			EA.Package package = _repository.Models.Cast<EA.Package>().FirstOrDefault(p => p.Name == root);
+			if (package == null)
+			{
+				return null;
+			}
+			foreach (string part in path.Parts.Skip(1))
+			{
+				var childPackage = package.Packages.Cast<EA.Package>().FirstOrDefault(p => p.Name == part);
+				if (childPackage == null) // last part is the diagram
+				{
+					return package;
+				}
+				package = childPackage;
+			}
+			return package;
+		}
+
+		public (Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath)
+		{
+			_repository = _repository ?? _getRepository();
+			EA.Package package = GetPackage(bpmnElementPath);
+			var elementName = bpmnElementPath.Parts.Last();
+			var element = package.Elements.Cast<EA.Element>().FirstOrDefault(e => e.Name == elementName);
+			var laneElements = element.Elements;
+			var elements = new List<BpmnElement>();
+			foreach (var laneElement in laneElements.Cast<EA.Element>())
+			{
+				var childElements = laneElement.GetBpmnElementsRecursively().ToList();
+				childElements.ForEach(ce => ce.Lane = laneElement.Name);
+				elements.AddRange(childElements);
+			}
+			return (CreateElement(element), elements);
+		}
+	}
 
     public class Path
     {
@@ -362,6 +463,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public IEnumerable<string> Parts => _parts;
         public override string ToString() => _path;
+        public Path CreateChild(string name) => new Path(new List<string>(_parts) { name });
     }
     public class PathConverter : JsonConverter
     {
@@ -385,6 +487,9 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("notes")]
+        public string Notes { get; set; }
+
         [JsonProperty("path")]
         [JsonConverter(typeof(PathConverter))]
         public Path Path { get; set; }
@@ -399,7 +504,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("diagrams")]
         public List<Diagram> Diagrams { get; set; }
     }
-    public sealed class Element
+    public class Element
     {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -410,12 +515,43 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("stereotype")]
         public string Stereotype { get; internal set; }
 
-        [JsonProperty("notes")]
-        public string Notes { get; internal set; }
+		[JsonProperty("notes")]
+		public string Notes { get; internal set; }
 
-        [JsonProperty("attributes")]
+		[JsonProperty("type")]
+		public string Type { get; internal set; }
+
+		[JsonProperty("attributes")]
         public List<Attribute> Attributes { get; internal set; }
-    }
+
+		[JsonProperty("alias")]
+		public string Alias { get; set; }
+	}
+	public sealed class BpmnElement : Element
+	{
+		public class AliasComparer : IComparer<BpmnElement>
+		{
+			public int Compare(BpmnElement left, BpmnElement right)
+			{
+				if (string.IsNullOrEmpty(left.Alias) && string.IsNullOrEmpty(right.Alias))
+				{
+					return 0;
+				}
+				if (string.IsNullOrEmpty(left.Alias) && !string.IsNullOrEmpty(right.Alias))
+				{
+					return 1;
+				}
+				if (!string.IsNullOrEmpty(left.Alias) && string.IsNullOrEmpty(right.Alias))
+				{
+					return -1;
+				}
+				return string.Compare(left.Alias, right.Alias);
+			}
+		}
+
+		[JsonProperty("lane")]
+		public string Lane { get; set; }
+	}
     public sealed class Attribute
     {
         [JsonProperty("id")]
@@ -427,7 +563,20 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("notes")]
         public string Notes { get; internal set; }
     }
+	public sealed class Lane
+	{
+		[JsonProperty("id")]
+		public int Id { get; set; }
 
+		[JsonProperty("name")]
+		public string Name { get; internal set; }
+
+		[JsonProperty("notes")]
+		public string Notes { get; internal set; }
+
+		[JsonProperty("elements")]
+		public List<Element> Elements { get; set; }
+	}
     public sealed class Package
     {
         [JsonProperty("id")]
@@ -439,8 +588,15 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("packages")]
         public List<Package> Packages { get; internal set; }
 
+        [JsonProperty("diagrams")]
+        public List<Diagram> Diagrams { get; internal set; }
+
         [JsonProperty("name")]
         public string Name { get; internal set; }
+
+        [JsonProperty("path")]
+        [JsonConverter(typeof(PathConverter))]
+        public Path Path { get; set; }
     }
 
     public static class PackageExtensions
@@ -456,4 +612,24 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return elements;
         }
     }
+	public static class ElementExtensions
+	{
+		public static IEnumerable<BpmnElement> GetBpmnElementsRecursively(this EA.Element element, List<BpmnElement> elements = null)
+		{
+			elements = elements ?? new List<BpmnElement>();
+			elements.Add(new BpmnElement
+			{
+				Id = element.ElementID,
+				Name = element.Name,
+				Notes = element.Notes,
+				Type = element.Type,
+				Alias = element.Alias
+			});
+			foreach(var e in element.Elements.Cast<EA.Element>())
+			{
+				GetBpmnElementsRecursively(e, elements);
+			}
+			return elements;
+		}
+	}
 }
