@@ -34,7 +34,7 @@ namespace MarkdownExtensions.Console
 			var scope = new ThreadScopedLifestyle();
 			container.Options.DefaultScopedLifestyle = scope;
 			container.RegisterInstance(formatSettings);
-			Ea.Plugin.Register(container, scope);
+			Ea.Plugin.Register(container);
 			container.Collection.Register<IMarkdownExtension>(
 				typeof(FolderFromDiskExtension),
 				typeof(SnippetExtension),
@@ -194,9 +194,9 @@ namespace MarkdownExtensions.Console
             var csss = new StringBuilder();
             csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
             var body = new StringBuilder();
-            foreach (var entry in cheatSheetByExtensionName)
-            {
-				using (ThreadScopedLifestyle.BeginScope(container))
+			using (ThreadScopedLifestyle.BeginScope(container))
+			{
+				foreach (var entry in cheatSheetByExtensionName)
 				{
 					var markdown = entry.Value;
 					var writer = new StringWriter();
@@ -229,9 +229,9 @@ namespace MarkdownExtensions.Console
 							<article>{html}</article>
 						</section>";
 					body.AppendLine(tab);
+					i += 1;
 				}
-                i += 1;
-            }
+			}
             var htmlDocument = $@"
 				<html>
 					<head>

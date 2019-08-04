@@ -229,8 +229,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 	}
     internal class EaProvider : IEaProvider
     {
-        private EA.RepositoryClass _repository;
-        private readonly Func<RepositoryWrapper> _getRepository;
+        private RepositoryWrapper _repository;
         private List<Element> _elements;
         private readonly Lazy<JsonSerializer> _jsonSerializer = new Lazy<JsonSerializer>(() =>
         {
@@ -239,15 +238,14 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return jsonSerializer;
         });
 
-        public EaProvider(Func<RepositoryWrapper> getRepository)
+        public EaProvider(RepositoryWrapper repository)
         {
-            _getRepository = getRepository;
+            _repository = repository;
         }
 
         public Package GetElementsByPackage(Path path)
         {
-            _repository = _repository ?? _getRepository();
-            EA.Package rootPackage = (EA.Package)_repository.Models.GetAt(0);
+            EA.Package rootPackage = (EA.Package)_repository.Repository.Models.GetAt(0);
             EA.Package eaPackage = rootPackage.GetPackage(path);
             Package package = FromEaPackage(eaPackage, path);
             _jsonSerializer.Value.SerializeToFile(package, $@"GetElementsByPackage-{path}.json");
@@ -288,15 +286,14 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public FilePath GetDiagramFilePath(string diagramName)
         {
-            _repository = _repository ?? _getRepository();
-            EA.Package rootPackage = (EA.Package)_repository.Models.GetAt(0);
+            EA.Package rootPackage = (EA.Package)_repository.Repository.Models.GetAt(0);
             bool Filter(EA.Diagram diagram) => diagram.Name.Equals(diagramName);
             EA.Diagram eaDiagram = rootPackage.GetDiagrams(Filter).FirstOrDefault();
             var filePath = System.IO.Path.GetTempPath() + eaDiagram.DiagramGUID.ToString() + ".png";
-            var project = _repository.GetProjectInterface();
+            var project = _repository.Repository.GetProjectInterface();
             project.PutDiagramImageToFile(eaDiagram.DiagramGUID, filePath, 1);
-            var package = _repository.GetPackageByID(eaDiagram.PackageID);
-            var path = package.ToPath(_repository);
+            var package = _repository.Repository.GetPackageByID(eaDiagram.PackageID);
+            var path = package.ToPath(_repository.Repository);
             var diagrams = new DiagramList
             {
                 Diagrams = new List<Diagram>
@@ -316,8 +313,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public Element GetElementByName(string elementName)
         {
-            _repository = _repository ?? _getRepository();
-            var package = (EA.Package)_repository.Models.GetAt(0);
+            var package = (EA.Package)_repository.Repository.Models.GetAt(0);
             var elements = package.GetElements(e => true).Select(CreateElement).ToList();
             var elementsList = new ElementList { Elements = elements };
             _jsonSerializer.Value.SerializeToFile(elementsList, "elementList.json");
@@ -360,8 +356,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             {
                 return _elements;
             }
-            _repository = _repository ?? _getRepository();
-            var package = (EA.Package)_repository.Models.GetAt(0);
+            var package = (EA.Package)_repository.Repository.Models.GetAt(0);
             Attribute CreateAttribute(EA.Attribute a) =>
                 new Attribute
                 {
@@ -392,10 +387,9 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public FilePath GetDiagramFilePath(Diagram diagram)
         {
-            _repository = _repository ?? _getRepository();
-            var eaDiagram = _repository.GetDiagramByID(diagram.Id);
+            var eaDiagram = _repository.Repository.GetDiagramByID(diagram.Id);
             var filePath = System.IO.Path.GetTempPath() + eaDiagram.DiagramGUID.ToString() + ".png";
-            var project = _repository.GetProjectInterface();
+            var project = _repository.Repository.GetProjectInterface();
             project.PutDiagramImageToFile(eaDiagram.DiagramGUID, filePath, 1);
             var diagrams = new DiagramList { Diagrams = new List<Diagram> { diagram } };
             _jsonSerializer.Value.SerializeToFile(diagrams, "diagramList.json");
@@ -405,7 +399,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 		private EA.Package GetPackage(Path path)
 		{
 			string root = path.Parts.FirstOrDefault();
-			EA.Package package = _repository.Models.Cast<EA.Package>().FirstOrDefault(p => p.Name == root);
+			EA.Package package = _repository.Repository.Models.Cast<EA.Package>().FirstOrDefault(p => p.Name == root);
 			if (package == null)
 			{
 				return null;
@@ -424,7 +418,6 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
 		public (Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath)
 		{
-			_repository = _repository ?? _getRepository();
 			EA.Package package = GetPackage(bpmnElementPath);
 			var elementName = bpmnElementPath.Parts.Last();
 			var element = package.Elements.Cast<EA.Element>().FirstOrDefault(e => e.Name == elementName);
