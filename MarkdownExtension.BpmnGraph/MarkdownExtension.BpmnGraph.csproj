@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="bpmn-graph.css" />
+    <None Remove="bpmn-viewer.development.js" />
+    <None Remove="CheatSheet.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="bpmn-graph.css" />
+    <EmbeddedResource Include="bpmn-viewer.development.js" />
+    <EmbeddedResource Include="CheatSheet.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarkdownExtensions\MarkdownExtensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="BpmnWorkflow.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

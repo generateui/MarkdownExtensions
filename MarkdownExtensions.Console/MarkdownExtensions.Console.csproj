@@ -59,6 +59,10 @@
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MarkdownExtension.BpmnGraph\MarkdownExtension.BpmnGraph.csproj">
+      <Project>{887B3EA6-DEC6-4F80-9BB6-90115237477A}</Project>
+      <Name>MarkdownExtension.BpmnGraph</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MarkdownExtension.EnterpriseArchitect\MarkdownExtension.EnterpriseArchitect.csproj">
       <Project>{2AD26007-FC70-408A-AD40-BAE771551289}</Project>
       <Name>MarkdownExtension.EnterpriseArchitect</Name>

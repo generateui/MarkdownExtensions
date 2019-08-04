@@ -26,5 +26,11 @@ namespace MarkdownExtensions
 			var typedAstNode = astNode as TModel;
 			Transform(typedBlock, typedAstNode);
 		}
+		protected void Replace(Block block, MarkdownDocument document)
+		{
+			var index = block.Parent.IndexOf(block);
+			block.Parent.Insert(index, document);
+			block.Parent.RemoveAt(index + 1);
+		}
 	}
 }

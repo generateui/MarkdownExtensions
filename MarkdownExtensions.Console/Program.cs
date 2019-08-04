@@ -18,6 +18,7 @@ using MarkdownExtension.GitHistory;
 using MarkdownExtension.GitGraph;
 using System.Linq;
 using MarkdownExtension.EnterpriseArchitect.WorkflowNotes;
+using MarkdownExtension.BpmnGraph;
 
 namespace MarkdownExtensions.Console
 {
@@ -33,7 +34,7 @@ namespace MarkdownExtensions.Console
 			var scope = new ThreadScopedLifestyle();
 			container.Options.DefaultScopedLifestyle = scope;
 			container.RegisterInstance(formatSettings);
-			Ea.Plugin.Register(container);
+			Ea.Plugin.Register(container, scope);
 			container.Collection.Register<IMarkdownExtension>(
 				typeof(FolderFromDiskExtension),
 				typeof(SnippetExtension),
@@ -43,6 +44,7 @@ namespace MarkdownExtensions.Console
 				typeof(GitHistoryExtension),
 				typeof(GitGraphExtension),
 				typeof(WorkflowNotesExtension),
+				typeof(BpmnGraphExtension),
 				typeof(NestedBlockExtension)
 			);
 			container.Collection.Register<IExtensionInfo>(
@@ -50,11 +52,12 @@ namespace MarkdownExtensions.Console
 				typeof(FolderFromDiskExtensionInfo),
 				typeof(MsSqlTableExtensionInfo),
 				typeof(PanZoomImageExtensionInfo),
-				typeof(GitGraphExtensionInfo),
+				//typeof(GitGraphExtensionInfo),
 				typeof(GitHistoryExtensionInfo),
 				typeof(KeyboardKeysExtensionInfo),
 				typeof(ExcelTableExtensionInfo),
 				typeof(WorkflowNotesExtensionInfo),
+				typeof(BpmnGraphExtensionInfo),
 				typeof(SnippetExtensionInfo)
 			);
 			//typeof(Ea.ObjectText),
@@ -62,16 +65,28 @@ namespace MarkdownExtensions.Console
 			//typeof(Ea.TableNotes),
 			//typeof(Ea.RequirementsTable),
 
+			// Arguments:
+			// - selfcontained (embed all into single html)
+
 			System.Console.WriteLine("Marking down...");
             if (args.Length > 0)
             {
-                File(args[0], null);
-            }
+				string path = args[0];
+				if (System.IO.File.Exists(path))
+				{
+					File(path, null);
+				}
+				if (System.IO.Directory.Exists(path))
+				{
+					Directory(path, null);
+				}
+			}
             else
             {
                 AggregateCheatSheet(container);
             }
         }
+
 
 		private static MarkdownPipeline CreatePipeline(Container container)
 		{
@@ -87,6 +102,7 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<MsSqlTableExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
 			var pipeline = pipelineBuilder.Build();
@@ -104,11 +120,24 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<GitHistoryBlock, GitHistoryExtension>();
 			renderer.RegisterBlock<GitGraphBlock, GitGraphExtension>();
 			renderer.RegisterBlock<WorkflowNotesBlock, WorkflowNotesExtension>();
+			renderer.RegisterBlock<BpmnGraphBlock, BpmnGraphExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}
 
-        private static void File(string fileName, Container container)
+		private static void Directory(string path, Container container)
+		{
+			var fileName = System.IO.Path.GetFileName(path);
+			// 1. pickup markdown file
+			// 2. generate html in /rendered
+			// 3. write images to /images
+			// 4. write css to /css
+			// 5. write js to /javascript
+			// 6. write extension caches to /{ExtensionName}
+			// 7. write markdown to /rendered
+		}
+
+		private static void File(string fileName, Container container)
         {
             var scripts = new StringBuilder();
             var csss = new StringBuilder();

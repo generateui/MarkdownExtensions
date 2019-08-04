@@ -1,4 +1,7 @@
-﻿.tabordion {
+﻿article {
+	width: 100%;
+}
+.tabordion {
     color: #333;
     display: block;
     margin: auto;

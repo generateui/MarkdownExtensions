@@ -29,6 +29,19 @@ namespace MarkdownExtensions.Extensions.Snippet
 			return 0;
 		}
 	}
+	public static class ContainerBlockExtensions
+	{
+		public static void IncreaseHeadingLevel(this ContainerBlock containerBlock, int levelDiff)
+		{
+			foreach (Block child in containerBlock)
+			{
+				if (child is HeadingBlock headingBlock)
+				{
+					headingBlock.Level += levelDiff;
+				}
+			}
+		}
+	}
 	public class SnippetTransformer : TransformerBase<SnippetBlock, Snippet>
 	{
 		public override void Transform(SnippetBlock block, Snippet astNode)
@@ -41,16 +54,12 @@ namespace MarkdownExtensions.Extensions.Snippet
 			{
 				level -= 1;
 			}
-			SetHeadingLevel(document, level);
+			document.IncreaseHeadingLevel(level);
 			if (astNode.HeadingName != null)
 			{
 				document = GetByHeadingName(document, astNode.HeadingName);
 			}
-
-			// replace
-			var index = block.Parent.IndexOf(block);
-			block.Parent.Insert(index, document);
-			block.Parent.RemoveAt(index + 1);
+			Replace(block, document);
 		}
 
 		// Note: this cannot be made an extension method as the parent is set
@@ -84,17 +93,6 @@ namespace MarkdownExtensions.Extensions.Snippet
 				}
 			}
 			return document;
-		}
-
-		private void SetHeadingLevel(ContainerBlock block, int levelDiff)
-		{
-			foreach (Block child in block)
-			{
-				if (child is HeadingBlock headingBlock)
-				{
-					headingBlock.Level += levelDiff;
-				}
-			}
 		}
 	}
 }

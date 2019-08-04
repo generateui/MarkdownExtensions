@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="EAPK_09D5495A_73B0_46db_BCF6_CDA5549DBA2D" targetNamespace="www.sparxsystems.com.au/bpmn20" xmlns:ssbp="www.sparxsystems.com.au/bpmn20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" exporter="Enterprise Architect" exporterVersion="14.1.1429" name="Workflow">
+	<bpmn:process id="EAID_B01DCC96_49C7_4ade_8A92_EE6D57611020" name="BpmnWorkflow" isClosed="false" processType="None">
+		<bpmn:ioSpecification>
+			<bpmn:dataInput id="EAID_1A2178E0_BABC_4de7_93F8_CDB43CD6553D" name="DataObject1" isCollection="false">
+				<bpmn:documentation>Store it in an external interface</bpmn:documentation>
+			</bpmn:dataInput>
+			<bpmn:inputSet>
+				<bpmn:dataInputRefs>EAID_1A2178E0_BABC_4de7_93F8_CDB43CD6553D</bpmn:dataInputRefs>
+			</bpmn:inputSet>
+			<bpmn:outputSet/>
+		</bpmn:ioSpecification>
+		<bpmn:laneSet id="EAID_LS000000_49C7_4ade_8A92_EE6D57611020">
+			<bpmn:lane id="EAID_1096DE80_8C7B_4709_A9DB_8B881EA66480" name="Lane1"/>
+			<bpmn:lane id="EAID_71235322_246B_47be_BC1D_B365C79528E8" name="Lane2">
+				<bpmn:flowNodeRef>EAID_10301E1F_8880_41cd_ABFF_72F8CC09D61F</bpmn:flowNodeRef>
+				<bpmn:flowNodeRef>EAID_CFD8F192_2B7D_4508_A5B6_82DC6EFF8F95</bpmn:flowNodeRef>
+				<bpmn:flowNodeRef>EAID_3208728C_E415_4991_ACE3_839A63C6D637</bpmn:flowNodeRef>
+				<bpmn:flowNodeRef>EAID_9604D422_235C_41f0_ADFD_6FE9FF21C26C</bpmn:flowNodeRef>
+				<bpmn:flowNodeRef>EAID_C1766C70_2519_4f48_8B51_73BA1E311958</bpmn:flowNodeRef>
+				<bpmn:flowNodeRef>EAID_619FD00E_6AEA_4446_866E_C4B0BC60B756</bpmn:flowNodeRef>
+				<bpmn:flowNodeRef>EAID_E8BB95A7_CECD_433b_998F_438C53E6315F</bpmn:flowNodeRef>
+			</bpmn:lane>
+		</bpmn:laneSet>
+		<bpmn:exclusiveGateway id="EAID_10301E1F_8880_41cd_ABFF_72F8CC09D61F" gatewayDirection="Unspecified">
+			<bpmn:documentation>A decision should be made</bpmn:documentation>
+			<bpmn:incoming>EAID_38FC7B3C_3D31_45d1_9D9D_46EB57799C49</bpmn:incoming>
+			<bpmn:outgoing>EAID_EED8B5BE_8FA6_4c9b_9247_087E1C518ECF</bpmn:outgoing>
+			<bpmn:outgoing>EAID_3220C801_3078_46c0_A5C0_A980AA75FC3E</bpmn:outgoing>
+		</bpmn:exclusiveGateway>
+		<bpmn:startEvent id="EAID_CFD8F192_2B7D_4508_A5B6_82DC6EFF8F95" name="StartEvent1" isInterrupting="true" parallelMultiple="false">
+			<bpmn:documentation>Start doing stuffz</bpmn:documentation>
+			<bpmn:outgoing>EAID_644B9ED1_85EE_456d_8FFC_D756A204071D</bpmn:outgoing>
+		</bpmn:startEvent>
+		<bpmn:endEvent id="EAID_3208728C_E415_4991_ACE3_839A63C6D637" name="EndEvent1">
+			<bpmn:documentation>End of workflow, done!</bpmn:documentation>
+			<bpmn:incoming>EAID_1DB6F2A1_D285_4803_AE8D_DD85CA45976D</bpmn:incoming>
+			<bpmn:incoming>EAID_C40CF3E4_3CFB_4db1_BC09_1D14FDFC747B</bpmn:incoming>
+		</bpmn:endEvent>
+		<bpmn:task id="EAID_9604D422_235C_41f0_ADFD_6FE9FF21C26C" name="Activity4" startQuantity="1" completionQuantity="1" isForCompensation="false">
+			<bpmn:documentation>We are going to store some stuffz</bpmn:documentation>
+			<bpmn:incoming>EAID_3220C801_3078_46c0_A5C0_A980AA75FC3E</bpmn:incoming>
+			<bpmn:outgoing>EAID_C40CF3E4_3CFB_4db1_BC09_1D14FDFC747B</bpmn:outgoing>
+			<bpmn:ioSpecification>
+				<bpmn:dataOutput id="EAID_DDIO000000_235C_41f0_ADFD_6FE9FF21C26C" isCollection="false"/>
+				<bpmn:inputSet/>
+				<bpmn:outputSet>
+					<bpmn:dataOutputRefs>EAID_DDIO000000_235C_41f0_ADFD_6FE9FF21C26C</bpmn:dataOutputRefs>
+				</bpmn:outputSet>
+			</bpmn:ioSpecification>
+			<bpmn:dataOutputAssociation id="EAID_F8C2CC68_E614_449e_A3CE_F23D9E41CB72">
+				<bpmn:sourceRef>EAID_DDIO000000_235C_41f0_ADFD_6FE9FF21C26C</bpmn:sourceRef>
+				<bpmn:targetRef>EAID_1A2178E0_BABC_4de7_93F8_CDB43CD6553D</bpmn:targetRef>
+			</bpmn:dataOutputAssociation>
+		</bpmn:task>
+		<bpmn:sequenceFlow id="EAID_C40CF3E4_3CFB_4db1_BC09_1D14FDFC747B" sourceRef="EAID_9604D422_235C_41f0_ADFD_6FE9FF21C26C" targetRef="EAID_3208728C_E415_4991_ACE3_839A63C6D637"/>
+		<bpmn:sequenceFlow id="EAID_3220C801_3078_46c0_A5C0_A980AA75FC3E" sourceRef="EAID_10301E1F_8880_41cd_ABFF_72F8CC09D61F" targetRef="EAID_9604D422_235C_41f0_ADFD_6FE9FF21C26C"/>
+		<bpmn:task id="EAID_C1766C70_2519_4f48_8B51_73BA1E311958" name="Activity3" startQuantity="1" completionQuantity="1" isForCompensation="false">
+			<bpmn:documentation>No storage required, just go to the end</bpmn:documentation>
+			<bpmn:incoming>EAID_EED8B5BE_8FA6_4c9b_9247_087E1C518ECF</bpmn:incoming>
+			<bpmn:outgoing>EAID_1DB6F2A1_D285_4803_AE8D_DD85CA45976D</bpmn:outgoing>
+		</bpmn:task>
+		<bpmn:sequenceFlow id="EAID_1DB6F2A1_D285_4803_AE8D_DD85CA45976D" sourceRef="EAID_C1766C70_2519_4f48_8B51_73BA1E311958" targetRef="EAID_3208728C_E415_4991_ACE3_839A63C6D637"/>
+		<bpmn:sequenceFlow id="EAID_EED8B5BE_8FA6_4c9b_9247_087E1C518ECF" sourceRef="EAID_10301E1F_8880_41cd_ABFF_72F8CC09D61F" targetRef="EAID_C1766C70_2519_4f48_8B51_73BA1E311958"/>
+		<bpmn:task id="EAID_619FD00E_6AEA_4446_866E_C4B0BC60B756" name="Activity2" startQuantity="1" completionQuantity="1" isForCompensation="false"/>
+		<bpmn:task id="EAID_E8BB95A7_CECD_433b_998F_438C53E6315F" name="Activity1" startQuantity="1" completionQuantity="1" isForCompensation="false">
+			<bpmn:documentation>This is the first activity</bpmn:documentation>
+			<bpmn:incoming>EAID_644B9ED1_85EE_456d_8FFC_D756A204071D</bpmn:incoming>
+			<bpmn:outgoing>EAID_38FC7B3C_3D31_45d1_9D9D_46EB57799C49</bpmn:outgoing>
+		</bpmn:task>
+		<bpmn:sequenceFlow id="EAID_38FC7B3C_3D31_45d1_9D9D_46EB57799C49" sourceRef="EAID_E8BB95A7_CECD_433b_998F_438C53E6315F" targetRef="EAID_10301E1F_8880_41cd_ABFF_72F8CC09D61F"/>
+		<bpmn:sequenceFlow id="EAID_644B9ED1_85EE_456d_8FFC_D756A204071D" sourceRef="EAID_CFD8F192_2B7D_4508_A5B6_82DC6EFF8F95" targetRef="EAID_E8BB95A7_CECD_433b_998F_438C53E6315F"/>
+		<bpmn:dataObject id="EAID_DD0880D6_7FE9_438d_AD37_EF4D64441266" name="DataObject2" isCollection="false"/>
+	</bpmn:process>
+	<bpmndi:BPMNDiagram id="EAID_475051DA_A3B2_4247_AB9A_699F8B8D9455" name="BpmnWorkflow">
+		<bpmndi:BPMNPlane id="EAID_PL000000_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_B01DCC96_49C7_4ade_8A92_EE6D57611020">
+			<bpmndi:BPMNShape id="EAID_DO000000_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_1096DE80_8C7B_4709_A9DB_8B881EA66480" isHorizontal="true">
+				<dc:Bounds x="12" y="236" width="573" height="150"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_8C7B_4709_A9DB_8B881EA66480" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000001_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_71235322_246B_47be_BC1D_B365C79528E8" isHorizontal="true">
+				<dc:Bounds x="12" y="16" width="573" height="220"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_246B_47be_BC1D_B365C79528E8" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000002_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_CFD8F192_2B7D_4508_A5B6_82DC6EFF8F95">
+				<dc:Bounds x="55" y="72" width="30" height="30"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_2B7D_4508_A5B6_82DC6EFF8F95" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455">
+					<dc:Bounds x="56" y="112" width="49" height="15"/>
+				</bpmndi:BPMNLabel>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000003_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_E8BB95A7_CECD_433b_998F_438C53E6315F">
+				<dc:Bounds x="127" y="57" width="110" height="60"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_CECD_433b_998F_438C53E6315F" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000004_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_10301E1F_8880_41cd_ABFF_72F8CC09D61F" isMarkerVisible="false">
+				<dc:Bounds x="284" y="66" width="42" height="42"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000005_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_1A2178E0_BABC_4de7_93F8_CDB43CD6553D">
+				<dc:Bounds x="293" y="303" width="35" height="50"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_BABC_4de7_93F8_CDB43CD6553D" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455">
+					<dc:Bounds x="294" y="363" width="52" height="15"/>
+				</bpmndi:BPMNLabel>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000006_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_C1766C70_2519_4f48_8B51_73BA1E311958">
+				<dc:Bounds x="369" y="57" width="110" height="60"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_2519_4f48_8B51_73BA1E311958" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000007_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_9604D422_235C_41f0_ADFD_6FE9FF21C26C">
+				<dc:Bounds x="250" y="150" width="110" height="60"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_235C_41f0_ADFD_6FE9FF21C26C" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455"/>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape id="EAID_DO000008_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_3208728C_E415_4991_ACE3_839A63C6D637">
+				<dc:Bounds x="531" y="72" width="30" height="30"/>
+				<bpmndi:BPMNLabel id="EAID_LBL000000_E415_4991_ACE3_839A63C6D637" labelStyle="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455">
+					<dc:Bounds x="523" y="48" width="45" height="15"/>
+				</bpmndi:BPMNLabel>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge id="EAID_DL000000_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_644B9ED1_85EE_456d_8FFC_D756A204071D">
+				<di:waypoint x="85" y="87"/>
+				<di:waypoint x="127" y="87"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000001_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_C40CF3E4_3CFB_4db1_BC09_1D14FDFC747B">
+				<di:waypoint x="360" y="180"/>
+				<di:waypoint x="546" y="180"/>
+				<di:waypoint x="546" y="102"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000002_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_1DB6F2A1_D285_4803_AE8D_DD85CA45976D">
+				<di:waypoint x="479" y="87"/>
+				<di:waypoint x="531" y="87"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000003_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_3220C801_3078_46c0_A5C0_A980AA75FC3E">
+				<di:waypoint x="305" y="108"/>
+				<di:waypoint x="305" y="150"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000004_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_F8C2CC68_E614_449e_A3CE_F23D9E41CB72" sourceElement="EAID_DO000007_A3B2_4247_AB9A_699F8B8D9455">
+				<di:waypoint x="309" y="210"/>
+				<di:waypoint x="309" y="303"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000005_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_EED8B5BE_8FA6_4c9b_9247_087E1C518ECF">
+				<di:waypoint x="326" y="87"/>
+				<di:waypoint x="369" y="87"/>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge id="EAID_DL000006_A3B2_4247_AB9A_699F8B8D9455" bpmnElement="EAID_38FC7B3C_3D31_45d1_9D9D_46EB57799C49">
+				<di:waypoint x="237" y="87"/>
+				<di:waypoint x="284" y="87"/>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+		<bpmndi:BPMNLabelStyle id="EAID_LS000000_A3B2_4247_AB9A_699F8B8D9455">
+			<dc:Font name="Calibri" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</bpmndi:BPMNLabelStyle>
+	</bpmndi:BPMNDiagram>
+</bpmn:definitions>
