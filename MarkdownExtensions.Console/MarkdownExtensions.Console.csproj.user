@@ -4,7 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>
-    </StartArguments>
+    <StartArguments>c:\users\ruudp\desktop\sospes\requirements.md</StartArguments>
   </PropertyGroup>
 </Project>

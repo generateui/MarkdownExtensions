@@ -2,9 +2,9 @@
 
 namespace MarkdownExtension.EnterpriseArchitect.Diagram
 {
-	public class DiagramParser : BlockExtensionParser<DiagramBlock>
+	public class DiagramBlockParser : BlockExtensionParser<DiagramBlock>
 	{
-		public DiagramParser()
+		public DiagramBlockParser()
 		{
 			InfoPrefix = "ea-diagram";
 			_create = _ => new DiagramBlock(this);

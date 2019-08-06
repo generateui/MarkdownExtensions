@@ -13,23 +13,17 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 			Renderer = new DiagramRenderer(provider);
 		}
 
-		public string Prefix => "ea-diagram";
 		public IParser Parser { get; }
 		public IRenderer Renderer { get; }
+		public IValidator Validator => null;
+		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "EA diagram";
 		public ExtensionName Name => NAME;
-		public IValidator Validator => null;
 
-		public ITransformer Transformer => throw new System.NotImplementedException();
+		public void Setup(MarkdownPipelineBuilder pipeline) =>
+			pipeline.BlockParsers.Insert(0, new DiagramBlockParser());
 
-		public void Setup(MarkdownPipelineBuilder pipeline)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
-		{
-			throw new System.NotImplementedException();
-		}
+		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) =>
+			renderer.ObjectRenderers.Insert(0, Renderer);
 	}
 }
