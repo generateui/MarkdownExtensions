@@ -29,8 +29,9 @@ namespace MarkdownExtension.EnterpriseArchitect
 							folder = System.IO.Path.GetDirectoryName(folder);
 							var file = "EaTest.eapx";
 							var filePath = System.IO.Path.Combine(folder, file);
-							_repository.OpenFile(new Uri(filePath).AbsolutePath);
-                        }
+							//_repository.OpenFile(new Uri(filePath).AbsolutePath);
+							_repository.OpenFile(@"c:\users\ruudp\desktop\ARS.eap");
+						}
                         catch (Exception)
                         {
                             return null;
@@ -42,10 +43,12 @@ namespace MarkdownExtension.EnterpriseArchitect
 
             public void Dispose()
             {
-                Repository.CloseFile();
-                //Marshal.ReleaseComObject(Repository);
-                Repository.Exit();
-            }
+				if (_repository != null)
+				{
+					Repository.CloseFile();
+					Repository.Exit();
+				}
+			}
 
             public static implicit operator RepositoryClass (RepositoryWrapper wrapper)
             {
