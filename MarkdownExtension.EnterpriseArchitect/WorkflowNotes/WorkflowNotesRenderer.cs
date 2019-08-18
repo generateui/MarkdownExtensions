@@ -13,7 +13,6 @@ namespace MarkdownExtension.EnterpriseArchitect.WorkflowNotes
 		{
 			_provider = provider;
 		}
-		// ARS T&TT.Products.SOSPES Permit.Tenants.Antwerp.SSS SOSPES Permit Antwerp.Workflows.Resident permit.Request.Request.Request resident
 		public override void Render(ExtensionHtmlRenderer renderer, Diagram diagram, IFormatState formatState)
 		{
 			var (element, elementsEnumerable) = _provider.GetBpmnElements(new Path(diagram.Name));

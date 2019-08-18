@@ -28,12 +28,7 @@ namespace MarkdownExtension.EnterpriseArchitect.WorkflowNotes
 			var sb = new StringBuilder();
 			sb.AppendLine($@"# {element.Name}");
 			var converter = new Html2Markdown.Converter();
-			// notes may contain html and markdown, so to include:
-			// 1. Convert html into markdown
-			// 2. Parse markdown into ast
-			// 3. Normalize headings
-			// 4. Convert ast into markdown text
-			// 5. Add markdown text to stream
+
 			foreach (BpmnElement e in elements)
 			{
 				string name = string.IsNullOrEmpty(e.Name) ? e.Alias : e.Name;

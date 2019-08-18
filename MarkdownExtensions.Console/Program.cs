@@ -112,7 +112,8 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
-
+			var tableNotesExtension = container.GetInstance<TableNotesExtension>();
+			pipelineBuilder.Extensions.Add(tableNotesExtension);
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
 

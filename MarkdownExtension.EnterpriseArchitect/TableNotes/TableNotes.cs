@@ -19,7 +19,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 			{
 				return true;
 			}
-			return tnm.Tables.Any(t => Equals(t, e.Name));
+			return tnm.Tables.Any(t => Equals(t.Name, e.Name));
 		}
 	}
 	public class Table
