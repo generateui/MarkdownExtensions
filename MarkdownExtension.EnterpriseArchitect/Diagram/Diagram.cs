@@ -3,5 +3,6 @@
 	public class Diagram
 	{
 		public string Path { get; set; }
+		public string PackagePath { get; set; }
 	}
 }

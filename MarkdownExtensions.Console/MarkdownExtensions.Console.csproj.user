@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>C:\Users\ruudp\Desktop\GitContractors.md</StartArguments>
+    <StartArguments>C:\Users\ruudp\Desktop\SOSPES\Repos\permit-services\doc</StartArguments>
   </PropertyGroup>
 </Project>

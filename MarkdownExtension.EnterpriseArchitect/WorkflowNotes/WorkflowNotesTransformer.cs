@@ -20,7 +20,7 @@ namespace MarkdownExtension.EnterpriseArchitect.WorkflowNotes
 			_provider = provider;
 		}
 
-		public override void Transform(WorkflowNotesBlock block, Diagram diagram)
+		public override void Transform(ExtensionHtmlRenderer extensionHtmlRenderer, WorkflowNotesBlock block, Diagram diagram)
 		{
 			var (element, elementsEnumerable) = _provider.GetBpmnElements(new EaProvider.Path(diagram.Name));
 			var elements = elementsEnumerable.ToList();

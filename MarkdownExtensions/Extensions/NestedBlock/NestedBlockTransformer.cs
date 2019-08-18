@@ -5,7 +5,7 @@ namespace MarkdownExtensions.Extensions.NestedBlock
 {
 	public class NestedBlockTransformer : ITransformer
 	{
-		public void Transform(FencedCodeBlock block, object astNode)
+		public void Transform(ExtensionHtmlRenderer extensionHtmlRenderer, FencedCodeBlock block, object astNode)
 		{
 			NestedBlock nestedBlock = astNode as NestedBlock;
 			// 1. parse markdown
