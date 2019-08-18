@@ -16,14 +16,15 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 
 		public override void Render(ExtensionHtmlRenderer renderer, Diagram diagram, IFormatState formatState)
 		{
-			FilePath filePath = _provider.GetDiagramFilePath(diagram.Name);
+			var path = new EaProvider.Path(diagram.Path);
+			FilePath filePath = _provider.GetDiagramFilePath(path);
 			if (File.Exists(filePath.Value))
 			{
 				var bytes = File.ReadAllBytes(filePath.Value);
 				var base64 = Convert.ToBase64String(bytes);
 				renderer.Write($@"<img src='data:image/png;base64,{base64}' />");
 			}
-			renderer.Write($@"<p>something went wrong retrieving the image {diagram.Name}</p>");
+			renderer.Write($@"<p>something went wrong retrieving the image [{diagram.Path}]</p>");
 		}
 	}
 }

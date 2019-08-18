@@ -10,8 +10,8 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
         public TableNotesExtension(IEaProvider provider)
         {
             Parser = new TableNotesSyntax();
-            Transformer = new TableNotesTransformer(provider);
             Validator = new TableNotesValidator(provider);
+			Transformer = new TableNotesTransformer(provider);
         }
 
         public IParser Parser { get; }

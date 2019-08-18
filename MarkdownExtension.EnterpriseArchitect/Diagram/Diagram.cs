@@ -2,6 +2,6 @@
 {
 	public class Diagram
 	{
-		public string Name { get; set; }
+		public string Path { get; set; }
 	}
 }

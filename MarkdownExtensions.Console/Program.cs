@@ -19,6 +19,7 @@ using MarkdownExtension.GitGraph;
 using System.Linq;
 using MarkdownExtension.EnterpriseArchitect.WorkflowNotes;
 using MarkdownExtension.BpmnGraph;
+using MarkdownExtension.EnterpriseArchitect.Diagram;
 using MarkdownExtension.EnterpriseArchitect.TableNotes;
 
 namespace MarkdownExtensions.Console
@@ -46,6 +47,8 @@ namespace MarkdownExtensions.Console
 				typeof(GitGraphExtension),
 				typeof(WorkflowNotesExtension),
 				typeof(BpmnGraphExtension),
+				typeof(DiagramImageExtension),
+				typeof(TableNotesExtension),
 				typeof(NestedBlockExtension)
 			);
 			container.Collection.Register<IExtensionInfo>(
@@ -76,11 +79,11 @@ namespace MarkdownExtensions.Console
 				string path = args[0];
 				if (System.IO.File.Exists(path))
 				{
-					File(path, null);
+					File(path, container);
 				}
 				if (System.IO.Directory.Exists(path))
 				{
-					Directory(path, null);
+					Directory(path, container);
 				}
 			}
             else
@@ -109,6 +112,10 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.Add(tableNotesExtension);
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
+			var tableNotesExtension = container.GetInstance<TableNotesExtension>();
+			pipelineBuilder.Extensions.Add(tableNotesExtension);
+			var diagramImageExtensionExtension = container.GetInstance<DiagramImageExtension>();
+			pipelineBuilder.Extensions.Add(diagramImageExtensionExtension);
 			var pipeline = pipelineBuilder.Build();
 			return pipeline;
 		}
@@ -125,6 +132,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<GitGraphBlock, GitGraphExtension>();
 			renderer.RegisterBlock<WorkflowNotesBlock, WorkflowNotesExtension>();
 			renderer.RegisterBlock<BpmnGraphBlock, BpmnGraphExtension>();
+			renderer.RegisterBlock<DiagramBlock, DiagramImageExtension>();
 			renderer.RegisterBlock<TableNotesBlock, TableNotesExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
@@ -165,7 +173,7 @@ namespace MarkdownExtensions.Console
 				var css = renderer.CollectCss();
 				csss.Append(css);
 				writer.Flush();
-				var html = writer.ToString();
+				body = writer.ToString();
 			}
 			var document = $@"
 				<html>

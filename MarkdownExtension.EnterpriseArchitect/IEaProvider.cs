@@ -12,7 +12,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
     public interface IEaProvider
     {
         Package GetElementsByPackage(Path path);
-        FilePath GetDiagramFilePath(string diagramName);
+        FilePath GetDiagramFilePath(Path diagramPath);
         FilePath GetDiagramFilePath(Diagram diagram);
         Element GetElementByName(string elementName);
         IEnumerable<Element> GetElements(Func<Element, bool> filter);
@@ -44,17 +44,17 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			return _eaProvider.GetBpmnElements(bpmnElementPath);
 		}
 
-		public FilePath GetDiagramFilePath(string diagramName)
+		public FilePath GetDiagramFilePath(Path diagramPath)
         {
             if (!_formatSettings.ForceRefreshData)
             {
-                var result = _jsonProvider.GetDiagramFilePath(diagramName);
+                var result = _jsonProvider.GetDiagramFilePath(diagramPath);
                 if (result != null)
                 {
                     return result;
                 }
             }
-            return _eaProvider.GetDiagramFilePath(diagramName);
+            return _eaProvider.GetDiagramFilePath(diagramPath);
         }
 
         public FilePath GetDiagramFilePath(Diagram diagram)
@@ -118,13 +118,13 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             jsonSerializer.Converters.Add(new PathConverter());
             return jsonSerializer;
         });
-        private Dictionary<string, Diagram> _diagramsByName;
+        private Dictionary<Path, Diagram> _diagramsByName;
         private Dictionary<string, Element> _elementsByName;
         private List<Element> _elements;
 
-        public FilePath GetDiagramFilePath(string diagramName)
+        public FilePath GetDiagramFilePath(Path diagramPath)
         {
-            var fromCache = GetDiagramFilePathFromCache(diagramName);
+            var fromCache = GetDiagramFilePathFromCache(diagramPath);
             if (fromCache != null)
             {
                 return fromCache;
@@ -141,8 +141,8 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                     // TODO: something with exception
                     return null;
                 }
-                _diagramsByName = diagrams.Diagrams.ToDictionary(x => x.Name, x => x);
-                var fromCache1 = GetDiagramFilePathFromCache(diagramName);
+                _diagramsByName = diagrams.Diagrams.ToDictionary(x => x.Path, x => x);
+                var fromCache1 = GetDiagramFilePathFromCache(diagramPath);
                 if (fromCache1 != null)
                 {
                     return fromCache1;
@@ -151,11 +151,11 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return null;
         }
 
-        private FilePath GetDiagramFilePathFromCache(string diagramName)
+        private FilePath GetDiagramFilePathFromCache(Path diagramPath)
         {
-            if (_diagramsByName != null && _diagramsByName.ContainsKey(diagramName))
+            if (_diagramsByName != null && _diagramsByName.ContainsKey(diagramPath))
             {
-                var diagram = _diagramsByName[diagramName];
+                var diagram = _diagramsByName[diagramPath];
                 var filePath = System.IO.Path.GetTempPath() + diagram.Guid.ToString() + ".png";
                 return new FilePath(filePath);
             }
@@ -284,16 +284,21 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return package;
         }
 
-        public FilePath GetDiagramFilePath(string diagramName)
+        public FilePath GetDiagramFilePath(Path diagramPath)
         {
             EA.Package rootPackage = (EA.Package)_repository.Repository.Models.GetAt(0);
+			var packagePath = diagramPath.RemoveLast(); // remove diagram part
+			EA.Package package = rootPackage.GetPackage(packagePath);
+			var diagramName = diagramPath.Parts.Last();
             bool Filter(EA.Diagram diagram) => diagram.Name.Equals(diagramName);
-            EA.Diagram eaDiagram = rootPackage.GetDiagrams(Filter).FirstOrDefault();
+			EA.Diagram eaDiagram = package.Diagrams.Cast<EA.Diagram>().FirstOrDefault(Filter);
+			if (eaDiagram == null)
+			{
+				throw new ArgumentException($@"Could not find diagram with path [{diagramPath}]");
+			}
             var filePath = System.IO.Path.GetTempPath() + eaDiagram.DiagramGUID.ToString() + ".png";
             var project = _repository.Repository.GetProjectInterface();
             project.PutDiagramImageToFile(eaDiagram.DiagramGUID, filePath, 1);
-            var package = _repository.Repository.GetPackageByID(eaDiagram.PackageID);
-            var path = package.ToPath(_repository.Repository);
             var diagrams = new DiagramList
             {
                 Diagrams = new List<Diagram>
@@ -302,7 +307,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                     {
                         Id = eaDiagram.DiagramID,
                         Name = eaDiagram.Name,
-                        Path = path,
+                        Path = diagramPath,
                         Guid = Guid.Parse(eaDiagram.DiagramGUID)
                     }
                 }
@@ -457,6 +462,12 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         public IEnumerable<string> Parts => _parts;
         public override string ToString() => _path;
         public Path CreateChild(string name) => new Path(new List<string>(_parts) { name });
+		public Path RemoveLast()
+		{
+			var parts = new List<string>(_parts);
+			parts.RemoveAt(_parts.Count - 1);
+			return new Path(new List<string>(parts));
+		}
     }
     public class PathConverter : JsonConverter
     {

@@ -1,20 +1,22 @@
 ﻿using Markdig;
+using Markdig.Syntax;
 using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
+using MarkdownExtensions.Extensions.Snippet;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 {
-	public class TableNotesTransformer : TransformerBase<TableNotesBlock, TableNotes>
+	class TableNotesTransformer : TransformerBase<TableNotesBlock, TableNotes>
 	{
 		private readonly IEaProvider _provider;
-
 		public TableNotesTransformer(IEaProvider provider)
 		{
 			_provider = provider;
 		}
+
 		public override void Transform(TableNotesBlock block, TableNotes tableNotes)
 		{
 			IEnumerable<Element> tables = null;
@@ -33,30 +35,30 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 			}
 
 			var all = new StringBuilder();
-			var eaNormalizer = new EaNormalizer();
+			void transform(MarkdownDocument md) { md.IncreaseHeadingLevel(1); }
 			foreach (var table in tables)
 			{
 				var sb = new StringBuilder();
 				sb.AppendLine($@"## {table.Name}");
 				bool hasTableNotes = false;
+
 				if (!string.IsNullOrEmpty(table.Notes))
 				{
 					hasTableNotes = true;
-					var notes = eaNormalizer.Normalize(table.Notes);
+					var notes = Helper.Converter(table.Notes, transform);
 					sb.AppendLine(notes);
-					sb.AppendLine();
 				}
 				bool hasFieldNotes = false;
 				foreach (var attribute in table.Attributes)
 				{
-					if (!string.IsNullOrEmpty(attribute.Notes))
+					if (string.IsNullOrEmpty(attribute.Notes))
 					{
-						hasFieldNotes = true;
-						var notes = eaNormalizer.Normalize(table.Notes);
-						sb.AppendLine($@"### {attribute.Name}");
-						sb.AppendLine(notes);
-						sb.AppendLine();
+						continue;
 					}
+					hasFieldNotes = true;
+					var notes = Helper.Converter(attribute.Notes, transform);
+					sb.AppendLine($@"### {attribute.Name}");
+					sb.AppendLine(notes);
 				}
 				bool hasNotes = hasTableNotes || hasFieldNotes;
 				if (hasNotes)
@@ -64,7 +66,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					all.Append(sb);
 				}
 			}
-			var document = Markdown.Parse(all.ToString());
+			MarkdownDocument document = Markdown.Parse(all.ToString());
 			Replace(block, document);
 		}
 	}
