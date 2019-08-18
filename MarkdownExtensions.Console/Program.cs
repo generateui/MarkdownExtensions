@@ -19,6 +19,7 @@ using MarkdownExtension.GitGraph;
 using System.Linq;
 using MarkdownExtension.EnterpriseArchitect.WorkflowNotes;
 using MarkdownExtension.BpmnGraph;
+using MarkdownExtension.EnterpriseArchitect.TableNotes;
 
 namespace MarkdownExtensions.Console
 {
@@ -28,7 +29,7 @@ namespace MarkdownExtensions.Console
         {
             var formatSettings = new FormatSettings
             {
-                ForceRefreshData = false
+                ForceRefreshData = true
             };
 			var container = new Container();
 			var scope = new ThreadScopedLifestyle();
@@ -54,6 +55,7 @@ namespace MarkdownExtensions.Console
 				typeof(PanZoomImageExtensionInfo),
 				//typeof(GitGraphExtensionInfo),
 				typeof(GitHistoryExtensionInfo),
+				typeof(TableNotesExtensionInfo),
 				typeof(KeyboardKeysExtensionInfo),
 				typeof(ExcelTableExtensionInfo),
 				typeof(WorkflowNotesExtensionInfo),
@@ -103,6 +105,8 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
+			var tableNotesExtension = container.GetInstance<TableNotesExtension>();
+			pipelineBuilder.Extensions.Add(tableNotesExtension);
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
 			var pipeline = pipelineBuilder.Build();
@@ -121,6 +125,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<GitGraphBlock, GitGraphExtension>();
 			renderer.RegisterBlock<WorkflowNotesBlock, WorkflowNotesExtension>();
 			renderer.RegisterBlock<BpmnGraphBlock, BpmnGraphExtension>();
+			renderer.RegisterBlock<TableNotesBlock, TableNotesExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}

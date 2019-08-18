@@ -6,7 +6,8 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 	{
 		public TableNotesParser()
 		{
-
+			InfoPrefix = "ea-table-notes";
+			_create = _ => new TableNotesBlock(this);
 		}
 	}
 }

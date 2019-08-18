@@ -1,4 +1,5 @@
-﻿using MarkdownExtension.EnterpriseArchitect.EaProvider;
+﻿using Markdig;
+using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,15 +7,15 @@ using System.Text;
 
 namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 {
-	public class TableNotesRenderer : BlockRendererBase<TableNotes, TableNotesBlock>
+	public class TableNotesTransformer : TransformerBase<TableNotesBlock, TableNotes>
 	{
 		private readonly IEaProvider _provider;
 
-		public TableNotesRenderer(IEaProvider provider)
+		public TableNotesTransformer(IEaProvider provider)
 		{
 			_provider = provider;
 		}
-		public override void Render(ExtensionHtmlRenderer renderer, TableNotes tableNotes, IFormatState formatState)
+		public override void Transform(TableNotesBlock block, TableNotes tableNotes)
 		{
 			IEnumerable<Element> tables = null;
 			if (tableNotes.PackagePath != null)
@@ -32,6 +33,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 			}
 
 			var all = new StringBuilder();
+			var eaNormalizer = new EaNormalizer();
 			foreach (var table in tables)
 			{
 				var sb = new StringBuilder();
@@ -40,7 +42,8 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 				if (!string.IsNullOrEmpty(table.Notes))
 				{
 					hasTableNotes = true;
-					sb.AppendLine(table.Notes);
+					var notes = eaNormalizer.Normalize(table.Notes);
+					sb.AppendLine(notes);
 					sb.AppendLine();
 				}
 				bool hasFieldNotes = false;
@@ -49,8 +52,9 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					if (!string.IsNullOrEmpty(attribute.Notes))
 					{
 						hasFieldNotes = true;
+						var notes = eaNormalizer.Normalize(table.Notes);
 						sb.AppendLine($@"### {attribute.Name}");
-						sb.AppendLine(attribute.Notes);
+						sb.AppendLine(notes);
 						sb.AppendLine();
 					}
 				}
@@ -60,7 +64,8 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					all.Append(sb);
 				}
 			}
-			renderer.Write(all.ToString());
+			var document = Markdown.Parse(all.ToString());
+			Replace(block, document);
 		}
 	}
 }

@@ -13,10 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="TableNotes\CheatSheet.md" />
     <None Remove="WorkflowNotes\CheatSheet.md" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="TableNotes\CheatSheet.md" />
     <EmbeddedResource Include="WorkflowNotes\CheatSheet.md" />
   </ItemGroup>
 

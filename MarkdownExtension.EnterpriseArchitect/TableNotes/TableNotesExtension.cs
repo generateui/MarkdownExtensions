@@ -2,7 +2,6 @@
 using Markdig.Renderers;
 using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
-using System;
 
 namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 {
@@ -11,25 +10,20 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
         public TableNotesExtension(IEaProvider provider)
         {
             Parser = new TableNotesSyntax();
-            Renderer = new TableNotesRenderer(provider);
+            Transformer = new TableNotesTransformer(provider);
             Validator = new TableNotesValidator(provider);
         }
 
         public IParser Parser { get; }
-        public IRenderer Renderer { get; }
+		public IRenderer Renderer => null;
 		public IValidator Validator { get; }
-		public ITransformer Transformer => null;
+		public ITransformer Transformer { get; }
 		public static ExtensionName NAME => "EA element notes in a table";
         public ExtensionName Name => NAME;
 
-		public void Setup(MarkdownPipelineBuilder pipeline)
-		{
-			throw new NotImplementedException();
-		}
+		public void Setup(MarkdownPipelineBuilder pipeline) =>
+			pipeline.BlockParsers.Insert(0, new TableNotesParser());
 
-		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
-		{
-			throw new NotImplementedException();
-		}
+		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) { }
 	}
 }

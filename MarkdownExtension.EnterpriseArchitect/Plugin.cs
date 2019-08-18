@@ -43,7 +43,6 @@ namespace MarkdownExtension.EnterpriseArchitect
             public void Dispose()
             {
                 Repository.CloseFile();
-                //Marshal.ReleaseComObject(Repository);
                 Repository.Exit();
             }
 
