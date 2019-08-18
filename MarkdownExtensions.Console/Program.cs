@@ -21,6 +21,7 @@ using MarkdownExtension.EnterpriseArchitect.WorkflowNotes;
 using MarkdownExtension.BpmnGraph;
 using MarkdownExtension.EnterpriseArchitect.Diagram;
 using MarkdownExtension.EnterpriseArchitect.TableNotes;
+using MarkdownExtension.EnterpriseArchitect.ObjectText;
 
 namespace MarkdownExtensions.Console
 {
@@ -30,7 +31,8 @@ namespace MarkdownExtensions.Console
         {
             var formatSettings = new FormatSettings
             {
-                ForceRefreshData = true
+                ForceRefreshData = false,
+				EmbedImages = false
             };
 			var container = new Container();
 			var scope = new ThreadScopedLifestyle();
@@ -48,6 +50,7 @@ namespace MarkdownExtensions.Console
 				typeof(WorkflowNotesExtension),
 				typeof(BpmnGraphExtension),
 				typeof(DiagramImageExtension),
+				typeof(ObjectTextExtension),
 				typeof(TableNotesExtension),
 				typeof(NestedBlockExtension)
 			);
@@ -59,9 +62,10 @@ namespace MarkdownExtensions.Console
 				//typeof(GitGraphExtensionInfo),
 				typeof(GitHistoryExtensionInfo),
 				typeof(TableNotesExtensionInfo),
-				typeof(KeyboardKeysExtensionInfo),
+				//typeof(KeyboardKeysExtensionInfo),
 				typeof(ExcelTableExtensionInfo),
 				typeof(WorkflowNotesExtensionInfo),
+				typeof(ObjectTextExtensionInfo),
 				typeof(BpmnGraphExtensionInfo),
 				typeof(SnippetExtensionInfo)
 			);
@@ -102,18 +106,25 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<FolderListExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<SnippetExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<PanZoomImageExtension>();
-			pipelineBuilder.Extensions.AddIfNotAlready<KeyboardKeysExtension>();
+			//pipelineBuilder.Extensions.AddIfNotAlready<KeyboardKeysExtension>(); //interferes with autolinks
 			pipelineBuilder.Extensions.AddIfNotAlready<ExcelTableExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<MsSqlTableExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
+
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
+
 			var tableNotesExtension = container.GetInstance<TableNotesExtension>();
 			pipelineBuilder.Extensions.Add(tableNotesExtension);
-			var diagramImageExtensionExtension = container.GetInstance<DiagramImageExtension>();
-			pipelineBuilder.Extensions.Add(diagramImageExtensionExtension);
+
+			var diagramImageExtension = container.GetInstance<DiagramImageExtension>();
+			pipelineBuilder.Extensions.Add(diagramImageExtension);
+
+			var objectTextExtension = container.GetInstance<ObjectTextExtension>();
+			pipelineBuilder.Extensions.Add(objectTextExtension);
+
 			var pipeline = pipelineBuilder.Build();
 			return pipeline;
 		}
@@ -132,13 +143,18 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<BpmnGraphBlock, BpmnGraphExtension>();
 			renderer.RegisterBlock<DiagramBlock, DiagramImageExtension>();
 			renderer.RegisterBlock<TableNotesBlock, TableNotesExtension>();
+			renderer.RegisterBlock<ObjectTextBlock, ObjectTextExtension>();
 
-			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
+			//renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}
 
 		private static void Directory(string path, Container container)
 		{
-			var fileName = System.IO.Path.GetFileName(path);
+			var markdownFiles = System.IO.Directory.GetFiles(path, "*.md", SearchOption.AllDirectories);
+			foreach (var file in markdownFiles)
+			{
+				File(file, container);
+			}
 			// 1. pickup markdown file
 			// 2. generate html in /rendered
 			// 3. write images to /images
@@ -154,13 +170,20 @@ namespace MarkdownExtensions.Console
             var csss = new StringBuilder();
             csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
             string body = null;
-            using (ThreadScopedLifestyle.BeginScope(container))
+			var sourceFolder = Path.GetDirectoryName(fileName);
+			var sourceSettings = new SourceSettings { Folder = sourceFolder };
+			//container.RegisterInstance(sourceSettings);
+            using (var scope = ThreadScopedLifestyle.BeginScope(container))
             {
 				var writer = new StringWriter();
 				var pipeline = CreatePipeline(container);
 				var markdown = System.IO.File.ReadAllText(fileName);
 				var markdownDocument = Markdown.Parse(markdown, pipeline);
-				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument);
+				var renderSettings = new RenderSettings
+				{
+					SourceFolder = sourceFolder
+				};
+				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, renderSettings);
 				pipeline.Setup(renderer);
 				RegisterBlocks(renderer);
 				renderer.Parse(container);
@@ -188,9 +211,8 @@ namespace MarkdownExtensions.Console
 						{body}
 					</body>
 				</html>";
-            var folder = Path.GetDirectoryName(fileName);
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-            var fullFilePath = Path.Combine(folder, $@"{fileNameWithoutExtension}.html");
+            var fullFilePath = Path.Combine(sourceFolder, $@"{fileNameWithoutExtension}.html");
             System.IO.File.WriteAllText(fullFilePath, document);
         }
 
@@ -213,7 +235,7 @@ namespace MarkdownExtensions.Console
 					var writer = new StringWriter();
 					var pipeline = CreatePipeline(container);
 					var document = Markdown.Parse(markdown, pipeline);
-					var renderer = new ExtensionHtmlRenderer(writer, document);
+					var renderer = new ExtensionHtmlRenderer(writer, document, new RenderSettings());
 					pipeline.Setup(renderer);
 					RegisterBlocks(renderer);
 					renderer.Parse(container);

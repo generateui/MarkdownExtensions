@@ -44,12 +44,24 @@ namespace MarkdownExtensions
 		private readonly HashSet<ICode> _csss = new HashSet<ICode>();
 		private readonly HashSet<ICode> _javascripts = new HashSet<ICode>();
 
-		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock) : base(writer)
+		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock, RenderSettings renderSettings) : base(writer)
 		{
 			_containerBlock = containerBlock;
+			RenderSettings = renderSettings;
 		}
 
 		public FormatState FormatState { get; }
+		public RenderSettings RenderSettings { get; }
+
+		public void RegisterImage(string fileName, string absoluteFilePath)
+		{
+			var newFullFilePath = Path.Combine(RenderSettings.AbsoluteImageFolder, fileName);
+			if (!Directory.Exists(RenderSettings.AbsoluteImageFolder))
+			{
+				Directory.CreateDirectory(RenderSettings.AbsoluteImageFolder);
+			}
+			File.Copy(absoluteFilePath, newFullFilePath, true); // todo: only overwrite when force new
+		}
 
 		public void RegisterBlock<TBlock, TExtension>()
 			where TBlock : IExtensionBlock
@@ -173,7 +185,7 @@ namespace MarkdownExtensions
 				if (transformer != null)
 				{
 					var model = GetBlockModel(extensionBlock as IExtensionBlock);
-					transformer.Transform(extensionBlock, model);
+					transformer.Transform(this, extensionBlock, model);
 				}
 			}
 		}

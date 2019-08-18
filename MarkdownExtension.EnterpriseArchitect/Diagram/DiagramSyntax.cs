@@ -6,7 +6,12 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 	{
 		public IParseResult Parse(string text)
 		{
-			//return new ParseFailure(new ParseError(new Range(new Position(1, 1), new Position(1, 10)), "derpified"));
+			var trimmed = text.Trim();
+			if (trimmed.StartsWith("package: "))
+			{
+				var packagePath = text.Substring(9, text.Length - 9);
+				return new ParseSuccess(new Diagram { PackagePath = packagePath });
+			}
 			return new ParseSuccess(new Diagram { Path = text });
 		}
 	}
