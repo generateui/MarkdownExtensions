@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Introduction.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Introduction.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\MarkdownExtension.EnterpriseArchitect\EaTest.eapx" Link="EaTest.eapx" />
+  </ItemGroup>
+
+</Project>

@@ -140,6 +140,10 @@ namespace MarkdownExtensions.Console
 
 		private static void Directory(string path, Container container)
 		{
+			// 1. get folder
+			// 2. read settings file
+			// 3. set output folders
+			// 4. 
 			var fileName = System.IO.Path.GetFileName(path);
 			// 1. pickup markdown file
 			// 2. generate html in /rendered

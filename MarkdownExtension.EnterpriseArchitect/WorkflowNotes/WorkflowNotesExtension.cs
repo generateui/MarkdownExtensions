@@ -10,7 +10,6 @@ namespace MarkdownExtension.EnterpriseArchitect.WorkflowNotes
 		public WorkflowNotesExtension(IEaProvider provider)
 		{
 			Parser = new WorkflowNotesSyntax();
-//			Renderer = new WorkflowNotesRenderer(provider);
 			Transformer = new WorkflowNotesTransformer(provider);
 		}
 
@@ -24,9 +23,6 @@ namespace MarkdownExtension.EnterpriseArchitect.WorkflowNotes
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.BlockParsers.Insert(0, new WorkflowNotesParser());
-
-		//public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) =>
-		//	renderer.ObjectRenderers.Insert(0, Renderer);
 
 		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) { }
 	}
