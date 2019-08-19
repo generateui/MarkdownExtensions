@@ -36,15 +36,19 @@ namespace MarkdownExtensions
 
 		public TomlTable Settings { get; private set; }
 
-		public static RenderSettings DefaultWiki()
+		public static RenderSettings DefaultWiki(AbsoluteFolder absoluteFolder)
 		{
-			return new RenderSettings
+            var outputFolder = new Folder(absoluteFolder, new RelativeFolder("output"));
+            var sourceFolder = new Folder(absoluteFolder);
+            return new RenderSettings
 			{
-				CssFolder = new Folder(new RelativeFolder("css")),
-				JavascriptFolder = new Folder(new RelativeFolder("javascript")),
-				ImageFolder = new Folder(new RelativeFolder("image")),
-                OutputFolder = new Folder(new RelativeFolder("output")),
-			};
+                SourceFolder = sourceFolder,
+                OutputFolder = outputFolder,
+				CssFolder = new Folder(outputFolder.Absolute, new RelativeFolder("css")),
+				JavascriptFolder = new Folder(outputFolder.Absolute, new RelativeFolder("javascript")),
+				ImageFolder = new Folder(outputFolder.Absolute, new RelativeFolder("image")),
+                SettingsFile = new File(sourceFolder, "settings.toml"),
+            };
 		}
 
 		public static RenderSettings DefaultFile()
@@ -56,15 +60,8 @@ namespace MarkdownExtensions
 				ImageFolder = new Folder(new RelativeFolder("image")),
 			};
 		}
-		public void SetSourceFolder(AbsoluteFolder absoluteFolder)
+		public void EnsureFoldersExist()
 		{
-			SourceFolder = new Folder(absoluteFolder);
-            OutputFolder.SetAbsoluteRoot(absoluteFolder);
-			CssFolder.SetAbsoluteRoot(OutputFolder.Absolute);
-			JavascriptFolder.SetAbsoluteRoot(OutputFolder.Absolute);
-			ImageFolder.SetAbsoluteRoot(OutputFolder.Absolute);
-			SettingsFile = new File(SourceFolder, "settings.toml");
-
             CreateIfNeeded(OutputFolder);
             CreateIfNeeded(CssFolder);
             CreateIfNeeded(JavascriptFolder);
@@ -93,14 +90,6 @@ namespace MarkdownExtensions
 			foreach (IExtensionSettings extensionSetting in extensionSettings)
 			{
 				extensionSetting.Parse(this, Settings);
-			}
-		}
-
-		public void EnsureFoldersExist()
-		{
-			if (!Directory.Exists(ImageFolder.Absolute.FullPath))
-			{
-				Directory.CreateDirectory(ImageFolder.Absolute.FullPath);
 			}
 		}
 

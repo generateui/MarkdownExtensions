@@ -143,14 +143,12 @@ namespace MarkdownExtensions.Console
 		private static void Directory(string path, Container container)
 		{
 			var sourceFolder = new AbsoluteFolder(path);
-			var renderSettings = RenderSettings.DefaultWiki();
-			renderSettings.SetSourceFolder(sourceFolder);
+			var renderSettings = RenderSettings.DefaultWiki(sourceFolder);
 			renderSettings.EnsureFoldersExist();
 			renderSettings.TryParseSettingsFile();
             container.RegisterInstance(renderSettings);
             var extensionSettings = container.GetAllInstances<IExtensionSettings>();
 			renderSettings.TryParseExtensionSettings(extensionSettings);
-
 
 			var markdownFiles = System.IO.Directory.GetFiles(path, "*.md", SearchOption.AllDirectories);
 			foreach (var file in markdownFiles)
@@ -175,8 +173,7 @@ namespace MarkdownExtensions.Console
 			var sourceFolder = new AbsoluteFolder(Path.GetDirectoryName(fileName));
 			if (settings == null)
 			{
-				settings = RenderSettings.DefaultWiki();
-				settings.SetSourceFolder(sourceFolder);
+				settings = RenderSettings.DefaultWiki(sourceFolder);
 			}
 
 			using (var scope = ThreadScopedLifestyle.BeginScope(container))

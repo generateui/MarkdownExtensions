@@ -12,11 +12,9 @@ namespace MarkdownExtensions
 		/// <summary>
 		/// Full path to folder on disk
 		/// </summary>
-		AbsoluteFolder Absolute { get; }
+		[CanBeNull] AbsoluteFolder Absolute { get; }
 
-		void SetAbsoluteRoot(AbsoluteFolder absolute);
-
-		RelativeFolder Relative { get; }
+        [CanBeNull] RelativeFolder Relative { get; }
 	}
 
 	public class Folder : IFolder
@@ -54,12 +52,6 @@ namespace MarkdownExtensions
 
 		public AbsoluteFolder Absolute { get; set; }
 		public RelativeFolder Relative { get; }
-
-		public void SetAbsoluteRoot(AbsoluteFolder absolute)
-		{
-			var fullFolderPath = Path.Combine(absolute.FullPath, Relative.Name);
-			Absolute = new AbsoluteFolder(fullFolderPath);
-		}
 	}
 
 	public class AbsoluteFolder
@@ -67,15 +59,6 @@ namespace MarkdownExtensions
 		public AbsoluteFolder(string fullPath)
 		{
 			FullPath = fullPath;
-			//if (Directory.Exists(AbsolutePath))
-			//{
-			//	Name = Path.GetFileName(AbsolutePath);
-			//}
-			//else
-			//{
-			//	// TODO: parse
-			//	throw new ArgumentException("absolute folder does not exist");
-			//}
 		}
 		public string FullPath { get; }
 		public string Name { get; }
