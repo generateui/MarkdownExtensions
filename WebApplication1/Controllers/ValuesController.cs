@@ -11,9 +11,9 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private readonly IMarkdownConverter _markdownConverter;
+        private readonly ExtensionHtmlRenderer _markdownConverter;
 
-        public ValuesController(IMarkdownConverter markdownConverter)
+        public ValuesController(ExtensionHtmlRenderer markdownConverter)
         {
             _markdownConverter = markdownConverter;
         }
@@ -33,8 +33,9 @@ namespace WebApplication1.Controllers
             var text = $@"```{prefix}:
 {markdown}
 ```";
-            string html = _markdownConverter.Convert(text, sourceSettings: sourceSettings);
-            return html;
+            //string html = _markdownConverter.Convert(text, sourceSettings: sourceSettings);
+            //return html;
+            return null;
         }
 
         // POST api/values/folder
@@ -50,8 +51,9 @@ namespace WebApplication1.Controllers
 {md}
 ```";
             var sourceSettings = new SourceSettings();
-            string html = _markdownConverter.Convert(text, sourceSettings: sourceSettings);
-            return html;
+            //string html = _markdownConverter.Convert(text, sourceSettings: sourceSettings);
+            //return html;
+            return null;
         }
 
         // PUT api/values/5

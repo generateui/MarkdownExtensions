@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>C:\Users\ruudp\Desktop\SOSPES\Repos\permit-services\doc</StartArguments>
+    <StartArguments>C:\Users\ruudp\Desktop\MarkdownExtensions\Wiki.Example\bin\Debug\netstandard2.0\doc</StartArguments>
   </PropertyGroup>
 </Project>

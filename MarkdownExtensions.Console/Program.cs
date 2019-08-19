@@ -10,6 +10,7 @@ using MarkdownExtensions.Extensions.FolderFromDisk;
 using MarkdownExtensions.Extensions.NestedBlock;
 using MarkdownExtensions.Extensions.Snippet;
 using MarkdownExtensions.Extensions.FolderList;
+using MarkdownExtensions.Extensions.MarkdownLink;
 using MarkdownExtension.PanZoomImage;
 using MarkdownExtension.KeyboardKeys;
 using MarkdownExtension.Excel;
@@ -29,15 +30,9 @@ namespace MarkdownExtensions.Console
     {
         static void Main(string[] args)
         {
-            var formatSettings = new FormatSettings
-            {
-                ForceRefreshData = false,
-				EmbedImages = false
-            };
 			var container = new Container();
 			var scope = new ThreadScopedLifestyle();
 			container.Options.DefaultScopedLifestyle = scope;
-			container.RegisterInstance(formatSettings);
 			Ea.Plugin.Register(container);
 			container.Collection.Register<IMarkdownExtension>(
 				typeof(FolderFromDiskExtension),
@@ -62,17 +57,13 @@ namespace MarkdownExtensions.Console
 				//typeof(GitGraphExtensionInfo),
 				typeof(GitHistoryExtensionInfo),
 				typeof(TableNotesExtensionInfo),
-				//typeof(KeyboardKeysExtensionInfo),
+				typeof(KeyboardKeysExtensionInfo),
 				typeof(ExcelTableExtensionInfo),
 				typeof(WorkflowNotesExtensionInfo),
 				typeof(ObjectTextExtensionInfo),
 				typeof(BpmnGraphExtensionInfo),
 				typeof(SnippetExtensionInfo)
 			);
-			//typeof(Ea.ObjectText),
-			//typeof(Ea.DiagramImage),
-			//typeof(Ea.TableNotes),
-			//typeof(Ea.RequirementsTable),
 
 			// Arguments:
 			// - selfcontained (embed all into single html)
@@ -83,7 +74,7 @@ namespace MarkdownExtensions.Console
 				string path = args[0];
 				if (System.IO.File.Exists(path))
 				{
-					File(path, container);
+					File(path, container, null);
 				}
 				if (System.IO.Directory.Exists(path))
 				{
@@ -112,8 +103,8 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
-			var tableNotesExtension = container.GetInstance<TableNotesExtension>();
-			pipelineBuilder.Extensions.Add(tableNotesExtension);
+			pipelineBuilder.Extensions.AddIfNotAlready<MarkdownLinkExtension>();
+
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
 
@@ -146,15 +137,25 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<TableNotesBlock, TableNotesExtension>();
 			renderer.RegisterBlock<ObjectTextBlock, ObjectTextExtension>();
 
-			//renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
+			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}
 
 		private static void Directory(string path, Container container)
 		{
+			var sourceFolder = new AbsoluteFolder(path);
+			var renderSettings = RenderSettings.DefaultWiki();
+			renderSettings.SetSourceFolder(sourceFolder);
+			renderSettings.EnsureFoldersExist();
+			renderSettings.TryParseSettingsFile();
+            container.RegisterInstance(renderSettings);
+            var extensionSettings = container.GetAllInstances<IExtensionSettings>();
+			renderSettings.TryParseExtensionSettings(extensionSettings);
+
+
 			var markdownFiles = System.IO.Directory.GetFiles(path, "*.md", SearchOption.AllDirectories);
 			foreach (var file in markdownFiles)
 			{
-				File(file, container);
+				File(file, container, renderSettings);
 			}
 			// 1. pickup markdown file
 			// 2. generate html in /rendered
@@ -165,26 +166,26 @@ namespace MarkdownExtensions.Console
 			// 7. write markdown to /rendered
 		}
 
-		private static void File(string fileName, Container container)
+		private static void File(string fileName, Container container, RenderSettings settings)
         {
             var scripts = new StringBuilder();
             var csss = new StringBuilder();
             csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
             string body = null;
-			var sourceFolder = Path.GetDirectoryName(fileName);
-			var sourceSettings = new SourceSettings { Folder = sourceFolder };
-			//container.RegisterInstance(sourceSettings);
-            using (var scope = ThreadScopedLifestyle.BeginScope(container))
+			var sourceFolder = new AbsoluteFolder(Path.GetDirectoryName(fileName));
+			if (settings == null)
+			{
+				settings = RenderSettings.DefaultWiki();
+				settings.SetSourceFolder(sourceFolder);
+			}
+
+			using (var scope = ThreadScopedLifestyle.BeginScope(container))
             {
 				var writer = new StringWriter();
 				var pipeline = CreatePipeline(container);
 				var markdown = System.IO.File.ReadAllText(fileName);
 				var markdownDocument = Markdown.Parse(markdown, pipeline);
-				var renderSettings = new RenderSettings
-				{
-					SourceFolder = sourceFolder
-				};
-				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, renderSettings);
+				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, settings);
 				pipeline.Setup(renderer);
 				RegisterBlocks(renderer);
 				renderer.Parse(container);
@@ -213,8 +214,8 @@ namespace MarkdownExtensions.Console
 					</body>
 				</html>";
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-            var fullFilePath = Path.Combine(sourceFolder, $@"{fileNameWithoutExtension}.html");
-            System.IO.File.WriteAllText(fullFilePath, document);
+            var file = new File(settings.OutputFolder, fileNameWithoutExtension + ".html");
+            System.IO.File.WriteAllText(file.AbsolutePath, document);
         }
 
         private static void AggregateCheatSheet(Container container)

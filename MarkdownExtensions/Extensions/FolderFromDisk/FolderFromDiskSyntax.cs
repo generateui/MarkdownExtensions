@@ -1,4 +1,4 @@
-﻿using MarkdownExtensions.Extensions.FolderModel;
+﻿using FM = MarkdownExtensions.Extensions.FolderModel;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +12,7 @@ namespace MarkdownExtensions.Extensions.FolderFromDisk
             var path = text;
             if (System.IO.Directory.Exists(path))
             {
-                Folder folder = EnumerateFolder(path);
+				FM.Folder folder = EnumerateFolder(path);
                 return new ParseSuccess(folder);
             }
             else
@@ -22,21 +22,21 @@ namespace MarkdownExtensions.Extensions.FolderFromDisk
             throw new Exception();
         }
 
-        private static Folder EnumerateFolder(string path)
+        private static FM.Folder EnumerateFolder(string path)
         {
-            var files = new List<File>();
+            var files = new List<FM.File>();
             foreach (var file in System.IO.Directory.EnumerateFiles(path))
             {
-                files.Add(new File(System.IO.Path.GetFileName(file)));
+                files.Add(new FM.File(System.IO.Path.GetFileName(file)));
             }
-            var subFolders = new List<Folder>();
+            var subFolders = new List<FM.Folder>();
             foreach (var subFolderPath in System.IO.Directory.EnumerateDirectories(path))
             {
                 var subFolder = EnumerateFolder(subFolderPath);
                 subFolders.Add(subFolder);
             }
             var name = System.IO.Path.GetFileName(path);
-            return new Folder(name, subFolders, files);
+            return new FM.Folder(name, subFolders, files);
         }
     }
 }

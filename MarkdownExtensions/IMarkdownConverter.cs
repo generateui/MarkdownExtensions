@@ -11,19 +11,6 @@ using System.Text;
 
 namespace MarkdownExtensions
 {
-	public class ConversionSettings
-	{
-		/// <summary>
-		/// True to embed errors in the output html
-		/// </summary>
-		public bool ReportErrorsInHtml { get; set; }
-
-		/// <summary>
-		/// Forces extensions to re-query their data sources instead of using cached data
-		/// </summary>
-		public bool ForceRefreshData { get; set; }
-	}
-
 	// parses internal syntax of extensions
 	public class ExtensionHtmlRenderer : HtmlRenderer
 	{
@@ -47,21 +34,16 @@ namespace MarkdownExtensions
 		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock, RenderSettings renderSettings) : base(writer)
 		{
 			_containerBlock = containerBlock;
-			RenderSettings = renderSettings;
+			FolderManager = new FolderManager(renderSettings);
+		}
+		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock, FolderManager folderManager) : base(writer)
+		{
+			_containerBlock = containerBlock;
+			FolderManager = folderManager;
 		}
 
 		public FormatState FormatState { get; }
-		public RenderSettings RenderSettings { get; }
-
-		public void RegisterImage(string fileName, string absoluteFilePath)
-		{
-			var newFullFilePath = Path.Combine(RenderSettings.AbsoluteImageFolder, fileName);
-			if (!Directory.Exists(RenderSettings.AbsoluteImageFolder))
-			{
-				Directory.CreateDirectory(RenderSettings.AbsoluteImageFolder);
-			}
-			File.Copy(absoluteFilePath, newFullFilePath, true); // todo: only overwrite when force new
-		}
+		public FolderManager FolderManager { get; }
 
 		public void RegisterBlock<TBlock, TExtension>()
 			where TBlock : IExtensionBlock
@@ -202,6 +184,7 @@ namespace MarkdownExtensions
 			sb.AppendCode(_javascripts);
 			return sb.ToString();
 		}
+
 	}
 
 	public static class ContainerBlockExtensions

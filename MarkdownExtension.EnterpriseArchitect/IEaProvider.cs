@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using MarkdownExtensions;
 using Newtonsoft.Json;
 using static MarkdownExtension.EnterpriseArchitect.Plugin;
+using IO = System.IO;
 
 namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 {
@@ -12,33 +12,43 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
     public interface IEaProvider
     {
         Package GetElementsByPackage(Path path);
-        FilePath GetDiagramFilePath(Path diagramPath);
-        FilePath GetDiagramFilePath(Diagram diagram);
+        File GetDiagramFile(Path diagramPath, IFolder folder);
+        File GetDiagramFile(Diagram diagram, IFolder folder);
         Element GetElementByName(string elementName);
         IEnumerable<Element> GetElements(Func<Element, bool> filter);
         IEnumerable<Element> GetElements(Path packagePath, bool recursive = false);
 		(Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath);
 		IEnumerable<Path> GetDiagramPaths(Path packagePath);
 	}
-    public class FilePath
+    internal static class FileNames
     {
-        public FilePath(string value)
-        {
-            Value = value;
-        }
-        public string Value { get; }
+        internal const string ENTERPRISE_ARCHITECT = "EnterpriseArchitect";
+        internal static string ELEMENT_LIST = "elementList.json";
+        internal static string DIAGRAM_LIST = "diagramList.json";
+
+        internal static File GetElementsByPackage(IFolder folder, Path packagePath) => 
+            new File(folder, $@"Elements - {packagePath}.json");
+
+        internal static File GetDiagramPathsByPackage(IFolder folder, Path packagePath) =>
+            new File(folder, $@"DiagramPaths - {packagePath}.json");
+
+        internal static File GetPackage(IFolder folder, Path path) =>
+            new File(folder, $@"Package - {path}.json");
+
+        internal static File GetDiagram(IFolder folder, string diagramName) =>
+            new File(folder, $@"{diagramName}.json");
     }
-	internal class CacheProvider : IEaProvider
+    internal class CacheProvider : IEaProvider
 	{
         private readonly EaProvider _eaProvider;
         private readonly JsonProvider _jsonProvider;
-        private readonly FormatSettings _formatSettings;
+        private readonly RenderSettings _renderSettings;
 
-        public CacheProvider(EaProvider eaProvider, JsonProvider jsonProvider, FormatSettings formatSettings)
+        public CacheProvider(EaProvider eaProvider, JsonProvider jsonProvider, RenderSettings renderSettings)
         {
             _eaProvider = eaProvider;
             _jsonProvider = jsonProvider;
-            _formatSettings = formatSettings;
+            _renderSettings = renderSettings;
         }
 
 		public (Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath)
@@ -46,35 +56,35 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			return _eaProvider.GetBpmnElements(bpmnElementPath);
 		}
 
-		public FilePath GetDiagramFilePath(Path diagramPath)
-        {
-            if (!_formatSettings.ForceRefreshData)
+		public File GetDiagramFile(Path diagramPath, IFolder folder)
+		{
+            if (!_renderSettings.ForceRefreshData)
             {
-				var filePath = new FilePath($@"{diagramPath}.png");
-				if (File.Exists(filePath.Value))
+				var file = new File(folder, $@"{diagramPath}.png");
+				if (IO.File.Exists(file.AbsolutePath))
 				{
-					return filePath;
+					return file;
 				}
             }
-            return _eaProvider.GetDiagramFilePath(diagramPath);
+            return _eaProvider.GetDiagramFile(diagramPath, folder);
         }
 
-        public FilePath GetDiagramFilePath(Diagram diagram)
+        public File GetDiagramFile(Diagram diagram, IFolder folder)
         {
-            if (!_formatSettings.ForceRefreshData)
+            if (!_renderSettings.ForceRefreshData)
             {
-                var result = _jsonProvider.GetDiagramFilePath(diagram);
+                var result = _jsonProvider.GetDiagramFile(diagram, folder);
                 if (result != null)
                 {
                     return result;
                 }
             }
-            return _eaProvider.GetDiagramFilePath(diagram);
+            return _eaProvider.GetDiagramFile(diagram, folder);
         }
 
 		public IEnumerable<Path> GetDiagramPaths(Path packagePath)
 		{
-			if (!_formatSettings.ForceRefreshData)
+			if (!_renderSettings.ForceRefreshData)
 			{
 				var result = _jsonProvider.GetDiagramPaths(packagePath);
 				if (result != null)
@@ -87,7 +97,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
 		public Element GetElementByName(string elementName)
         {
-            if (!_formatSettings.ForceRefreshData)
+            if (!_renderSettings.ForceRefreshData)
             {
                 var result = _jsonProvider.GetElementByName(elementName);
                 if (result != null)
@@ -100,7 +110,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public IEnumerable<Element> GetElements(Func<Element, bool> filter)
         {
-            if (!_formatSettings.ForceRefreshData)
+            if (!_renderSettings.ForceRefreshData)
             {
                 var result = _jsonProvider.GetElements(filter);
                 if (result != null)
@@ -113,7 +123,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
 		public IEnumerable<Element> GetElements(Path packagePath, bool recursive = false)
 		{
-			if (!_formatSettings.ForceRefreshData)
+			if (!_renderSettings.ForceRefreshData)
 			{
 				var result = _jsonProvider.GetElements(packagePath, recursive);
 				if (result != null)
@@ -126,7 +136,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
 		public Package GetElementsByPackage(Path path)
         {
-            if (!_formatSettings.ForceRefreshData)
+            if (!_renderSettings.ForceRefreshData)
             {
                 var result = _jsonProvider.GetElementsByPackage(path);
                 if (result != null)
@@ -146,36 +156,34 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             jsonSerializer.Converters.Add(new PathConverter());
             return jsonSerializer;
         });
-        private Dictionary<Path, Diagram> _diagramsByName;
+        private readonly IFolder _folder;
+
         private Dictionary<string, Element> _elementsByName;
         private List<Element> _elements;
 		private readonly Dictionary<Path, IEnumerable<Element>> _elementsByPath = new Dictionary<Path, IEnumerable<Element>>();
 		private readonly Dictionary<Path, IEnumerable<Path>> _diagramPathsByPackagePath = new Dictionary<Path, IEnumerable<Path>>();
+        private readonly RenderSettings _renderSettings;
 
-        public FilePath GetDiagramFilePath(Path diagramPath)
+        public JsonProvider(RenderSettings renderSettings)
         {
-			return new FilePath($@"{diagramPath}.png");
+            _renderSettings = renderSettings;
+             _folder = _renderSettings.GetExtensionFolder(FileNames.ENTERPRISE_ARCHITECT);
         }
 
-        private FilePath GetDiagramFilePathFromCache(Path diagramPath)
+        public File GetDiagramFile(Path diagramPath, IFolder folder)
         {
-            if (_diagramsByName != null && _diagramsByName.ContainsKey(diagramPath))
-            {
-                var diagram = _diagramsByName[diagramPath];
-                var filePath = System.IO.Path.GetTempPath() + diagram.Guid.ToString() + ".png";
-                return new FilePath(filePath);
-            }
-            return null;
+			return new File(folder, $@"{diagramPath}.png");
         }
 
         public Package GetElementsByPackage(Path path)
         {
-            if (File.Exists($@"GetElementsByPackage-{path}.json"))
+            File file = FileNames.GetPackage(_folder, path);
+            if (file.Exists())
             {
                 Package package;
                 try
                 {
-                    package = _jsonSerializer.Value.DeserializeFromFile<Package>($@"GetElementsByPackage-{path}.json");
+                    package = _jsonSerializer.Value.DeserializeFromFile<Package>(file.AbsolutePath);
                 }
                 catch (JsonReaderException jre)
                 {
@@ -192,9 +200,10 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             {
                 return _elementsByName[elementName];
             }
-            if (File.Exists("elementList.json"))
+            var file = new File(_folder, FileNames.ELEMENT_LIST);
+            if (IO.File.Exists(file.AbsolutePath))
             {
-                var elementList = _jsonSerializer.Value.DeserializeFromFile<ElementList>("elementList.json");
+                var elementList = _jsonSerializer.Value.DeserializeFromFile<ElementList>(file.AbsolutePath);
                 _elementsByName = elementList.Elements.ToDictionary(x => x.Name, x => x);
                 if (_elementsByName != null && _elementsByName.ContainsKey(elementName))
                 {
@@ -210,20 +219,22 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             {
                 return _elements;
             }
-            if (File.Exists("elementList.json"))
+            var file = new File(_folder, FileNames.ELEMENT_LIST);
+            if (file.Exists())
             {
-                var elementList = _jsonSerializer.Value.DeserializeFromFile<ElementList>("elementList.json");
+                var elementList = _jsonSerializer.Value.DeserializeFromFile<ElementList>(file.AbsolutePath);
                 return _elements = elementList.Elements;
             }
             return null;
         }
 
-        public FilePath GetDiagramFilePath(Diagram diagram)
+        public File GetDiagramFile(Diagram diagram, IFolder folder)
         {
-            var filePath = System.IO.Path.GetTempPath() + diagram.Guid.ToString() + ".png";
-            if (File.Exists(filePath))
+            var fileName = diagram.Guid.ToString() + ".png";
+			var file = new File(folder, fileName);
+            if (IO.File.Exists(file.AbsolutePath))
             {
-                return new FilePath(filePath);
+				return file;
             }
             return null;
         }
@@ -239,10 +250,10 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			{
 				return _elementsByPath[packagePath];
 			}
-			var fileName = $@"Elements - {packagePath}.json";
-			if (File.Exists(fileName))
+            var file = FileNames.GetElementsByPackage(_folder, packagePath);
+			if (file.Exists())
 			{
-				var elementList = _jsonSerializer.Value.DeserializeFromFile<List<Element>>(fileName);
+				var elementList = _jsonSerializer.Value.DeserializeFromFile<List<Element>>(file.AbsolutePath);
 				return _elementsByPath[packagePath] = elementList;
 			}
 			return null;
@@ -254,10 +265,10 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			{
 				return _diagramPathsByPackagePath[packagePath];
 			}
-			var fileName = $@"DiagramPaths - {packagePath}.json";
-			if (File.Exists(fileName))
+            File file = FileNames.GetDiagramPathsByPackage(_folder, packagePath);
+			if (file.Exists())
 			{
-				var diagramPathList = _jsonSerializer.Value.DeserializeFromFile<PathList>(fileName);
+				var diagramPathList = _jsonSerializer.Value.DeserializeFromFile<PathList>(file.AbsolutePath);
 				return _diagramPathsByPackagePath[packagePath] = diagramPathList.Paths.Select(p => new Path(p));
 			}
 			return null;
@@ -273,10 +284,12 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             jsonSerializer.Converters.Add(new PathConverter());
             return jsonSerializer;
         });
+        private IFolder _folder;
 
-        public EaProvider(RepositoryWrapper repository)
+        public EaProvider(RepositoryWrapper repository, RenderSettings renderSettings)
         {
             _repository = repository;
+             _folder = renderSettings.GetExtensionFolder(FileNames.ENTERPRISE_ARCHITECT);
         }
 
         public Package GetElementsByPackage(Path path)
@@ -284,7 +297,8 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             EA.Package rootPackage = (EA.Package)_repository.Repository.Models.GetAt(0);
             EA.Package eaPackage = rootPackage.GetPackage(path);
             Package package = FromEaPackage(eaPackage, path);
-            _jsonSerializer.Value.SerializeToFile(package, $@"GetElementsByPackage-{path}.json");
+            var file = FileNames.GetPackage(_folder, path);
+            _jsonSerializer.Value.SerializeToFile(package, file.AbsolutePath);
             return package;
         }
 
@@ -320,7 +334,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return package;
         }
 
-        public FilePath GetDiagramFilePath(Path diagramPath)
+        public File GetDiagramFile(Path diagramPath, IFolder folder)
         {
             EA.Package rootPackage = (EA.Package)_repository.Repository.Models.GetAt(0);
 			var packagePath = diagramPath.RemoveLast(); // remove diagram part
@@ -332,11 +346,11 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			{
 				throw new ArgumentException($@"Could not find diagram with path [{diagramPath}]");
 			}
-			var filePath = $@"{diagramPath}.png";
+			var fileName = $@"{diagramPath}.png";
             var project = _repository.Repository.GetProjectInterface();
-			var fullFilePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), filePath);
-            project.PutDiagramImageToFile(eaDiagram.DiagramGUID, fullFilePath, 1);
-            return new FilePath(filePath);
+			var file = new File(folder, fileName);
+            project.PutDiagramImageToFile(eaDiagram.DiagramGUID, file.AbsolutePath, 1);
+			return file;
         }
 
         public Element GetElementByName(string elementName)
@@ -413,15 +427,15 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return elements.Where(filter);
         }
 
-        public FilePath GetDiagramFilePath(Diagram diagram)
+        public File GetDiagramFile(Diagram diagram, IFolder folder)
         {
             var eaDiagram = _repository.Repository.GetDiagramByID(diagram.Id);
-            var filePath = System.IO.Path.GetTempPath() + eaDiagram.DiagramGUID.ToString() + ".png";
+            var file = FileNames.GetDiagram(_folder, diagram.Name);
             var project = _repository.Repository.GetProjectInterface();
-            project.PutDiagramImageToFile(eaDiagram.DiagramGUID, filePath, 1);
+            project.PutDiagramImageToFile(eaDiagram.DiagramGUID, file.AbsolutePath, 1);
             var diagrams = new DiagramList { Diagrams = new List<Diagram> { diagram } };
-            _jsonSerializer.Value.SerializeToFile(diagrams, "diagramList.json");
-            return new FilePath(filePath);
+            _jsonSerializer.Value.SerializeToFile(diagrams, file.AbsolutePath);
+            return file;
         }
 
 		private EA.Package GetPackage(Path path)
@@ -473,8 +487,8 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 				var elements = package.Elements
 					.Cast<EA.Element>()
 					.Select(CreateElement);
-				var fileName = $@"Elements - {packagePath}.json";
-				_jsonSerializer.Value.SerializeToFile(elements, fileName);
+                var file = FileNames.GetElementsByPackage(_folder, packagePath);
+				_jsonSerializer.Value.SerializeToFile(elements, file.AbsolutePath);
 				return elements;
 			}
 		}
@@ -489,9 +503,9 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 				var path = packagePath.CreateChild(diagram.Name);
 				paths.Add(path);
 			}
-			var fileName = $@"DiagramPaths - {packagePath}.json";
+            var file = FileNames.GetDiagramPathsByPackage(_folder, packagePath);
 			var pathList = new PathList { Paths = paths.Select(p => p.ToString()).ToList() };
-			_jsonSerializer.Value.SerializeToFile(pathList, fileName);
+			_jsonSerializer.Value.SerializeToFile(pathList, file.AbsolutePath);
 			return paths;
 		}
 	}

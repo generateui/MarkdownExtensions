@@ -26,35 +26,31 @@ namespace WebApplication1
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            var formatSettings = new FormatSettings
-            {
-                ForceRefreshData = false
-            };
+
             var scope = new ThreadScopedLifestyle();
             container.Options.DefaultScopedLifestyle = scope;
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-            container.RegisterInstance(formatSettings);
-            container.Register<IMarkdownConverter, MarkdownExtensionConverter>(Lifestyle.Scoped);
-            container.Register<Func<IMarkdownConverter>>(() => container.GetInstance<IMarkdownConverter>, Lifestyle.Scoped);
+            //container.Register<IMarkdownConverter, MarkdownExtensionConverter>(Lifestyle.Scoped);
+            //container.Register<Func<IMarkdownConverter>>(() => container.GetInstance<IMarkdownConverter>, Lifestyle.Scoped);
             //container.Register<Ea.ObjectText>(scope);
             //Ea.Plugin.Register(container);
-            container.Collection.Register<IMarkdownExtension>(
-                typeof(FolderFromDisk),
-                typeof(Folder),
-                //typeof(GitGraph),
-                //typeof(GitHistory),
-                //typeof(Ea.ObjectText),
-                //typeof(Ea.DiagramImage),
-                //typeof(Ea.TableNotes),
-                //typeof(Ea.RequirementsTable),
-                //typeof(PanZoomImage),
-                //typeof(Snippet),
-                //typeof(MsSqlTable),
-                //typeof(NestedBlockExample),
-                //typeof(NestedInlineExample),
-                typeof(ExcelTable)
-            //typeof(KeyboardKeys)
-            );
+            //container.Collection.Register<IMarkdownExtension>(
+            //    typeof(FolderFromDisk),
+            //    typeof(Folder),
+            //    //typeof(GitGraph),
+            //    //typeof(GitHistory),
+            //    //typeof(Ea.ObjectText),
+            //    //typeof(Ea.DiagramImage),
+            //    //typeof(Ea.TableNotes),
+            //    //typeof(Ea.RequirementsTable),
+            //    //typeof(PanZoomImage),
+            //    //typeof(Snippet),
+            //    //typeof(MsSqlTable),
+            //    //typeof(NestedBlockExample),
+            //    //typeof(NestedInlineExample),
+            //    typeof(ExcelTable)
+            ////typeof(KeyboardKeys)
+            //);
         }
 
         public IConfiguration Configuration { get; }

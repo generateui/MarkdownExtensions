@@ -1,6 +1,6 @@
 ﻿using MarkdownExtensions;
 using System.Collections.Generic;
-using System.IO;
+using IO = System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -11,7 +11,7 @@ namespace MarkdownExtension.BpmnGraph
 		public override void Render(ExtensionHtmlRenderer renderer, BpmnGraph bpmnGraph, IFormatState formatState)
 		{
 			var sb = new StringBuilder();
-			var bpmnXml = File.ReadAllText(bpmnGraph.FileUri);
+			var bpmnXml = IO.File.ReadAllText(bpmnGraph.FileUri);
 			// Loading BPMN xml from filesystem results in a CORS error
 			sb.AppendLine($@"
 				<div class='box'>

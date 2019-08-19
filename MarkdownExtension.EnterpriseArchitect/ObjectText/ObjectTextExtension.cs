@@ -13,7 +13,7 @@ namespace MarkdownExtension.EnterpriseArchitect.ObjectText
 			Transformer = new ObjectTextTransformer(provider);
         }
 
-        public IParser Parser { get; }
+		public IParser Parser { get; }
         public IRenderer Renderer => null;
 		public IValidator Validator => null;
 		public ITransformer Transformer { get; }

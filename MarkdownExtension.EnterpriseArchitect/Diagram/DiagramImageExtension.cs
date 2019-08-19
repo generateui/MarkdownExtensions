@@ -7,12 +7,10 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 {
 	public partial class DiagramImageExtension : IExtension
 	{
-		private readonly FormatSettings formatSettings;
-
-		public DiagramImageExtension(IEaProvider provider, FormatSettings formatSettings)
+		public DiagramImageExtension(IEaProvider provider, RenderSettings renderSettings)
 		{
 			Parser = new DiagramSyntax();
-			Renderer = new DiagramRenderer(provider, formatSettings);
+			Renderer = new DiagramRenderer(provider, renderSettings);
 		}
 
 		public IParser Parser { get; }

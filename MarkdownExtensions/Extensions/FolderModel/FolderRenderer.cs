@@ -1,28 +1,28 @@
 ﻿using Markdig.Syntax;
-using MarkdownExtensions.Extensions.FolderModel;
+using FM = MarkdownExtensions.Extensions.FolderModel;
 using System;
 using System.Collections.Generic;
 
 namespace MarkdownExtensions.Extensions.FolderFromDisk
 {
-    internal abstract class FolderRenderer<TFolderBlock> : BlockRendererBase<Folder, TFolderBlock>
+    internal abstract class FolderRenderer<TFolderBlock> : BlockRendererBase<FM.Folder, TFolderBlock>
 		where TFolderBlock : FencedCodeBlock, IExtensionBlock
 	{
-		public override void Render(ExtensionHtmlRenderer renderer, Folder model, IFormatState formatState)
+		public override void Render(ExtensionHtmlRenderer renderer, FM.Folder model, IFormatState formatState)
 		{
 			void write(string value) => renderer.Write(value);
 			Output(model, 1, write);
 		}
 
-		private void Output(Folder folder, int indent, Action<string> write)
+		private void Output(FM.Folder folder, int indent, Action<string> write)
         {
 			write(@"<ul class='folder-content'>");
 			write($@"<li class='folder'>{folder.Name}</li>");
-            foreach (Folder subFolder in folder.Folders)
+            foreach (FM.Folder subFolder in folder.Folders)
             {
                 Output(subFolder, indent + 1, write);
             }
-            foreach (File file in folder.Files)
+            foreach (FM.File file in folder.Files)
             {
 				write($@"<li class='file'>{file.Name}</li>");
             }

@@ -2,7 +2,7 @@
 using MarkdownExtensions;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
+using IO = System.IO;
 using System.Text;
 
 namespace MarkdownExtension.Excel
@@ -12,7 +12,7 @@ namespace MarkdownExtension.Excel
 		public override void Render(ExtensionHtmlRenderer renderer, ExcelTableSelection excelSelection, IFormatState formatState)
 		{
 			var excelTable = new ExcelTable { Rows = new List<Row>() };
-			using (var stream = File.Open(excelSelection.FileName, FileMode.Open, FileAccess.Read))
+			using (var stream = IO.File.Open(excelSelection.FileName, IO.FileMode.Open, IO.FileAccess.Read))
 			{
 				using (var reader = ExcelReaderFactory.CreateReader(stream))
 				{

@@ -1,31 +1,31 @@
 ﻿using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
 using System;
-using System.IO;
+using IO = System.IO;
 
 namespace MarkdownExtension.EnterpriseArchitect.Diagram
 {
 	public class DiagramRenderer : BlockRendererBase<Diagram, DiagramBlock>
 	{
 		private readonly IEaProvider _provider;
-		private readonly FormatSettings _formatSettings;
+		private readonly RenderSettings _renderSettings;
 
-		public DiagramRenderer(IEaProvider provider, FormatSettings formatSettings)
+		public DiagramRenderer(IEaProvider provider, RenderSettings renderSettings)
 		{
 			_provider = provider;
-			_formatSettings = formatSettings;
+			_renderSettings = renderSettings;
 		}
 
 		public override void Render(ExtensionHtmlRenderer renderer, Diagram diagram, IFormatState formatState)
 		{
 			if (diagram.Path != null)
 			{
-				var path = new EaProvider.Path(diagram.Path);
+				var path = new Path(diagram.Path);
 				RenderDiagram(path, renderer);
 			}
 			if (diagram.PackagePath != null)
 			{
-				var path = new EaProvider.Path(diagram.PackagePath);
+				var path = new Path(diagram.PackagePath);
 				var paths = _provider.GetDiagramPaths(path);
 				foreach(var diagramPath in paths)
 				{
@@ -34,28 +34,22 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 			}
 		}
 
-		private void RenderDiagram(EaProvider.Path diagramPath, ExtensionHtmlRenderer renderer)
+		private void RenderDiagram(Path diagramPath, ExtensionHtmlRenderer renderer)
 		{
-			FilePath filePath = _provider.GetDiagramFilePath(diagramPath);
-			if (File.Exists(filePath.Value))
+			var folder = renderer.FolderManager.RenderSettings.ImageFolder;
+			File file = _provider.GetDiagramFile(diagramPath, folder);
+			renderer.FolderManager.RegisterImageFile(file);
+			if (IO.File.Exists(file.AbsolutePath))
 			{
-				if (_formatSettings.EmbedImages)
+				if (_renderSettings.EmbedImages)
 				{
-					var bytes = File.ReadAllBytes(filePath.Value);
+					var bytes = IO.File.ReadAllBytes(file.AbsolutePath);
 					var base64 = Convert.ToBase64String(bytes);
 					renderer.Write($@"<img src='data:image/png;base64,{base64}' />");
 				}
 				else
 				{
-					var folder = renderer.RenderSettings.RelativeImageFolder;
-					if (!string.IsNullOrEmpty(folder))
-					{
-						folder += @"/";
-					}
-					var uri = $@"{folder}{filePath.Value}";
-					renderer.Write($@"<img src='{uri}' />");
-					var absoluteFilePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), filePath.Value);
-					renderer.RegisterImage(filePath.Value, absoluteFilePath);
+					renderer.Write($@"<img src='{file.RelativePath}' />");
 				}
 			}
 			else

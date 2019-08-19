@@ -1,7 +1,7 @@
 ﻿using Markdig;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using System.IO;
+using IO = System.IO;
 
 namespace MarkdownExtensions.Extensions.Snippet
 {
@@ -46,9 +46,9 @@ namespace MarkdownExtensions.Extensions.Snippet
 	{
 		public override void Transform(ExtensionHtmlRenderer extensionHtmlRenderer, SnippetBlock block, Snippet astNode)
 		{
-			var renderSettings = extensionHtmlRenderer.RenderSettings;
-			string fullFilePath = Path.Combine(renderSettings.SourceFolder, astNode.FileName);
-			string content = File.ReadAllText(fullFilePath);
+			var renderSettings = extensionHtmlRenderer.FolderManager.RenderSettings;
+			string fullFilePath = IO.Path.Combine(renderSettings.SourceFolder.Absolute.FullPath, astNode.FileName);
+			string content = IO.File.ReadAllText(fullFilePath);
 			MarkdownDocument document = Markdown.Parse(content);
 
 			int level = block.GetHeadingLevel();

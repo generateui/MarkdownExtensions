@@ -2,7 +2,7 @@
 using MarkdownExtensions;
 using System;
 using System.Data;
-using System.IO;
+using IO = System.IO;
 
 namespace MarkdownExtension.Excel
 {
@@ -10,14 +10,14 @@ namespace MarkdownExtension.Excel
 	{
 		public override IErrors ValidateTyped(ExcelTableSelection excelSelection, SourceSettings sourceSettings)
 		{
-			var fullFilePath = Path.Combine(sourceSettings.Folder, excelSelection.FileName);
-			if (!File.Exists(fullFilePath))
+			var fullFilePath = IO.Path.Combine(sourceSettings.Folder, excelSelection.FileName);
+			if (!IO.File.Exists(fullFilePath))
 			{
 				return new ValidationFailure(new Error($@"File [{excelSelection.FileName}] not found, tried looking at [{fullFilePath}]"));
 			}
 			try
 			{
-				using (var stream = File.Open(fullFilePath, FileMode.Open, FileAccess.Read))
+				using (var stream = IO.File.Open(fullFilePath, IO.FileMode.Open, IO.FileAccess.Read))
 				using (var reader = ExcelReaderFactory.CreateReader(stream))
 				{
 					DataSet result = reader.AsDataSet();

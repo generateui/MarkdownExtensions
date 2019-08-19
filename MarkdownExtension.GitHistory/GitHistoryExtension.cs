@@ -27,7 +27,7 @@ namespace MarkdownExtension.GitHistory
 		public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer) =>
 			renderer.ObjectRenderers.Insert(0, Renderer);
 	}
-    public static class CommitExtensions
+	public static class CommitExtensions
     {
         public static string ToText(this Commit commit)
         {

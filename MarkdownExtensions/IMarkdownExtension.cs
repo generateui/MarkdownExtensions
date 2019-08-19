@@ -62,14 +62,6 @@ namespace MarkdownExtensions
     {
         public int HeadingLevel { get; set; }
     }
-    public class FormatSettings
-    {
-        /// <summary>
-        /// Forces extensions to re-query their data sources instead of using cached data
-        /// </summary>
-        public bool ForceRefreshData { get; set; }
-		public bool EmbedImages { get; set; }
-	}
 
     public class Position
     {

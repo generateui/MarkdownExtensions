@@ -46,5 +46,6 @@ namespace MarkdownExtensions.Extensions.NestedInline
 		{
 			throw new System.NotImplementedException();
 		}
+		public void ParseSettings(dynamic toml) { }
 	}
 }

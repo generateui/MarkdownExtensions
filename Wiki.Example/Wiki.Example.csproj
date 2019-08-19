@@ -9,11 +9,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Introduction.md" />
+    <EmbeddedResource Include="doc\Introduction.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\MarkdownExtension.EnterpriseArchitect\EaTest.eapx" Link="EaTest.eapx" />
+    <None Include="..\MarkdownExtension.EnterpriseArchitect\EaTest.eapx" Link="doc\EaTest.eapx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="doc\EnterpriseArchitect.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="doc\Index.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="doc\settings.toml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
