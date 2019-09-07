@@ -53,6 +53,14 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					sb.AppendLine(notes);
 				}
 				bool hasFieldNotes = false;
+				foreach (var taggedValue in table.TaggedValues)
+				{
+					if (string.IsNullOrEmpty(taggedValue.Value))
+					{
+						continue;
+					}
+					sb.AppendLine($@"- **{taggedValue.Key}**: {taggedValue.Value}");
+				}
 				foreach (var attribute in table.Attributes)
 				{
 					if (string.IsNullOrEmpty(attribute.Notes))

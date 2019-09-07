@@ -373,10 +373,23 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                             Attributes = e.Attributes
                                 .Cast<EA.Attribute>()
                                 .Select(CreateAttribute)
-                                .ToList()
+                                .ToList(),
+							TaggedValues = CreateTaggedValues(e)
                         };
 
-        private static Attribute CreateAttribute(EA.Attribute a) =>
+		private static Dictionary<string, string> CreateTaggedValues(EA.Element e)
+		{
+			var result = new Dictionary<string, string>();
+			foreach (var tv in e.TaggedValues.OfType<EA.TaggedValue>())
+			{
+				var name = tv.Name;
+				var value = tv.Value;
+				result[name] = value;
+			}
+			return result;
+		}
+
+		private static Attribute CreateAttribute(EA.Attribute a) =>
                         new Attribute
                         {
                             Id = a.AttributeID,
@@ -603,6 +616,9 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
 		[JsonProperty("alias")]
 		public string Alias { get; set; }
+
+		[JsonProperty("taggedValues")]
+		public Dictionary<string, string> TaggedValues { get; internal set; }
 	}
 	public sealed class BpmnElement : Element
 	{

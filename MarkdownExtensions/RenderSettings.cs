@@ -25,6 +25,7 @@ namespace MarkdownExtensions
         public IFolder ImageFolder { get; internal set; }
 		public IFolder CssFolder { get; internal set; }
 		public IFolder JavascriptFolder { get; internal set; }
+		public IFolder MarkdownFolder { get; internal set; }
 		public IFolder OutputFolder { get; internal set; }
 		public File SettingsFile { get; set; }
 
@@ -36,14 +37,15 @@ namespace MarkdownExtensions
 
 		public TomlTable Settings { get; private set; }
 
-		public static RenderSettings DefaultWiki(AbsoluteFolder absoluteFolder)
+		public static RenderSettings DefaultWiki(AbsoluteFolder rootFolder)
 		{
-            var outputFolder = new Folder(absoluteFolder, new RelativeFolder("output"));
-            var sourceFolder = new Folder(absoluteFolder);
+            var outputFolder = new Folder(rootFolder, new RelativeFolder("output"));
+            var sourceFolder = new Folder(rootFolder);
             return new RenderSettings
 			{
                 SourceFolder = sourceFolder,
                 OutputFolder = outputFolder,
+				MarkdownFolder = new Folder(outputFolder.Absolute, new RelativeFolder("markdown")),
 				CssFolder = new Folder(outputFolder.Absolute, new RelativeFolder("css")),
 				JavascriptFolder = new Folder(outputFolder.Absolute, new RelativeFolder("javascript")),
 				ImageFolder = new Folder(outputFolder.Absolute, new RelativeFolder("image")),
@@ -63,6 +65,7 @@ namespace MarkdownExtensions
 		public void EnsureFoldersExist()
 		{
             CreateIfNeeded(OutputFolder);
+            CreateIfNeeded(MarkdownFolder);
             CreateIfNeeded(CssFolder);
             CreateIfNeeded(JavascriptFolder);
             CreateIfNeeded(ImageFolder);

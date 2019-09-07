@@ -39,9 +39,10 @@ namespace MarkdownExtensions.Extensions.FolderFromDisk
 	public sealed class FolderFromDiskExtension : IExtension
 	{
 		public static ExtensionName NAME => "Folder from disk";
-        public FolderFromDiskExtension()
+
+        public FolderFromDiskExtension(RenderSettings renderSettings)
         {
-            Parser = new FolderFromDiskParser();
+            Parser = new FolderFromDiskParser(renderSettings);
             Renderer = new FolderFromDiskRenderer();
         }
 

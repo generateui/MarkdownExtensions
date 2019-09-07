@@ -27,7 +27,7 @@ namespace MarkdownExtensions
 		}
 		public Folder(AbsoluteFolder absolute, RelativeFolder relative)
 		{
-			Absolute = absolute;
+			Absolute = new AbsoluteFolder(Path.Combine(absolute.FullPath, relative.Name));
 			Relative = relative;
 		}
 		public Folder(AbsoluteFolder absoluteFolder)
@@ -49,6 +49,7 @@ namespace MarkdownExtensions
         }
 
 		public string Name => Relative.Name;
+		public bool Exists() => System.IO.Directory.Exists(Absolute.FullPath);
 
 		public AbsoluteFolder Absolute { get; set; }
 		public RelativeFolder Relative { get; }

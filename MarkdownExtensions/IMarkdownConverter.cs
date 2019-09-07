@@ -27,7 +27,7 @@ namespace MarkdownExtensions
 			new Dictionary<IExtensionBlock, ITransformer>();
 		private readonly Dictionary<IExtensionInline, ITransformer> _transformerByInline =
 			new Dictionary<IExtensionInline, ITransformer>();
-		private readonly List<(IMarkdownExtension Extension, IError Error)> _errors;
+		private readonly List<(IMarkdownExtension Extension, IError Error)> _errors = new List<(IMarkdownExtension Extension, IError Error)>();
 		private readonly HashSet<ICode> _csss = new HashSet<ICode>();
 		private readonly HashSet<ICode> _javascripts = new HashSet<ICode>();
 

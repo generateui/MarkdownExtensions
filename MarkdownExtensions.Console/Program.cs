@@ -92,7 +92,10 @@ namespace MarkdownExtensions.Console
 		{
 			var pipelineBuilder = new MarkdownPipelineBuilder()
 				.UseAdvancedExtensions();
-			pipelineBuilder.Extensions.AddIfNotAlready<FolderFromDiskExtension>();
+
+			var folderFromDiskExtension = container.GetInstance<FolderFromDiskExtension>();
+			pipelineBuilder.Extensions.Add(folderFromDiskExtension);
+
 			pipelineBuilder.Extensions.AddIfNotAlready<NestedBlockExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<FolderListExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<SnippetExtension>();

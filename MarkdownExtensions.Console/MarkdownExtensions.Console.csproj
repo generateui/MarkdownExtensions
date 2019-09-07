@@ -54,6 +54,7 @@
     <None Include="Design.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Wiki.md" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
