@@ -6,7 +6,7 @@ namespace MarkdownExtension.MsSql
 {
 	public class MsSqlTableValidator : ValidatorBase<MsSqlTable>
 	{
-		public override IErrors ValidateTyped(MsSqlTable table, SourceSettings sourceSettings)
+		public override IErrors ValidateTyped(MsSqlTable table, RenderSettings renderSettings)
 		{
 			var scsb = new SqlConnectionStringBuilder();
 			using (var connection = new SqlConnection(@"Data Source=DESKTOP-A1T0LHV\SQLEXPRESS;Integrated Security=true;"))

@@ -29,7 +29,7 @@ namespace WebApplication1.Controllers
         [HttpGet("markdown/{prefix}")]
         public ActionResult<string> Get(string prefix, [FromBody] string markdown)
         {
-            var sourceSettings = new SourceSettings();
+            //var sourceSettings = new SourceSettings();
             var text = $@"```{prefix}:
 {markdown}
 ```";
@@ -50,7 +50,7 @@ namespace WebApplication1.Controllers
             var text = $@"```{prefix}:
 {md}
 ```";
-            var sourceSettings = new SourceSettings();
+            //var sourceSettings = new SourceSettings();
             //string html = _markdownConverter.Convert(text, sourceSettings: sourceSettings);
             //return html;
             return null;

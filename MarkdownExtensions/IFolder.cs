@@ -19,12 +19,6 @@ namespace MarkdownExtensions
 
 	public class Folder : IFolder
 	{
-		public Folder(string absoluteFolderPath)
-		{
-			Absolute = new AbsoluteFolder(absoluteFolderPath);
-			var name = Path.GetFileName(absoluteFolderPath);
-			Relative = new RelativeFolder(name, Absolute);
-		}
 		public Folder(AbsoluteFolder absolute, RelativeFolder relative)
 		{
 			Absolute = new AbsoluteFolder(Path.Combine(absolute.FullPath, relative.Name));
@@ -34,10 +28,6 @@ namespace MarkdownExtensions
 		{
 			Relative = null;
 			Absolute = absoluteFolder;
-		}
-		public Folder(RelativeFolder relative)
-		{
-			Relative = relative;
 		}
         public Folder(string name, IFolder parent)
         {
@@ -49,7 +39,7 @@ namespace MarkdownExtensions
         }
 
 		public string Name => Relative.Name;
-		public bool Exists() => System.IO.Directory.Exists(Absolute.FullPath);
+		public bool Exists() => Directory.Exists(Absolute.FullPath);
 
 		public AbsoluteFolder Absolute { get; set; }
 		public RelativeFolder Relative { get; }
@@ -62,7 +52,6 @@ namespace MarkdownExtensions
 			FullPath = fullPath;
 		}
 		public string FullPath { get; }
-		public string Name { get; }
 	}
     public class RelativeFolder
     {
@@ -70,17 +59,6 @@ namespace MarkdownExtensions
 
         public RelativeFolder(string name)
         {
-            Name = name;
-        }
-        public RelativeFolder(string name, AbsoluteFolder parent)
-        {
-            Name = name;
-            Absolute = parent;
-        }
-
-        public RelativeFolder(string name, RelativeFolder parent)
-        {
-            Parent = parent;
             Name = name;
         }
 
@@ -114,11 +92,6 @@ namespace MarkdownExtensions
 		{
 			Folder = folder;
 			Name = name;
-		}
-		public File(string fullFilePath)
-		{
-			Folder = new Folder(Path.GetDirectoryName(fullFilePath));
-			Name = Path.GetFileName(fullFilePath);
 		}
 
 		public IFolder Folder { get; }

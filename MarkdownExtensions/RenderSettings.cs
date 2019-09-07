@@ -53,15 +53,6 @@ namespace MarkdownExtensions
             };
 		}
 
-		public static RenderSettings DefaultFile()
-		{
-			return new RenderSettings
-			{
-				CssFolder = new Folder(new RelativeFolder("css")),
-				JavascriptFolder = new Folder(new RelativeFolder("javascript")),
-				ImageFolder = new Folder(new RelativeFolder("image")),
-			};
-		}
 		public void EnsureFoldersExist()
 		{
             CreateIfNeeded(OutputFolder);

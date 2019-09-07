@@ -13,7 +13,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 		{
 			_provider = provider;
 		}
-		public override IErrors ValidateTyped(TableNotes tableNotes, SourceSettings sourceSettings)
+		public override IErrors ValidateTyped(TableNotes tableNotes, RenderSettings renderSettings)
 		{
 			if (tableNotes.PackagePath != null)
 			{
