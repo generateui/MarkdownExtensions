@@ -11,11 +11,12 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 		{
 			Parser = new DiagramSyntax();
 			Renderer = new DiagramRenderer(provider, renderSettings);
+			Validator = new DiagramValidator(provider, renderSettings);
 		}
 
 		public IParser Parser { get; }
 		public IRenderer Renderer { get; }
-		public IValidator Validator => null;
+		public IValidator Validator { get; }
 		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "EA diagram";
 		public ExtensionName Name => NAME;

@@ -4,6 +4,7 @@
 - [Introduction](Introduction.md)
 - [License](License.md)
 - [Enterprise Architect](EnterpriseArchitect.md)
+- [Errors](Errors.md)
 
 Link to the [Links] header.
 

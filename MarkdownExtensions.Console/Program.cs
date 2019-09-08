@@ -191,7 +191,7 @@ namespace MarkdownExtensions.Console
 				renderer.Parse(container);
 				// validate errors
 				renderer.Transform();
-				// run validations
+				renderer.Validate(container);
 				renderer.Render(markdownDocument);
 				var css = renderer.CollectCss();
 				csss.Append(css);

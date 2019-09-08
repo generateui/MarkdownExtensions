@@ -14,11 +14,13 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         Package GetElementsByPackage(Path path);
         File GetDiagramFile(Path diagramPath, IFolder folder);
         File GetDiagramFile(Diagram diagram, IFolder folder);
-        Element GetElementByName(string elementName);
+		bool IsValidDiagramPath(Path path, IFolder folder);
+		Element GetElementByName(string elementName);
         IEnumerable<Element> GetElements(Func<Element, bool> filter);
         IEnumerable<Element> GetElements(Path packagePath, bool recursive = false);
 		(Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath);
 		IEnumerable<Path> GetDiagramPaths(Path packagePath);
+		bool IsValidPackagePath(Path packagePath, IFolder folder);
 	}
     internal static class FileNames
     {
@@ -146,7 +148,26 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             }
             return _eaProvider.GetElementsByPackage(path);
         }
-    }
+
+		public bool IsValidDiagramPath(Path path, IFolder folder)
+		{
+			if (!_renderSettings.ForceRefreshData)
+			{
+				var file = _jsonProvider.GetDiagramFile(path, folder);
+				return file.Exists();
+			}
+			return _eaProvider.IsValidDiagramPath(path, folder);
+		}
+
+		public bool IsValidPackagePath(Path packagePath, IFolder folder)
+		{
+			if (!_renderSettings.ForceRefreshData)
+			{
+				return _jsonProvider.IsValidPackagePath(packagePath, folder);
+			}
+			return _eaProvider.IsValidPackagePath(packagePath, folder);
+		}
+	}
 
 	internal class JsonProvider : IEaProvider
 	{
@@ -272,6 +293,18 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 				return _diagramPathsByPackagePath[packagePath] = diagramPathList.Paths.Select(p => new Path(p));
 			}
 			return null;
+		}
+
+		public bool IsValidDiagramPath(Path path, IFolder folder)
+		{
+			var file = GetDiagramFile(path, folder);
+			return file.Exists();
+		}
+
+		public bool IsValidPackagePath(Path packagePath, IFolder imageFolder)
+		{
+			File file = FileNames.GetPackage(_folder, packagePath);
+			return file.Exists();
 		}
 	}
 	internal class EaProvider : IEaProvider
@@ -520,6 +553,23 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			var pathList = new PathList { Paths = paths.Select(p => p.ToString()).ToList() };
 			_jsonSerializer.Value.SerializeToFile(pathList, file.AbsolutePath);
 			return paths;
+		}
+
+		public bool IsValidDiagramPath(Path diagramPath, IFolder folder)
+		{
+			EA.Package rootPackage = (EA.Package)_repository.Repository.Models.GetAt(0);
+			var packagePath = diagramPath.RemoveLast(); // remove diagram part
+			EA.Package package = rootPackage.GetPackage(packagePath);
+			var diagramName = diagramPath.Parts.Last();
+			bool Filter(EA.Diagram diagram) => diagram.Name.Equals(diagramName);
+			EA.Diagram eaDiagram = package.Diagrams.Cast<EA.Diagram>().FirstOrDefault(Filter);
+			return eaDiagram == null;
+		}
+
+		public bool IsValidPackagePath(Path packagePath, IFolder imageFolder)
+		{
+			EA.Package package = GetPackage(packagePath);
+			return package == null;
 		}
 	}
 
