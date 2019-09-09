@@ -37,6 +37,12 @@ namespace MarkdownExtensions.Extensions.FolderFromDisk
         private static FM.Folder EnumerateFolder(string path)
         {
             var files = new List<FM.File>();
+			if (path.Length > 248)
+			{
+				// suppress PathTooLongException
+				var name1 = System.IO.Path.GetFileName(path);
+				return new FM.Folder(name1, new List<FM.Folder>(), files);
+			}
             foreach (var file in System.IO.Directory.EnumerateFiles(path))
             {
                 files.Add(new FM.File(System.IO.Path.GetFileName(file)));
