@@ -16,7 +16,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         File GetDiagramFile(Diagram diagram, IFolder folder);
 		bool IsValidDiagramPath(Path path, IFolder folder);
 		Element GetElementByName(string elementName);
-        IEnumerable<Element> GetElements(Func<Element, bool> filter);
+        IEnumerable<Element> GetElements(Path packagePath, Func<Element, bool> filter, string filterName, bool recursive = false);
         IEnumerable<Element> GetElements(Path packagePath, bool recursive = false);
 		(Element bpmnWorkflow, IEnumerable<BpmnElement>) GetBpmnElements(Path bpmnElementPath);
 		IEnumerable<Path> GetDiagramPaths(Path packagePath);
@@ -28,10 +28,13 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         internal static string ELEMENT_LIST = "elementList.json";
         internal static string DIAGRAM_LIST = "diagramList.json";
 
-        internal static File GetElementsByPackage(IFolder folder, Path packagePath) => 
-            new File(folder, $@"Elements - {packagePath}.json");
+		internal static File GetElementsByPackage(IFolder folder, Path packagePath) =>
+			new File(folder, $@"Elements - {packagePath}.json");
 
-        internal static File GetDiagramPathsByPackage(IFolder folder, Path packagePath) =>
+		internal static File GetElementsFiltered(IFolder folder, Path packagePath, string filterName) =>
+			new File(folder, $@"Elements ({filterName}) - {packagePath}.json");
+
+		internal static File GetDiagramPathsByPackage(IFolder folder, Path packagePath) =>
             new File(folder, $@"DiagramPaths - {packagePath}.json");
 
         internal static File GetPackage(IFolder folder, Path path) =>
@@ -110,17 +113,17 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return _eaProvider.GetElementByName(elementName);
         }
 
-        public IEnumerable<Element> GetElements(Func<Element, bool> filter)
+        public IEnumerable<Element> GetElements(Path packagePath, Func<Element, bool> filter, string filterName, bool recursive = false)
         {
             if (!_renderSettings.ForceRefreshData)
             {
-                var result = _jsonProvider.GetElements(filter);
+                var result = _jsonProvider.GetElements(packagePath, filter, filterName, recursive);
                 if (result != null)
                 {
                     return result;
                 }
             }
-            return _eaProvider.GetElements(filter);
+            return _eaProvider.GetElements(packagePath, filter, filterName, recursive);
         }
 
 		public IEnumerable<Element> GetElements(Path packagePath, bool recursive = false)
@@ -234,13 +237,13 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             return null;
         }
 
-        public IEnumerable<Element> GetElements(Func<Element, bool> filter)
+        public IEnumerable<Element> GetElements(Path packagePath, Func<Element, bool> filter, string filterName, bool recursive = false)
         {
             if (_elements != null)
             {
                 return _elements;
             }
-            var file = new File(_folder, FileNames.ELEMENT_LIST);
+            var file = FileNames.GetElementsFiltered(_folder, packagePath, filterName);
             if (file.Exists())
             {
                 var elementList = _jsonSerializer.Value.DeserializeFromFile<ElementList>(file.AbsolutePath);
@@ -403,6 +406,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                             Name = e.Name,
                             Notes = e.Notes.FixNewlines(),
                             Stereotype = e.Stereotype,
+							Type = e.Type,
                             Attributes = e.Attributes
                                 .Cast<EA.Attribute>()
                                 .Select(CreateAttribute)
@@ -427,6 +431,10 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                         {
                             Id = a.AttributeID,
                             Name = a.Name,
+							Type = a.Type,
+							Length = string.IsNullOrEmpty(a.Length) ? 0 : int.Parse(a.Length),
+							Nullable = a.LowerBound != "1",
+							DefaultValue = a.Default,
                             Notes = a.Notes.FixNewlines()
                         };
         private static Diagram CreateDiagram(EA.Diagram d, Path parentPath) =>
@@ -438,39 +446,27 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
                 Path = parentPath.CreateChild(d.Name)
             };
 
-        private IEnumerable<Element> GetElements()
+		public IEnumerable<Element> GetElements(Path packagePath, Func<Element, bool> filter, string filterName, bool recursive = false)
         {
-            if (_elements != null)
-            {
-                return _elements;
-            }
-            var package = (EA.Package)_repository.Repository.Models.GetAt(0);
-            Attribute CreateAttribute(EA.Attribute a) =>
-                new Attribute
-                {
-                    Id = a.AttributeID,
-                    Name = a.Name,
-                    Notes = a.Notes.FixNewlines()
-                };
-            Element CreateElement(EA.Element e) =>
-                new Element
-                {
-                    Id = e.ElementID,
-                    Name = e.Name,
-                    Notes = e.Notes.FixNewlines(),
-                    Stereotype = e.Stereotype,
-                    Attributes = e.Attributes
-                        .Cast<EA.Attribute>()
-                        .Select(CreateAttribute)
-                        .ToList()
-                };
-            return _elements = package.GetElements(e => true).Select(CreateElement).ToList();
-        }
-
-        public IEnumerable<Element> GetElements(Func<Element, bool> filter)
-        {
-            var elements = GetElements();
-            return elements.Where(filter);
+			var package = GetPackage(packagePath);
+			IEnumerable<Element> elements = null;
+			if (recursive)
+			{
+				var p = FromEaPackage(package);
+				elements = p.GetElementsRecursively();
+			}
+			else
+			{
+				EA.Package p = GetPackage(packagePath);
+				elements = p.Elements
+					.Cast<EA.Element>()
+					.Select(CreateElement);
+			}
+			var filtered = elements.Where(filter);
+			File file = FileNames.GetElementsFiltered(_folder, packagePath, filterName);
+			var elementList = new ElementList { Elements = filtered.ToList() };
+			_jsonSerializer.Value.SerializeToFile(elementList, file.AbsolutePath);
+            return filtered;
         }
 
         public File GetDiagramFile(Diagram diagram, IFolder folder)
@@ -524,20 +520,37 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 		{
 			EA.Package package = GetPackage(packagePath);
 
+			IEnumerable<Element> elements = null;
 			if (recursive)
 			{
-				throw new NotSupportedException();
+				var p = FromEaPackage(package);
+				elements = p.GetElementsRecursively();
 			}
 			else
 			{
-				var elements = package.Elements
+				elements = package.Elements
 					.Cast<EA.Element>()
 					.Select(CreateElement);
-                var file = FileNames.GetElementsByPackage(_folder, packagePath);
-				_jsonSerializer.Value.SerializeToFile(elements, file.AbsolutePath);
-				return elements;
 			}
+			var file = FileNames.GetElementsByPackage(_folder, packagePath);
+			_jsonSerializer.Value.SerializeToFile(elements, file.AbsolutePath);
+			return elements;
 		}
+
+		//private List<Package> GetChildPackages(Path packagePath, EA.Package package, List<Package> packages = null)
+		//{
+		//	packages = packages ?? new List<Package>();
+		//	if (package == null)
+		//	{
+		//		return packages;
+		//	}
+		//	foreach (var childPackage in package.Packages.OfType<EA.Package>())
+		//	{
+		//		var childPath = packagePath.CreateChild(childPackage.Name);
+		//		var cp = FromEaPackage(childPackage,)
+		//	}
+		//	return package;
+		//}
 
 		// TODO: support recursive
 		public IEnumerable<Path> GetDiagramPaths(Path packagePath)
@@ -700,12 +713,24 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("name")]
-        public string Name { get; internal set; }
+		[JsonProperty("name")]
+		public string Name { get; internal set; }
 
-        [JsonProperty("notes")]
+		[JsonProperty("type")]
+		public string Type { get; internal set; }
+
+		[JsonProperty("notes")]
         public string Notes { get; internal set; }
-    }
+
+		[JsonProperty("length")]
+		public int Length { get; internal set; }
+
+		[JsonProperty("nullable")]
+		public bool Nullable { get; internal set; }
+
+		[JsonProperty("defaultValue")]
+		public string DefaultValue { get; internal set; }
+	}
 	public sealed class Lane
 	{
 		[JsonProperty("id")]

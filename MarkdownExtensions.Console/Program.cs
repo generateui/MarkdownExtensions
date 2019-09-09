@@ -23,6 +23,7 @@ using MarkdownExtension.BpmnGraph;
 using MarkdownExtension.EnterpriseArchitect.Diagram;
 using MarkdownExtension.EnterpriseArchitect.TableNotes;
 using MarkdownExtension.EnterpriseArchitect.ObjectText;
+using MarkdownExtension.EnterpriseArchitect.DatamodelApi;
 
 namespace MarkdownExtensions.Console
 {
@@ -42,6 +43,7 @@ namespace MarkdownExtensions.Console
 				typeof(MsSqlTableExtension),
 				typeof(GitHistoryExtension),
 				typeof(GitGraphExtension),
+				typeof(DatamodelApiExtension),
 				typeof(WorkflowNotesExtension),
 				typeof(BpmnGraphExtension),
 				typeof(DiagramImageExtension),
@@ -108,6 +110,9 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<MarkdownLinkExtension>();
 
+			var datamodelApiExtension = container.GetInstance<DatamodelApiExtension>();
+			pipelineBuilder.Extensions.Add(datamodelApiExtension);
+
 			var workflowNotesExtension = container.GetInstance<WorkflowNotesExtension>();
 			pipelineBuilder.Extensions.Add(workflowNotesExtension);
 
@@ -139,6 +144,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<DiagramBlock, DiagramImageExtension>();
 			renderer.RegisterBlock<TableNotesBlock, TableNotesExtension>();
 			renderer.RegisterBlock<ObjectTextBlock, ObjectTextExtension>();
+			renderer.RegisterBlock<DatamodelApiBlock, DatamodelApiExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}

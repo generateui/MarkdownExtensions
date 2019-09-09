@@ -3,6 +3,7 @@ using Markdig.Syntax;
 using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
 using MarkdownExtensions.Extensions.Snippet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,9 +34,11 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 			}
 			else
 			{
-				tables = _provider
-					.GetElements(e => e.Stereotype == "table")
-					.Where(e => TableNotes.Include(tableNotes, e));
+				//tables = _provider
+				//	.GetElements(e => e.Stereotype == "table")
+				//	.Where(e => TableNotes.Include(tableNotes, e));
+				throw new NotImplementedException();
+
 			}
 
 			var all = new StringBuilder();

@@ -102,11 +102,15 @@ namespace MarkdownExtension.EnterpriseArchitect
         {
             var parts = new List<string> { package.Name };
             var parent = repository.GetPackageByID(package.ParentID);
-            while (parent.ParentID != 0)
+			var previousPackageId = 999;
+            while (parent.ParentID != 0 && parent.ParentID != previousPackageId)
             {
                 parts.Insert(0, parent.Name);
                 parent = repository.GetPackageByID(package.ParentID);
+				previousPackageId = parent.ParentID;
             }
+			var rootPackage = (EA.Package)repository.Models.GetAt(0);
+			parts.Insert(0, rootPackage.Name);
             return new Path(parts);
         }
     }
