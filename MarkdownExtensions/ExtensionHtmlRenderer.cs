@@ -396,6 +396,12 @@ namespace MarkdownExtensions
 				}
 			}
 		}
+
+		public void RegisterDynamicCss(ICode code)
+		{
+			_csss.Add(code);
+		}
+
 		public string CollectCss()
 		{
 			var sb = new StringBuilder();

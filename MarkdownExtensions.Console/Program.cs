@@ -107,7 +107,7 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.Add(snippetExtension);
 
 			pipelineBuilder.Extensions.AddIfNotAlready<PanZoomImageExtension>();
-			//pipelineBuilder.Extensions.AddIfNotAlready<KeyboardKeysExtension>(); //interferes with autolinks
+			pipelineBuilder.Extensions.AddIfNotAlready<KeyboardKeysExtension>(); //interferes with autolinks
 			pipelineBuilder.Extensions.AddIfNotAlready<ExcelTableExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<MsSqlTableExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<GitHistoryExtension>();

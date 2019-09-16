@@ -7,7 +7,7 @@ namespace MarkdownExtensions
     {
         public static void AppendCode(this StringBuilder sb, IEnumerable<ICode> codes)
         {
-            foreach (var entry in codes)
+            foreach (ICode entry in codes)
             {
 				var code = entry.GetCode();
                 sb.AppendLine(code);

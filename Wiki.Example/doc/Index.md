@@ -1,6 +1,11 @@
 ﻿# Index
 
 ```toc
+Level2: Decimal
+Level3: Decimal
+Level4: Decimal
+Level5: Decimal
+Level6: Decimal
 ```
 
 ## Links
@@ -14,6 +19,14 @@ Link to the [Links] header.
 
 ## Folder
 ### Folder using syntax
+````
+```folder
+- [root folder]
+	- [sub folder]
+	- file1
+	- file2
+```
+````
 ```folder
 - [root folder]
 	- [sub folder]
@@ -21,20 +34,47 @@ Link to the [Links] header.
 	- file2
 ```
 ### Folder using a relative path on disk
+````
+```folder-from-disk
+TestFolder
+```
+````
 ```folder-from-disk
 TestFolder
 ```
 ### Folder using an absolute path on disk
+````
+```folder-from-disk
+C:\Windows\Help\Windows
+```
+````
 ```folder-from-disk
 C:\Windows\Help\Windows
 ```
 
 ## Snippets from other markdown files
 ### Snippet placed as sibling
+````
+```md-snippet
+=SnippetExample.md:Header 1
+```
+```` 
+
 ```md-snippet
 =SnippetExample.md:Header 1
 ```
 ### Snippet placed as child of current header
+````
 ```md-snippet
 >SnippetExample.md:Header 1
 ```
+````
+```md-snippet
+>SnippetExample.md:Header 1
+```
+
+## Keyboard keys
+- `[keys:ctrl+a]` [keys:ctrl+a] 
+- `[keys:ctrl+alt+delete]` [keys:ctrl+alt+delete]
+- `[keys:⌘+a]` [keys:⌘+a]
+

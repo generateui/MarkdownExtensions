@@ -51,8 +51,12 @@ namespace MarkdownExtension.KeyboardKeys
 				}
 			}
 			slice.NextChar();
-			processor.Inline = new KeyboardKeysInline(result);
-			return true;
+			if (prefix == Prefix && colon)
+			{
+				processor.Inline = new KeyboardKeysInline(result);
+				return true;
+			}
+			return false;
 		}
 	}
 }
