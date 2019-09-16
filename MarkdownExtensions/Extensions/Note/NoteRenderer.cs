@@ -21,8 +21,9 @@ namespace MarkdownExtensions.Extensions.Note
 							padding-left: 1em;
 						}
 						.note:before {
-							font-size: 200%;
-							content: '\1F4DD';  /* 📝 */
+							font-size: 150%;
+							content: '\1F4D9';
+							padding-right: 0.25em;
 						}
 					";
 				});
