@@ -82,6 +82,12 @@ namespace MarkdownExtensions
 		{
 			Errors = new ErrorsImpl(errors);
 		}
+		public ParseFailure(int line, string message)
+		{
+			var range = new Range(new Position(line, 0), new Position(line, 0));
+			var error = new ParseError(range, message);
+			Errors = new ErrorsImpl(new[] { error });
+		}
 		public object SyntaxTree => null;
 		public IErrors Errors { get; }
 	}

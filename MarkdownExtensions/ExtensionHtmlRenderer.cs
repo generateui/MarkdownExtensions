@@ -2,6 +2,7 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using MarkdownExtensions.ExtensionMethods;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
@@ -219,25 +220,28 @@ namespace MarkdownExtensions
 			bool isError = false;
 			if (obj is IExtensionBlock block && _blockErrors.ContainsKey(block))
 			{
-				var errors = _blockErrors[block];
-				var sb = new StringBuilder();
-				sb.AppendLine("<ul class='error-list'>");
-				foreach (var error in errors.Errors)
+				if (!isSummary)
 				{
-					sb.AppendLine("<li class='error'>");
-					var extension = _extensionByBlock[block];
-					var extensionName = extension.GetType().Name;
-					var parseError = error as IParseError;
-					if (parseError != null)
+					var errors = _blockErrors[block];
+					var sb = new StringBuilder();
+					sb.AppendLine("<ul class='error-list'>");
+					foreach (var error in errors.Errors)
 					{
-						sb.Append($@"<span class='Range'>{parseError.Range}</span> ");
+						sb.AppendLine("<li class='error'>");
+						IExtension extension = _extensionByBlock[block];
+						string extensionName = extension.GetType().Name;
+						var parseError = error as IParseError;
+						if (parseError != null)
+						{
+							sb.Append($@"<span class='Range'>{parseError.Range}</span> ");
+						}
+						sb.Append($@"<span class='extension-name'>{extensionName}:</span>");
+						sb.Append($@"<span class='message'>{error.Message}</span>");
+						sb.AppendLine("</li>");
 					}
-					sb.Append($@"<span class='extension-name'>{extensionName}:</span>");
-					sb.Append($@"<span class='message'>{error.Message}</span>");
-					sb.AppendLine("</li>");
+					sb.AppendLine("</ul>");
+					WriteLine(sb.ToString());
 				}
-				sb.AppendLine("</ul>");
-				WriteLine(sb.ToString());
 				isError = true;
 			}
 			if (obj is IExtensionInline inline && _inlineErrors.ContainsKey(inline))
@@ -438,54 +442,6 @@ namespace MarkdownExtensions
 			var sb = new StringBuilder();
 			sb.AppendCode(_javascripts);
 			return sb.ToString();
-		}
-	}
-
-	public static class ContainerBlockExtensions
-	{
-		public static IEnumerable<IExtensionInline> GetInlinesRecursively(this ContainerBlock block, List<IExtensionInline> list = null)
-		{
-			list = list ?? new List<IExtensionInline>();
-			foreach (var child in block)
-			{
-				if (child is ContainerBlock containerBlock)
-				{
-					GetInlinesRecursively(containerBlock, list);
-				}
-				if (child is LeafBlock leafBlock && leafBlock.Inline != null)
-				{
-					foreach (Inline inline in leafBlock.Inline)
-					{
-						if (inline is IExtensionInline extensionInline)
-						{
-							list.Add(extensionInline);
-						}
-					}
-				}
-			}
-			return list;
-		}
-
-		public static IEnumerable<T> GetRecursivelyOfType<T>(this ContainerBlock block, List<T> list = null)
-			where T : IExtensionBlock
-		{
-			list = list ?? new List<T>();
-			if (block is IExtensionBlock extensionBlock)
-			{
-				list.Add((T)extensionBlock);
-			}
-			foreach (var child in block)
-			{
-				if (child is ContainerBlock cb)
-				{
-					GetRecursivelyOfType(cb, list);
-				}
-				if (child is IExtensionBlock eb)
-				{
-					list.Add((T)eb);
-				}
-			}
-			return list;
 		}
 	}
 }

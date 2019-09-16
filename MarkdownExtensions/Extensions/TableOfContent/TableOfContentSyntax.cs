@@ -6,32 +6,34 @@
 		{
 			string[] lines = text.Split('\n');
 			TableOfContent toc = null;
+			int lineNumber = -1;
 			if (lines.Length > 0)
 			{
 				foreach (var line in lines)
 				{
-					// level1: decimal
+					lineNumber += 1;
+					// example: "level1: decimal"
 					var sanitized = line.Trim().ToLower();
 					if (sanitized.StartsWith("level"))
 					{
-						if (!int.TryParse(sanitized[5].ToString(), out int level))
+						if (sanitized.Length < 6 || !int.TryParse(sanitized[5].ToString(), out int level))
 						{
-							continue;
+							return new ParseFailure(lineNumber, @"Line must start with ""level:""");
 						}
 						if (level < 1 && level > 6)
 						{
-							continue;
+							return new ParseFailure(lineNumber, @"Level must be 1, 2, 3, 4, 5 or 6");
 						}
 						var split = sanitized.Split(':');
 						if (split.Length != 2)
 						{
-							continue;
+							return new ParseFailure(lineNumber, @"After the ""level:"", specify the numbering style");
 						}
 						var numberingStyleText = split[1];
 						NumberingStyle numberingStyle = NumberingStyle.TryParse(numberingStyleText);
 						if (numberingStyle == null)
 						{
-							continue;
+							return new ParseFailure(lineNumber, $@"Unrecognized numbering style [{numberingStyleText}]");
 						}
 						toc = toc ?? TableOfContent.Empty();
 						switch (level)
