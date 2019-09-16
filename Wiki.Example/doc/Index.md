@@ -78,3 +78,10 @@ C:\Windows\Help\Windows
 - `[keys:ctrl+alt+delete]` [keys:ctrl+alt+delete]
 - `[keys:⌘+a]` [keys:⌘+a]
 
+## Note
+```
+Note: a paragraph with a note in it will be rendered as a note.
+```
+
+Note: a paragraph with a note in it will be rendered as a note.
+

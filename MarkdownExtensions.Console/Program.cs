@@ -25,6 +25,8 @@ using MarkdownExtension.EnterpriseArchitect.TableNotes;
 using MarkdownExtension.EnterpriseArchitect.ObjectText;
 using MarkdownExtension.EnterpriseArchitect.DatamodelApi;
 using MarkdownExtensions.Extensions.TableOfContent;
+using MarkdownExtensions.Extensions.Note;
+using Markdig.Syntax;
 
 namespace MarkdownExtensions.Console
 {
@@ -51,6 +53,7 @@ namespace MarkdownExtensions.Console
 				typeof(ObjectTextExtension),
 				typeof(TableNotesExtension),
 				typeof(TableOfContentExtension),
+				typeof(NoteExtension),
 				typeof(NestedBlockExtension)
 			);
 			container.Collection.Register<IExtensionInfo>(
@@ -115,6 +118,7 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<MarkdownLinkExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<TableOfContentExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<NoteExtension>();
 
 			var datamodelApiExtension = container.GetInstance<DatamodelApiExtension>();
 			pipelineBuilder.Extensions.Add(datamodelApiExtension);
@@ -152,6 +156,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<ObjectTextBlock, ObjectTextExtension>();
 			renderer.RegisterBlock<DatamodelApiBlock, DatamodelApiExtension>();
 			renderer.RegisterBlock<TableOfContentBlock, TableOfContentExtension>();
+			renderer.RegisterBlock<NoteParagraphBlock, NoteExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}

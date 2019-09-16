@@ -13,6 +13,10 @@ namespace MarkdownExtensions
 		public static string GetContent(this IExtensionBlock extensionBlock)
 		{
 			var fencedCodeBlock = extensionBlock as FencedCodeBlock;
+			if (fencedCodeBlock == null)
+			{
+				return null;
+			}
 			return fencedCodeBlock.Lines.ToString();
 		}
 	}

@@ -9,11 +9,11 @@ namespace MarkdownExtension.EnterpriseArchitect
 {
 	public static class Helper
 	{
-		public static string Converter(string mixedHtmlAndMarkdown, Action<MarkdownDocument> transform, MarkdownPipeline pipeline = null)
+		public static string Converter(string mixedHtmlAndMarkdown, Action<MarkdownDocument> transform, MarkdownPipeline pipeline)
 		{
 			var converter = new Html2Markdown.Converter();
 			string markdownOnly = converter.Convert(mixedHtmlAndMarkdown);
-			pipeline = pipeline ?? new MarkdownPipelineBuilder()
+			pipeline = new MarkdownPipelineBuilder()
 				.UseAdvancedExtensions()
 				.Build();
 			pipeline.Extensions.AddIfNotAlready<SoftlineBreakAsHardlineExtension>();
