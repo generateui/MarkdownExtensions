@@ -20,6 +20,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 		public ITransformer Transformer { get; }
 		public static ExtensionName NAME => "EA element notes in a table";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.BlockParsers.Insert(0, new TableNotesParser());

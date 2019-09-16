@@ -19,6 +19,7 @@ namespace MarkdownExtension.EnterpriseArchitect.ObjectText
 		public ITransformer Transformer { get; }
 		public static ExtensionName NAME => "EA object text";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline)
 		{

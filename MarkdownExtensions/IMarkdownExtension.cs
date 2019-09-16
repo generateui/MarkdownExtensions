@@ -20,6 +20,8 @@ namespace MarkdownExtensions
     {
         ExtensionName Name { get; }
 
+		bool IsSummary { get; }
+
         /// <summary>
         /// Parse given content of [prefix:{content}] or ```prefix:\n{content}```.
         /// </summary>

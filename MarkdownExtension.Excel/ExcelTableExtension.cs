@@ -20,8 +20,9 @@ namespace MarkdownExtension.Excel
 
         public ExtensionName Name => NAME;
         public static readonly ExtensionName NAME = "Excel table";
+		public bool IsSummary => false;
 
-        public IParser Parser { get; }
+		public IParser Parser { get; }
         public IValidator Validator { get; }
         public IRenderer Renderer { get; }
 		public ITransformer Transformer => null;

@@ -47,6 +47,7 @@ namespace MarkdownExtensions.Extensions.FolderFromDisk
         }
 
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
         public IParser Parser { get; }
         public IRenderer Renderer { get; }
         public IValidator Validator => null;

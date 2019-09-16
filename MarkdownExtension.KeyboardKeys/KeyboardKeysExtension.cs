@@ -18,6 +18,7 @@ namespace MarkdownExtension.KeyboardKeys
 		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "Keyboard keys";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.InlineParsers.Insert(0, new KeyboardKeysParser());

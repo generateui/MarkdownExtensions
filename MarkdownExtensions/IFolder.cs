@@ -7,6 +7,8 @@ namespace MarkdownExtensions
 	/// <summary>
 	/// Represent a folder on disk with relative & absolute path support
 	/// </summary>
+	/// This enables passing a reference to a folder once and have the caller 
+	/// decide to use relative or absolute paths
 	public interface IFolder
 	{
 		/// <summary>

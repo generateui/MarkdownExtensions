@@ -20,6 +20,7 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "EA diagram";
 		public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.BlockParsers.Insert(0, new DiagramBlockParser());

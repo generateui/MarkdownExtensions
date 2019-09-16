@@ -19,6 +19,7 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "EA datamodel api";
 		public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.BlockParsers.Insert(0, new DatamodelApiParser());

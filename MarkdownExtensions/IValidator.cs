@@ -1,5 +1,8 @@
 ﻿namespace MarkdownExtensions
 {
+	/// <summary>
+	/// Enables validation of a model produced by the syntax
+	/// </summary>
 	public interface IValidator
     {
         IErrors Validate(object tree, RenderSettings renderSettings);

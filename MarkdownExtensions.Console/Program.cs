@@ -24,6 +24,7 @@ using MarkdownExtension.EnterpriseArchitect.Diagram;
 using MarkdownExtension.EnterpriseArchitect.TableNotes;
 using MarkdownExtension.EnterpriseArchitect.ObjectText;
 using MarkdownExtension.EnterpriseArchitect.DatamodelApi;
+using MarkdownExtensions.Extensions.TableOfContent;
 
 namespace MarkdownExtensions.Console
 {
@@ -49,6 +50,7 @@ namespace MarkdownExtensions.Console
 				typeof(DiagramImageExtension),
 				typeof(ObjectTextExtension),
 				typeof(TableNotesExtension),
+				typeof(TableOfContentExtension),
 				typeof(NestedBlockExtension)
 			);
 			container.Collection.Register<IExtensionInfo>(
@@ -100,7 +102,10 @@ namespace MarkdownExtensions.Console
 
 			pipelineBuilder.Extensions.AddIfNotAlready<NestedBlockExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<FolderListExtension>();
-			pipelineBuilder.Extensions.AddIfNotAlready<SnippetExtension>();
+
+			var snippetExtension = container.GetInstance<SnippetExtension>();
+			pipelineBuilder.Extensions.Add(snippetExtension);
+
 			pipelineBuilder.Extensions.AddIfNotAlready<PanZoomImageExtension>();
 			//pipelineBuilder.Extensions.AddIfNotAlready<KeyboardKeysExtension>(); //interferes with autolinks
 			pipelineBuilder.Extensions.AddIfNotAlready<ExcelTableExtension>();
@@ -109,6 +114,7 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<GitGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<MarkdownLinkExtension>();
+			pipelineBuilder.Extensions.AddIfNotAlready<TableOfContentExtension>();
 
 			var datamodelApiExtension = container.GetInstance<DatamodelApiExtension>();
 			pipelineBuilder.Extensions.Add(datamodelApiExtension);
@@ -145,6 +151,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<TableNotesBlock, TableNotesExtension>();
 			renderer.RegisterBlock<ObjectTextBlock, ObjectTextExtension>();
 			renderer.RegisterBlock<DatamodelApiBlock, DatamodelApiExtension>();
+			renderer.RegisterBlock<TableOfContentBlock, TableOfContentExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}
@@ -179,6 +186,7 @@ namespace MarkdownExtensions.Console
             var csss = new StringBuilder();
             csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
             string body = null;
+            string summaries = null;
 			var sourceFolder = new AbsoluteFolder(Path.GetDirectoryName(fileName));
 			if (settings == null)
 			{
@@ -186,23 +194,33 @@ namespace MarkdownExtensions.Console
 			}
 
 			using (var scope = ThreadScopedLifestyle.BeginScope(container))
+			using (var writer = new StringWriter())
             {
-				var writer = new StringWriter();
-				var pipeline = CreatePipeline(container);
+				MarkdownPipeline pipeline = CreatePipeline(container);
 				var markdown = System.IO.File.ReadAllText(fileName);
 				var markdownDocument = Markdown.Parse(markdown, pipeline);
-				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, settings);
+				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, settings, pipeline);
 				pipeline.Setup(renderer);
 				RegisterBlocks(renderer);
 				renderer.Parse(container);
 				// validate errors
 				renderer.Transform();
 				renderer.Validate(container);
+
 				renderer.Render(markdownDocument);
-				var css = renderer.CollectCss();
-				csss.Append(css);
 				writer.Flush();
 				body = writer.ToString();
+				using (var summaryWriter = new StringWriter())
+				{
+					// a bit of a hack to use different writer for summaries
+					renderer.Writer = summaryWriter;
+					renderer.RenderSummaries(markdownDocument);
+					summaryWriter.Flush();
+					summaries = summaryWriter.ToString();
+				}
+
+				var css = renderer.CollectCss();
+				csss.Append(css);
 			}
 			var document = $@"
 				<html>
@@ -216,7 +234,10 @@ namespace MarkdownExtensions.Console
 						</style>
 					</head>
 					<body>
+						{summaries}
+						<main>
 						{body}
+						</main>
 					</body>
 				</html>";
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
@@ -243,7 +264,7 @@ namespace MarkdownExtensions.Console
 					var writer = new StringWriter();
 					var pipeline = CreatePipeline(container);
 					var document = Markdown.Parse(markdown, pipeline);
-					var renderer = new ExtensionHtmlRenderer(writer, document, new RenderSettings());
+					var renderer = new ExtensionHtmlRenderer(writer, document, new RenderSettings(), pipeline);
 					pipeline.Setup(renderer);
 					RegisterBlocks(renderer);
 					renderer.Parse(container);

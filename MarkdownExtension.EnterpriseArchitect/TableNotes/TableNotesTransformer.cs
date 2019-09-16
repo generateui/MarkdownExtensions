@@ -20,10 +20,6 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 
 		public override void Transform(ExtensionHtmlRenderer extensionHtmlRenderer, TableNotesBlock block, TableNotes tableNotes)
 		{
-			var pipeline = new MarkdownPipelineBuilder()
-				.UseAdvancedExtensions()
-				.Build();
-
 			IEnumerable<Element> tables = null;
 			if (tableNotes.PackagePath != null)
 			{
@@ -52,7 +48,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 				if (!string.IsNullOrEmpty(table.Notes))
 				{
 					hasTableNotes = true;
-					var notes = Helper.Converter(table.Notes, transform, pipeline);
+					var notes = Helper.Converter(table.Notes, transform, extensionHtmlRenderer.Pipeline);
 					sb.AppendLine(notes);
 				}
 				bool hasFieldNotes = false;
@@ -71,7 +67,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 						continue;
 					}
 					hasFieldNotes = true;
-					var notes = Helper.Converter(attribute.Notes, transform, pipeline);
+					var notes = Helper.Converter(attribute.Notes, transform, extensionHtmlRenderer.Pipeline);
 					sb.AppendLine($@"### {attribute.Name}");
 					sb.AppendLine(notes);
 				}
@@ -82,7 +78,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 				}
 			}
 
-			MarkdownDocument document = Markdown.Parse(all.ToString(), pipeline);
+			MarkdownDocument document = Markdown.Parse(all.ToString(), extensionHtmlRenderer.Pipeline);
 			Replace(block, document);
 		}
 	}

@@ -18,6 +18,7 @@ namespace MarkdownExtension.MsSql
         public IValidator Validator { get; }
         public IRenderer Renderer { get; }
 		public ITransformer Transformer => null;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.BlockParsers.Insert(0, new MsSqlTableParser());

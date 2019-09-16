@@ -19,6 +19,7 @@ namespace MarkdownExtension.EnterpriseArchitect.RequirementsTable
 		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "EA requirements in a table";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline)
 		{

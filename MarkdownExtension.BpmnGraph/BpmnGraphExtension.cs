@@ -13,6 +13,7 @@ namespace MarkdownExtension.BpmnGraph
 		}
 		public static ExtensionName NAME = "BPMN graph";
 		public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public IParser Parser { get; }
 		public IValidator Validator => null;

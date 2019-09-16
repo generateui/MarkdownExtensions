@@ -36,9 +36,8 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 
 		private void RenderDiagram(Path diagramPath, ExtensionHtmlRenderer renderer)
 		{
-			var folder = renderer.FolderManager.RenderSettings.ImageFolder;
+			var folder = _renderSettings.ImageFolder;
 			File file = _provider.GetDiagramFile(diagramPath, folder);
-			renderer.FolderManager.RegisterImageFile(file);
 			if (IO.File.Exists(file.AbsolutePath))
 			{
 				if (_renderSettings.EmbedImages)

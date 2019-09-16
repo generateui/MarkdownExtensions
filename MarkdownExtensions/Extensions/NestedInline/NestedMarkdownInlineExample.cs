@@ -32,6 +32,7 @@ namespace MarkdownExtensions.Extensions.NestedInline
 
         public string Prefix => "nested-inline-md";
         public ExtensionName Name => "Nested markdown example";
+		public bool IsSummary => false;
         public IParser Parser { get; }
         public IValidator Validator => null;
         public IRenderer Renderer { get; }

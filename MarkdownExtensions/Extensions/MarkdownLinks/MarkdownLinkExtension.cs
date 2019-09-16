@@ -9,6 +9,7 @@ namespace MarkdownExtensions.Extensions.MarkdownLink
 		public static readonly ExtensionName NAME = "Markdown link";
 
 		public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 		public IParser Parser => null;
 		public IValidator Validator => null;
 		public IRenderer Renderer => null;

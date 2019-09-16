@@ -17,7 +17,6 @@ namespace MarkdownExtensions
         private readonly Dictionary<Type, IMarkdownObjectRenderer> _renderersPerType = new Dictionary<Type, IMarkdownObjectRenderer>();
         private IMarkdownObjectRenderer _previousRenderer;
         private Type _previousObjectType;
-		private readonly ContainerBlock _containerBlock;
 		private readonly RenderSettings _renderSettings;
 		private readonly Dictionary<IExtensionBlock, object> _modelByBlock = new Dictionary<IExtensionBlock, object>();
 		private readonly Dictionary<IExtensionInline, object> _modelByInline = new Dictionary<IExtensionInline, object>();
@@ -36,20 +35,18 @@ namespace MarkdownExtensions
 		private readonly HashSet<ICode> _csss = new HashSet<ICode>();
 		private readonly HashSet<ICode> _javascripts = new HashSet<ICode>();
 
-		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock, RenderSettings renderSettings) : base(writer)
+		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock, RenderSettings renderSettings, MarkdownPipeline pipeline) : base(writer)
 		{
-			_containerBlock = containerBlock;
+			ContainerBlock = containerBlock;
 			_renderSettings = renderSettings;
-			FolderManager = new FolderManager(renderSettings);
-		}
-		public ExtensionHtmlRenderer(TextWriter writer, ContainerBlock containerBlock, FolderManager folderManager) : base(writer)
-		{
-			_containerBlock = containerBlock;
-			FolderManager = folderManager;
+			Pipeline = pipeline;
 		}
 
+		public new bool IsFirstInContainer { get; private set; }
+		public new bool IsLastInContainer { get; private set; }
+		public ContainerBlock ContainerBlock { get; }
+		public MarkdownPipeline Pipeline { get; }
 		public FormatState FormatState { get; }
-		public FolderManager FolderManager { get; }
 
 		public void RegisterBlock<TBlock, TExtension>()
 			where TBlock : IExtensionBlock
@@ -75,7 +72,7 @@ namespace MarkdownExtensions
 		/// <param name="container"></param>
 		public void Parse(Container container)
 		{
-			var extensionBlocks = _containerBlock.GetRecursivelyOfType<IExtensionBlock>();
+			var extensionBlocks = ContainerBlock.GetRecursivelyOfType<IExtensionBlock>();
 			foreach (var extensionBlock in extensionBlocks)
 			{
 				var extensionType = _extensionByBlockType[extensionBlock.GetType()];
@@ -111,7 +108,7 @@ namespace MarkdownExtensions
 					}
 				}
 			}
-			var extensionInlines = _containerBlock.GetInlinesRecursively();
+			var extensionInlines = ContainerBlock.GetInlinesRecursively();
 			foreach (var extensionInline in extensionInlines)
 			{
 				var extensionType = _extensionByInlineType[extensionInline.GetType()];
@@ -152,7 +149,7 @@ namespace MarkdownExtensions
 
 		public void Validate(Container container)
 		{
-			var extensionBlocks = _containerBlock.GetRecursivelyOfType<IExtensionBlock>();
+			var extensionBlocks = ContainerBlock.GetRecursivelyOfType<IExtensionBlock>();
 			foreach (var extensionBlock in extensionBlocks)
 			{
 				if (_blockErrors.ContainsKey(extensionBlock))
@@ -174,7 +171,7 @@ namespace MarkdownExtensions
 					_blockErrors.Add(extensionBlock, validationResult);
 				}
 			}
-			var extensionInlines = _containerBlock.GetInlinesRecursively();
+			var extensionInlines = ContainerBlock.GetInlinesRecursively();
 			foreach (var extensionInline in extensionInlines)
 			{
 				if (_inlineErrors.ContainsKey(extensionInline))
@@ -213,7 +210,7 @@ namespace MarkdownExtensions
 		/// Write{T}(T obj) cannot be overridden. Therefore, copy 'n paste the complete impl
 		/// of Render and modify it slightly so that errors are rendered.
 		/// </remarks>
-		public void WriteInternal<T>(T obj) where T : MarkdownObject
+		public void WriteInternal<T>(T obj, bool isSummary = false) where T : MarkdownObject
 		{
 			if (obj == null)
 			{
@@ -230,7 +227,7 @@ namespace MarkdownExtensions
 					sb.AppendLine("<li class='error'>");
 					var extension = _extensionByBlock[block];
 					var extensionName = extension.GetType().Name;
-					IParseError parseError = error as IParseError;
+					var parseError = error as IParseError;
 					if (parseError != null)
 					{
 						sb.Append($@"<span class='Range'>{parseError.Range}</span> ");
@@ -257,6 +254,14 @@ namespace MarkdownExtensions
 
 				// Handle regular renderers
 				var objectType = obj.GetType();
+				var extensionBlock = obj as IExtensionBlock;
+				bool isSummaryExtension = extensionBlock != null && 
+					_extensionByBlock.ContainsKey(extensionBlock) &&
+					_extensionByBlock[extensionBlock].IsSummary;
+				bool shouldRender = obj is MarkdownDocument ||
+					(isSummary && isSummaryExtension) ||
+					(!isSummary && !isSummaryExtension);
+
 				IMarkdownObjectRenderer renderer = _previousObjectType == objectType ? _previousRenderer : null;
 				if (renderer == null && !_renderersPerType.TryGetValue(objectType, out renderer))
 				{
@@ -270,21 +275,21 @@ namespace MarkdownExtensions
 						}
 					}
 				}
-				if (renderer != null)
+				if (renderer != null && shouldRender)
 				{
 					renderer.Write(this, obj);
 				}
 				else
 				{
 					var containerBlock = obj as ContainerBlock;
-					if (containerBlock != null)
+					if (containerBlock != null && shouldRender)
 					{
-						WriteChildrenInternal(containerBlock);
+						WriteChildrenInternal(containerBlock, isSummary);
 					}
 					else
 					{
 						var containerInline = obj as ContainerInline;
-						if (containerInline != null)
+						if (containerInline != null && shouldRender)
 						{
 							WriteChildrenInternal(containerInline);
 						}
@@ -299,11 +304,25 @@ namespace MarkdownExtensions
 			//var writeAfter = ObjectWriteAfter;
 			//writeAfter?.Invoke(this, obj);
 		}
+
+		/// <summary>
+		/// Renders summaries of thed document after the document has been generated
+		/// </summary>
+		/// <param name="markdownDocument"></param>
+		/// <example>
+		/// Example summaries are a Table of Content, references list.
+		/// </example>
+		public object RenderSummaries(MarkdownDocument markdownDocument)
+		{
+			WriteInternal(markdownDocument, isSummary: true);
+			return Writer;
+		}
+
 		/// <summary>
 		/// Writes the children of the specified <see cref="ContainerBlock"/>.
 		/// </summary>
 		/// <param name="containerBlock">The container block.</param>
-		public void WriteChildrenInternal(ContainerBlock containerBlock)
+		public void WriteChildrenInternal(ContainerBlock containerBlock, bool isSummary = false)
 		{
 			if (containerBlock == null)
 			{
@@ -318,7 +337,7 @@ namespace MarkdownExtensions
 
 				IsFirstInContainer = i == 0;
 				IsLastInContainer = i + 1 == children.Count;
-				WriteInternal(children[i]);
+				WriteInternal(children[i], isSummary);
 
 				IsFirstInContainer = saveIsFirstInContainer;
 				IsLastInContainer = saveIsLastInContainer;
@@ -354,10 +373,6 @@ namespace MarkdownExtensions
 				isFirst = false;
 			}
 		}
-
-		public new bool IsFirstInContainer { get; private set; }
-
-		public new bool IsLastInContainer { get; private set; }
 
 		public object GetBlockModel(IExtensionBlock extensionBlock)
 		{

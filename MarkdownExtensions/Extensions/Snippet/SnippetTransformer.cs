@@ -44,12 +44,17 @@ namespace MarkdownExtensions.Extensions.Snippet
 	}
 	public class SnippetTransformer : TransformerBase<SnippetBlock, Snippet>
 	{
+		private readonly RenderSettings _renderSettings;
+
+		public SnippetTransformer(RenderSettings renderSettings)
+		{
+			_renderSettings = renderSettings;
+		}
 		public override void Transform(ExtensionHtmlRenderer extensionHtmlRenderer, SnippetBlock block, Snippet astNode)
 		{
-			var renderSettings = extensionHtmlRenderer.FolderManager.RenderSettings;
-			string fullFilePath = IO.Path.Combine(renderSettings.SourceFolder.Absolute.FullPath, astNode.FileName);
+			string fullFilePath = IO.Path.Combine(_renderSettings.SourceFolder.Absolute.FullPath, astNode.FileName);
 			string content = IO.File.ReadAllText(fullFilePath);
-			MarkdownDocument document = Markdown.Parse(content);
+			MarkdownDocument document = Markdown.Parse(content, extensionHtmlRenderer.Pipeline);
 
 			int level = block.GetHeadingLevel();
 			if (level > 0 && astNode.AsSiblingHeading)

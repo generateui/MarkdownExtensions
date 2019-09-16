@@ -7,6 +7,7 @@ namespace MarkdownExtensions.Extensions.NestedBlock
     {
         public string Prefix => "nested-block-md";
         public ExtensionName Name => "Nested markdown example";
+		public bool IsSummary => false;
         public IParser Parser { get; } = new NestedBlockSyntax();
         public IValidator Validator => null;
 		public IRenderer Renderer => null;

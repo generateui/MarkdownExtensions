@@ -16,6 +16,7 @@ namespace MarkdownExtension.GitHistory
 
         public static ExtensionName NAME => "Git history in a table";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 		public IParser Parser { get; }
 		public IRenderer Renderer { get; }
 		public IValidator Validator => null;

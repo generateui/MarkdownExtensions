@@ -18,6 +18,7 @@ namespace MarkdownExtensions.Extensions.FolderList
 
 		public static ExtensionName NAME => "Folder using a Markdown list";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) => 
 			pipeline.BlockParsers.Insert(0, new FolderListParser());

@@ -5,18 +5,20 @@ namespace MarkdownExtensions.Extensions.Snippet
 {
 	public class SnippetExtension : IExtension
 	{
-		public SnippetExtension()
+		public SnippetExtension(RenderSettings renderSettings)
 		{
 			Parser = new SnippetSyntax();
+			Transformer = new SnippetTransformer(renderSettings);
 		}
 
 		public IParser Parser { get; }
 		public IRenderer Renderer => null;
 		public IValidator Validator => null;
+		public ITransformer Transformer { get; }
+
 		public static ExtensionName NAME => "Markdown snippets";
 		public ExtensionName Name => NAME;
-
-		public ITransformer Transformer => new SnippetTransformer(); // TODO: inject deps
+		public bool IsSummary => false;
 
 		public void Setup(MarkdownPipelineBuilder pipeline) =>
 			pipeline.BlockParsers.Insert(0, new SnippetParser());

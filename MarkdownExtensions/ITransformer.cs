@@ -28,9 +28,16 @@ namespace MarkdownExtensions
 		}
 		protected void Replace(Block block, MarkdownDocument document)
 		{
-			var index = block.Parent.IndexOf(block);
-			block.Parent.Insert(index, document);
-			block.Parent.RemoveAt(index + 1);
+			int index = block.Parent.IndexOf(block);
+			foreach (Block child in document)
+			{
+				// hack since setting the parent is `internal`
+				System.Reflection.PropertyInfo property = child.GetType().GetProperty("Parent");
+				property.SetValue(child, null);
+				block.Parent.Insert(index, child);
+				index += 1;
+			}
+			block.Parent.RemoveAt(index);
 		}
 	}
 }

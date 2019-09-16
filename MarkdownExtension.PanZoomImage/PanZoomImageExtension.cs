@@ -12,6 +12,7 @@ namespace MarkdownExtension.PanZoomImage
 		public ITransformer Transformer => null;
 		public static ExtensionName NAME => "Pan & zoom an image";
         public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public PanZoomImageExtension()
         {

@@ -16,6 +16,7 @@ namespace MarkdownExtension.GitGraph
 
 		public static ExtensionName NAME => "Git graph using syntax";
 		public ExtensionName Name => NAME;
+		public bool IsSummary => false;
 
 		public IParser Parser { get; }
         public IRenderer Renderer { get; }

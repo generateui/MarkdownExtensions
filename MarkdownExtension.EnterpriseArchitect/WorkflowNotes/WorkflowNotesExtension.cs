@@ -15,6 +15,7 @@ namespace MarkdownExtension.EnterpriseArchitect.WorkflowNotes
 
 		public string Prefix => "ea-workflow-notes";
 		public ExtensionName Name => "EA workflow notes";
+		public bool IsSummary => false;
 
 		public IValidator Validator => null;
 		public IParser Parser { get; }
