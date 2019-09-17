@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<books>
+	<book title="An example book" subtitle="Derpy">
+		<authors>
+			<author name="Ruud Poutsma" YearOfBirth="1982" />
+			<author name="Marcus Aurelius" YearOfBirth="23" />
+		</authors>
+	</book>
+	<book title="Another example book" subtitle="Derpy">
+		<authors>
+			<author name="Donald Duck" YearOfBirth="1936" />
+		</authors>
+	</book>
+	<book title="An example book" subtitle="Derpy">
+		<authors>
+			<author name="Saul Goodman" YearOfBirth="2013" />
+		</authors>
+	</book>
+</books>

@@ -33,6 +33,15 @@ namespace MarkdownExtensions
 	{
 		IEnumerable<IError> Errors { get; }
 	}
+
+	public class ValidationResult : IErrors
+	{
+		public ValidationResult(List<IError> errors)
+		{
+			Errors = errors;
+		}
+		public IEnumerable<IError> Errors { get; }
+	}
 	public class NoErrors : IErrors
 	{
 		public IEnumerable<IError> Errors => Enumerable.Empty<IError>();

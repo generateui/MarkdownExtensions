@@ -29,3 +29,14 @@ level1:
 ```toc
 level1: dezimal
 ```
+
+## Xml snippet
+```xml-snippet
+file: doesnotexist.xml
+xpath: /books/book[1]
+```
+
+```xml-snippet
+file: Example.xml
+xpath: invalidxpath
+```

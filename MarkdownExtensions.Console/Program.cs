@@ -26,6 +26,8 @@ using MarkdownExtension.EnterpriseArchitect.ObjectText;
 using MarkdownExtension.EnterpriseArchitect.DatamodelApi;
 using MarkdownExtensions.Extensions.TableOfContent;
 using MarkdownExtensions.Extensions.Note;
+using MarkdownExtensions.Extensions.XmlSnippet;
+using Markdig.SyntaxHighlighting;
 
 namespace MarkdownExtensions.Console
 {
@@ -53,6 +55,7 @@ namespace MarkdownExtensions.Console
 				typeof(TableNotesExtension),
 				typeof(TableOfContentExtension),
 				typeof(NoteExtension),
+				typeof(XmlSnippetExtension),
 				typeof(NestedBlockExtension)
 			);
 			container.Collection.Register<IExtensionInfo>(
@@ -97,7 +100,8 @@ namespace MarkdownExtensions.Console
 		private static MarkdownPipeline CreatePipeline(Container container)
 		{
 			var pipelineBuilder = new MarkdownPipelineBuilder()
-				.UseAdvancedExtensions();
+				.UseAdvancedExtensions()
+				.UseSyntaxHighlighting();
 
 			var folderFromDiskExtension = container.GetInstance<FolderFromDiskExtension>();
 			pipelineBuilder.Extensions.Add(folderFromDiskExtension);
@@ -118,6 +122,9 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<MarkdownLinkExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<TableOfContentExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<NoteExtension>();
+
+			var xmlSnippetExtension = container.GetInstance<XmlSnippetExtension>();
+			pipelineBuilder.Extensions.Add(xmlSnippetExtension);
 
 			var datamodelApiExtension = container.GetInstance<DatamodelApiExtension>();
 			pipelineBuilder.Extensions.Add(datamodelApiExtension);
@@ -156,6 +163,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<DatamodelApiBlock, DatamodelApiExtension>();
 			renderer.RegisterBlock<TableOfContentBlock, TableOfContentExtension>();
 			renderer.RegisterBlock<NoteParagraphBlock, NoteExtension>();
+			renderer.RegisterBlock<XmlSnippetBlock, XmlSnippetExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
 		}
@@ -209,8 +217,8 @@ namespace MarkdownExtensions.Console
 				pipeline.Setup(renderer);
 				RegisterBlocks(renderer);
 				renderer.Parse(container);
-				renderer.Transform();
 				renderer.Validate(container);
+				renderer.Transform();
 				renderer.Render(markdownDocument);
 				writer.Flush();
 				body = writer.ToString();

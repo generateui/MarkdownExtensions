@@ -391,12 +391,16 @@ namespace MarkdownExtensions
 		{
 			foreach (var item in _transformerByBlock)
 			{
-				var extensionBlock = item.Key as FencedCodeBlock;
+				var fencedCodeBlock = item.Key as FencedCodeBlock;
+				var extensionBlock = item.Key as IExtensionBlock;
 				var transformer = item.Value;
 				if (transformer != null)
 				{
-					var model = GetBlockModel(extensionBlock as IExtensionBlock);
-					transformer.Transform(this, extensionBlock, model);
+					var model = GetBlockModel(fencedCodeBlock as IExtensionBlock);
+					if (!_blockErrors.ContainsKey(extensionBlock))
+					{
+						transformer.Transform(this, fencedCodeBlock, model);
+					}
 				}
 			}
 		}

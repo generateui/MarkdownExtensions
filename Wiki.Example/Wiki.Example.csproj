@@ -30,6 +30,9 @@
     <None Update="doc\Errors.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="doc\Example.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="doc\Index.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

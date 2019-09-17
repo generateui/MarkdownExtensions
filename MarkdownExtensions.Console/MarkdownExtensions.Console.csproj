@@ -57,6 +57,9 @@
     <None Include="Wiki.md" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Markdig.SyntaxHighlighting">
+      <Version>1.1.7</Version>
+    </PackageReference>
     <PackageReference Include="SimpleInjector" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>

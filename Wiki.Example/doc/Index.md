@@ -85,3 +85,17 @@ Note: a paragraph starting with the text "Note:" will be rendered as a note.
 
 Note: a paragraph with a note in it will be rendered as a note.
 
+## Xml snippet
+Uses an xpath query on a target xml document to retrieve an xml snippet. This xml content is then rendered as an xml codeblock.
+
+````
+```xml-snippet
+file: Example.xml
+xpath: /books/book[1]
+```
+````
+
+```xml-snippet
+file: Example.xml
+xpath: /books/book[1]
+```
