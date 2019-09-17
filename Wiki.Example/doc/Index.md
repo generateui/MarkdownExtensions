@@ -80,7 +80,7 @@ C:\Windows\Help\Windows
 
 ## Note
 ```
-Note: a paragraph with a note in it will be rendered as a note.
+Note: a paragraph starting with the text "Note:" will be rendered as a note.
 ```
 
 Note: a paragraph with a note in it will be rendered as a note.

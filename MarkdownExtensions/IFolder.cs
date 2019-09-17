@@ -58,13 +58,31 @@ namespace MarkdownExtensions
     public class RelativeFolder
     {
         private AbsoluteFolder _absolute;
+		private string _recursivePath;
 
-        public RelativeFolder(string name)
+		public RelativeFolder(string name)
         {
             Name = name;
         }
 
         public string Name { get; }
+		public string RecursivePath
+		{
+			get
+			{
+				if (_recursivePath == null)
+				{
+					_recursivePath = Name;
+					RelativeFolder parent = Parent;
+					while (parent != null)
+					{
+						_recursivePath = parent.Name + @"\" + _recursivePath;
+						parent = parent.Parent;
+					}
+				}
+				return _recursivePath;
+			}
+		}
         public RelativeFolder Parent { get; }
 
         public AbsoluteFolder Absolute

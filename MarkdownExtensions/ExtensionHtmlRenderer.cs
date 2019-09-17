@@ -406,10 +406,8 @@ namespace MarkdownExtensions
 			_csss.Add(code);
 		}
 
-		public string CollectCss()
+		public string RenderCssHeader()
 		{
-			var sb = new StringBuilder();
-			sb.AppendCode(_csss);
 			if (_blockErrors.Any() || _inlineErrors.Any())
 			{
 				var errorCss = @"
@@ -432,16 +430,69 @@ namespace MarkdownExtensions
 						font-family: 'consolas';
 					}
 				";
-				sb.AppendLine(errorCss);
+				RegisterDynamicCss(new Code("markdown-extensions-errors", "0.0.1", () => errorCss));
 			}
-			return sb.ToString();
+			if (_renderSettings.EmbedCss)
+			{
+				var sb = new StringBuilder();
+				sb.AppendCode(_javascripts);
+				return $@"
+					<script type='text/javascript'>
+						{sb.ToString()}
+					</script>
+				";
+			}
+			else
+			{
+				var cssFolder = _renderSettings.CssFolder;
+				var fileNames = new List<string>();
+				foreach (var css in _csss)
+				{
+					var fileName = $@"{css.LibraryName}-{css.LibraryVersion}.css";
+					fileNames.Add(fileName);
+					var file = new File(cssFolder, fileName);
+					System.IO.File.WriteAllText(file.AbsolutePath, css.GetCode());
+				}
+				string relativeFolder = cssFolder.Relative.RecursivePath;
+				var scriptFileNames = string.Join("\n", fileNames.Select(fn =>
+				{
+					string path = relativeFolder + @"\" + fn;
+					return $@"<link rel='stylesheet' type='text/css' href='{path}'>";
+				}));
+				return scriptFileNames;
+			}
 		}
 
-		public string CollectJavascript()
+		public string RenderJavascriptHeader()
 		{
-			var sb = new StringBuilder();
-			sb.AppendCode(_javascripts);
-			return sb.ToString();
+			if (_renderSettings.EmbedJavascript)
+			{
+				var sb = new StringBuilder();
+				sb.AppendCode(_javascripts);
+				return $@"
+					<script type='text/javascript'>
+						{sb.ToString()}
+					</script>";
+			}
+			else
+			{
+				IFolder javascriptFolder = _renderSettings.JavascriptFolder;
+				var fileNames = new List<string>();
+				foreach (ICode javascript in _javascripts)
+				{
+					var fileName = $@"{javascript.LibraryName}-{javascript.LibraryVersion}.css";
+					fileNames.Add(fileName);
+					var file = new File(javascriptFolder, fileName);
+					System.IO.File.WriteAllText(file.AbsolutePath, javascript.GetCode());
+				}
+				string relativeFolder = javascriptFolder.Relative.RecursivePath;
+				string scriptFileNames = string.Join("\n", fileNames.Select(fn =>
+				{
+					var path = relativeFolder + @"\" + fn;
+					return $@"<script type='text/javascript' src='{path}'></script>";
+				}));
+				return scriptFileNames;
+			}
 		}
 	}
 }

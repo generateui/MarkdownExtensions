@@ -17,12 +17,15 @@ namespace MarkdownExtensions
         /// </summary>
         public bool ReportErrorsInHtml { get; set; }
 
-        /// <summary>
-        /// True to embed images using base64 data: encoding
-        /// </summary>
-        public bool EmbedImages { get; set; }
+		/// <summary>
+		/// True to embed images using base64 data: encoding
+		/// </summary>
+		public bool EmbedImages { get; set; } = false;
 
-        public IFolder ImageFolder { get; internal set; }
+		public bool EmbedCss { get; set; } = false;
+		public bool EmbedJavascript { get; set; } = false;
+
+		public IFolder ImageFolder { get; internal set; }
 		public IFolder CssFolder { get; internal set; }
 		public IFolder JavascriptFolder { get; internal set; }
 		public IFolder MarkdownFolder { get; internal set; }
@@ -43,6 +46,9 @@ namespace MarkdownExtensions
             var sourceFolder = new Folder(rootFolder);
             return new RenderSettings
 			{
+				EmbedCss = false,
+				EmbedJavascript = false,
+				EmbedImages = false,
                 SourceFolder = sourceFolder,
                 OutputFolder = outputFolder,
 				MarkdownFolder = new Folder(outputFolder.Absolute, new RelativeFolder("markdown")),

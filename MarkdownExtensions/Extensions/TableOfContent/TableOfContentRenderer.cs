@@ -137,6 +137,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 				top: 0;
 				left: 0;
 				padding: 1em;
+				background-color: #eee;
 			}
 			main {
 				margin-left: 200px; /* Same as the width of the sidebar */

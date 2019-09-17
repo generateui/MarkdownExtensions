@@ -26,7 +26,6 @@ using MarkdownExtension.EnterpriseArchitect.ObjectText;
 using MarkdownExtension.EnterpriseArchitect.DatamodelApi;
 using MarkdownExtensions.Extensions.TableOfContent;
 using MarkdownExtensions.Extensions.Note;
-using Markdig.Syntax;
 
 namespace MarkdownExtensions.Console
 {
@@ -188,10 +187,10 @@ namespace MarkdownExtensions.Console
 		private static void File(string fileName, Container container, RenderSettings settings)
         {
             var scripts = new StringBuilder();
-            var csss = new StringBuilder();
-            csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
             string body = null;
             string summaries = null;
+			string cssHeader = null;
+			string jsHeader = null;
 			var sourceFolder = new AbsoluteFolder(Path.GetDirectoryName(fileName));
 			if (settings == null)
 			{
@@ -205,13 +204,13 @@ namespace MarkdownExtensions.Console
 				var markdown = System.IO.File.ReadAllText(fileName);
 				var markdownDocument = Markdown.Parse(markdown, pipeline);
 				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, settings, pipeline);
+				renderer.RegisterDynamicCss(new Code("markdown-extensions", "0.0.1", () =>
+					Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css")));
 				pipeline.Setup(renderer);
 				RegisterBlocks(renderer);
 				renderer.Parse(container);
-				// validate errors
 				renderer.Transform();
 				renderer.Validate(container);
-
 				renderer.Render(markdownDocument);
 				writer.Flush();
 				body = writer.ToString();
@@ -224,19 +223,14 @@ namespace MarkdownExtensions.Console
 					summaries = summaryWriter.ToString();
 				}
 
-				var css = renderer.CollectCss();
-				csss.Append(css);
+				cssHeader = renderer.RenderCssHeader();
+				jsHeader = renderer.RenderJavascriptHeader();
 			}
 			var document = $@"
 				<html>
 					<head>
-						<link rel='stylesheet' type='text/css' href='Template.css'>
-						<script type='text/javascript'>
-							{scripts}
-						</script>
-						<style>
-							{csss}
-						</style>
+
+						{cssHeader}
 					</head>
 					<body>
 						{summaries}
@@ -245,7 +239,7 @@ namespace MarkdownExtensions.Console
 						</main>
 					</body>
 				</html>";
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+			string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             var file = new File(settings.OutputFolder, fileNameWithoutExtension + ".html");
             System.IO.File.WriteAllText(file.AbsolutePath, document);
         }
@@ -257,10 +251,9 @@ namespace MarkdownExtensions.Console
 				.ToDictionary(x => x.Name, x => x.CheatSheet);
             var sb = new StringBuilder();
             int i = 1;
-            var scripts = new StringBuilder();
-            var csss = new StringBuilder();
-            csss.Append(Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css"));
             var body = new StringBuilder();
+			string cssHeader = null;
+			string javascriptHeader = null;
 			using (ThreadScopedLifestyle.BeginScope(container))
 			{
 				foreach (var entry in cheatSheetByExtensionName)
@@ -277,12 +270,10 @@ namespace MarkdownExtensions.Console
 					renderer.Transform();
 					// run validations
 					renderer.Render(document);
-					// do css + js collection
 					writer.Flush();
-					var css = renderer.CollectCss();
-					csss.Append(css);
-					var js = renderer.CollectJavascript();
-					scripts.Append(js);
+
+					cssHeader = renderer.RenderCssHeader();
+					javascriptHeader = renderer.RenderJavascriptHeader();
 
 					string isChecked = i == 1 ? "checked" : "";
 					string name = entry.Key;
@@ -302,13 +293,8 @@ namespace MarkdownExtensions.Console
             var htmlDocument = $@"
 				<html>
 					<head>
-						<link rel='stylesheet' type='text/css' href='Template.css'>
-						<script type='text/javascript'>
-							{scripts}
-						</script>
-						<style>
-							{csss}
-						</style>
+						{javascriptHeader}
+						{cssHeader}
 					</head>
 					<body>
 						<div class='tabordion'>

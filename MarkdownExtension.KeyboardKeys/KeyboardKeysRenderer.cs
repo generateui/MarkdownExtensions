@@ -18,7 +18,7 @@ namespace MarkdownExtension.KeyboardKeys
 		{
 			get
 			{
-				yield return new Code("`keyabord-keys", "0.0.1",
+				yield return new Code("keyboard-keys", "0.0.1",
 					() => Assembly.GetExecutingAssembly().GetFileContent("keyscss.css"));
 			}
 		}
