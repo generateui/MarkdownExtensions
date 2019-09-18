@@ -1,5 +1,6 @@
 ﻿using Markdig;
 using Markdig.Renderers;
+using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownExtensions.ExtensionMethods;
@@ -307,6 +308,21 @@ namespace MarkdownExtensions
 			// Calls after writing an object
 			//var writeAfter = ObjectWriteAfter;
 			//writeAfter?.Invoke(this, obj);
+		}
+
+		public void RenderMarkdown(string fileName, MarkdownDocument document)
+		{
+			if (!_renderSettings.RenderMarkdown)
+			{
+				return;
+			}
+			string renamedFileName = fileName.Substring(0, fileName.Length - 3) + ".normalized.md";
+			var file = new File(_renderSettings.MarkdownFolder, renamedFileName);
+			using (var writer = new StreamWriter(file.AbsolutePath))
+			{
+				var normalizeRenderer = new NormalizeRenderer(writer);
+				normalizeRenderer.Render(document);
+			}
 		}
 
 		/// <summary>

@@ -18,12 +18,20 @@ namespace MarkdownExtensions
         public bool ReportErrorsInHtml { get; set; }
 
 		/// <summary>
-		/// True to embed images using base64 data: encoding
+		/// True to embed images using base64 data: encoding, False to write images 
+		/// as separate files to disk
 		/// </summary>
 		public bool EmbedImages { get; set; } = false;
 
 		public bool EmbedCss { get; set; } = false;
 		public bool EmbedJavascript { get; set; } = false;
+
+		/// <summary>
+		/// True to write markdown to output folder
+		/// </summary>
+		/// As extensions may replace (transform) document blocks/inlines into other markdown, 
+		/// it can be useful to write the transformed markdown to disk.
+		public bool RenderMarkdown { get; internal set; } = false;
 
 		public IFolder ImageFolder { get; internal set; }
 		public IFolder CssFolder { get; internal set; }
@@ -40,6 +48,7 @@ namespace MarkdownExtensions
 
 		public TomlTable Settings { get; private set; }
 
+
 		public static RenderSettings DefaultWiki(AbsoluteFolder rootFolder)
 		{
             var outputFolder = new Folder(rootFolder, new RelativeFolder("output"));
@@ -49,6 +58,7 @@ namespace MarkdownExtensions
 				EmbedCss = false,
 				EmbedJavascript = false,
 				EmbedImages = false,
+				RenderMarkdown = true,
                 SourceFolder = sourceFolder,
                 OutputFolder = outputFolder,
 				MarkdownFolder = new Folder(outputFolder.Absolute, new RelativeFolder("markdown")),

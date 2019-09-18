@@ -192,14 +192,13 @@ namespace MarkdownExtensions.Console
 			// 7. write markdown to /rendered
 		}
 
-		private static void File(string fileName, Container container, RenderSettings settings)
+		private static void File(string fullFilePath, Container container, RenderSettings settings)
         {
-            var scripts = new StringBuilder();
             string body = null;
             string summaries = null;
 			string cssHeader = null;
 			string jsHeader = null;
-			var sourceFolder = new AbsoluteFolder(Path.GetDirectoryName(fileName));
+			var sourceFolder = new AbsoluteFolder(Path.GetDirectoryName(fullFilePath));
 			if (settings == null)
 			{
 				settings = RenderSettings.DefaultWiki(sourceFolder);
@@ -209,19 +208,24 @@ namespace MarkdownExtensions.Console
 			using (var writer = new StringWriter())
             {
 				MarkdownPipeline pipeline = CreatePipeline(container);
-				var markdown = System.IO.File.ReadAllText(fileName);
+				var markdown = System.IO.File.ReadAllText(fullFilePath);
 				var markdownDocument = Markdown.Parse(markdown, pipeline);
 				var renderer = new ExtensionHtmlRenderer(writer, markdownDocument, settings, pipeline);
 				renderer.RegisterDynamicCss(new Code("markdown-extensions", "0.0.1", () =>
 					Assembly.GetExecutingAssembly().GetFileContent("vscode-markdown.css")));
+
 				pipeline.Setup(renderer);
 				RegisterBlocks(renderer);
+
 				renderer.Parse(container);
 				renderer.Validate(container);
 				renderer.Transform();
 				renderer.Render(markdownDocument);
+				var fileName = Path.GetFileName(fullFilePath);
+				renderer.RenderMarkdown(fileName, markdownDocument);
 				writer.Flush();
 				body = writer.ToString();
+
 				using (var summaryWriter = new StringWriter())
 				{
 					// a bit of a hack to use different writer for summaries
@@ -247,7 +251,7 @@ namespace MarkdownExtensions.Console
 						</main>
 					</body>
 				</html>";
-			string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+			string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fullFilePath);
             var file = new File(settings.OutputFolder, fileNameWithoutExtension + ".html");
             System.IO.File.WriteAllText(file.AbsolutePath, document);
         }
@@ -285,8 +289,8 @@ namespace MarkdownExtensions.Console
 
 					string isChecked = i == 1 ? "checked" : "";
 					string name = entry.Key;
-					var md = entry.Value;
-					var html = writer.ToString();
+					string md = entry.Value;
+					string html = writer.ToString();
 
 					var tab = $@"
 						<section>

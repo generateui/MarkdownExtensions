@@ -1,12 +1,13 @@
-﻿# Index
-
-```toc
+﻿```toc
 Level2: Decimal
 Level3: Decimal
 Level4: Decimal
 Level5: Decimal
 Level6: Decimal
 ```
+
+# Index
+This document is a showcase document of extensions implemented in MarkdownExtensions.
 
 ## Links
 - [Introduction](Introduction.md)
