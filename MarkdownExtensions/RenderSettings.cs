@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Tomlyn;
 using Tomlyn.Model;
@@ -39,18 +40,34 @@ namespace MarkdownExtensions
 
 		public static RenderSettings DefaultWiki(AbsoluteFolder rootFolder)
 		{
-            var outputFolder = new Folder(rootFolder, new RelativeFolder("output"));
-            var sourceFolder = new Folder(rootFolder);
-            return new RenderSettings
+			var outputFolder = new Folder(rootFolder, new RelativeFolder("output"));
+			var sourceFolder = new Folder(rootFolder);
+			return new RenderSettings
 			{
-                SourceFolder = sourceFolder,
-                OutputFolder = outputFolder,
+				SourceFolder = sourceFolder,
+				OutputFolder = outputFolder,
 				MarkdownFolder = new Folder(outputFolder.Absolute, new RelativeFolder("markdown")),
 				CssFolder = new Folder(outputFolder.Absolute, new RelativeFolder("css")),
 				JavascriptFolder = new Folder(outputFolder.Absolute, new RelativeFolder("javascript")),
 				ImageFolder = new Folder(outputFolder.Absolute, new RelativeFolder("image")),
-                SettingsFile = new File(sourceFolder, "settings.toml"),
-            };
+				SettingsFile = new File(sourceFolder, "settings.toml"),
+			};
+		}
+
+		public static RenderSettings DefaultFile(AbsoluteFolder rootFolder)
+		{
+			var outputFolder = new Folder(rootFolder, new RelativeFolder("output"));
+			var sourceFolder = new Folder(rootFolder);
+			return new RenderSettings
+			{
+				SourceFolder = sourceFolder,
+				OutputFolder = outputFolder,
+				MarkdownFolder = new Folder(outputFolder.Absolute, new RelativeFolder("markdown")),
+				CssFolder = new Folder(outputFolder.Absolute, new RelativeFolder("css")),
+				JavascriptFolder = new Folder(outputFolder.Absolute, new RelativeFolder("javascript")),
+				ImageFolder = new Folder(outputFolder.Absolute, new RelativeFolder("image")),
+				SettingsFile = new File(sourceFolder, "settings.toml"),
+			};
 		}
 
 		public void EnsureFoldersExist()
@@ -77,6 +94,11 @@ namespace MarkdownExtensions
 				string content = System.IO.File.ReadAllText(SettingsFile.AbsolutePath);
                 Settings = Tomlyn.Toml.Parse(content).ToModel();
 			}
+		}
+
+		public static object DefaultFile()
+		{
+			throw new NotImplementedException();
 		}
 
 		public void TryParseExtensionSettings(IEnumerable<IExtensionSettings> extensionSettings)

@@ -32,11 +32,11 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				{
 					return false;
 				}
-				if (!e.TaggedValues.ContainsKey("IsDatamodelApi"))
+				if (!e.TaggedValues.ContainsKey("IsMigrationApi"))
 				{
 					return false;
 				}
-				if (e.TaggedValues["IsDatamodelApi"] != "True")
+				if (e.TaggedValues["IsMigrationApi"] != "True")
 				{
 					return false;
 				}
@@ -83,6 +83,19 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				var required = new List<string>();
 				foreach (var attribute in table.Attributes)
 				{
+					if (attribute.TaggedValues == null)
+					{
+						continue;
+					}
+					if (!attribute.TaggedValues.ContainsKey("IsMigrationApi"))
+					{
+						continue;
+					}
+					if (attribute.TaggedValues["IsMigrationApi"] != "True")
+					{
+						continue;
+					}
+
 					bool isEnum = attribute.Name.EndsWith("EnumId");
 					var columnSchema = new JSchema
 					{
@@ -136,6 +149,10 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				case "nvarchar": return JSchemaType.String;
 				case "nvarchar(max)": return JSchemaType.String;
 				case "varchar": return JSchemaType.String;
+				case "datetime": return JSchemaType.String;
+				case "date": return JSchemaType.String;
+				case "bigint": return JSchemaType.Integer;
+				case "bit": return JSchemaType.Boolean;
 			}
 			throw new NotSupportedException();
 		}

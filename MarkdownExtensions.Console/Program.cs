@@ -76,6 +76,15 @@ namespace MarkdownExtensions.Console
 				string path = args[0];
 				if (System.IO.File.Exists(path))
 				{
+					var directory = Path.GetDirectoryName(path);
+					var sourceFolder = new AbsoluteFolder(directory);
+					var renderSettings = RenderSettings.DefaultFile(sourceFolder);
+					renderSettings.EnsureFoldersExist();
+					renderSettings.TryParseSettingsFile();
+					container.RegisterInstance(renderSettings);
+					var extensionSettings = container.GetAllInstances<IExtensionSettings>();
+					renderSettings.TryParseExtensionSettings(extensionSettings);
+
 					File(path, container, null);
 				}
 				if (System.IO.Directory.Exists(path))

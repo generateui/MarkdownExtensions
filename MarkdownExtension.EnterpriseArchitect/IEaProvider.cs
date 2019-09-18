@@ -426,18 +426,36 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 			return result;
 		}
 
-		private static Attribute CreateAttribute(EA.Attribute a) =>
-                        new Attribute
-                        {
-                            Id = a.AttributeID,
-                            Name = a.Name,
-							Type = a.Type,
-							Length = string.IsNullOrEmpty(a.Length) ? 0 : int.Parse(a.Length),
-							Nullable = a.LowerBound != "1",
-							DefaultValue = a.Default,
-                            Notes = a.Notes.FixNewlines()
-                        };
-        private static Diagram CreateDiagram(EA.Diagram d, Path parentPath) =>
+		private static Dictionary<string, string> CreateTaggedValues(EA.Attribute a)
+		{
+			var nname = a.Name;
+			var result = new Dictionary<string, string>();
+			foreach (var tv in a.TaggedValues.OfType<EA.AttributeTag>())
+			{
+				var name = tv.Name;
+				var value = tv.Value;
+				result[name] = value;
+			}
+			return result;
+		}
+
+		private static Attribute CreateAttribute(EA.Attribute a)
+		{
+			var name = a.Name;
+			return new Attribute
+			{
+				Id = a.AttributeID,
+				Name = a.Name,
+				Type = a.Type,
+				Length = string.IsNullOrEmpty(a.Length) ? 0 : int.Parse(a.Length),
+				Nullable = !a.AllowDuplicates,
+				DefaultValue = a.Default,
+				TaggedValues = CreateTaggedValues(a),
+				Notes = a.Notes.FixNewlines()
+			};
+		}
+
+		private static Diagram CreateDiagram(EA.Diagram d, Path parentPath) =>
             new Diagram
             {
                 Id = d.DiagramID,
@@ -730,6 +748,10 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
 		[JsonProperty("defaultValue")]
 		public string DefaultValue { get; internal set; }
+
+		[JsonProperty("taggedValues")]
+		public Dictionary<string, string> TaggedValues { get; internal set; }
+
 	}
 	public sealed class Lane
 	{
