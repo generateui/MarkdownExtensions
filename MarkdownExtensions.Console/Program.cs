@@ -110,6 +110,8 @@ namespace MarkdownExtensions.Console
 		{
 			var pipelineBuilder = new MarkdownPipelineBuilder()
 				.UseAdvancedExtensions()
+				.UsePipeTables()
+				.UseGridTables()
 				.UseSyntaxHighlighting();
 
 			var folderFromDiskExtension = container.GetInstance<FolderFromDiskExtension>();
@@ -187,7 +189,9 @@ namespace MarkdownExtensions.Console
             var extensionSettings = container.GetAllInstances<IExtensionSettings>();
 			renderSettings.TryParseExtensionSettings(extensionSettings);
 
-			var markdownFiles = System.IO.Directory.GetFiles(path, "*.md", SearchOption.AllDirectories);
+			var markdownFiles = System.IO.Directory
+				.GetFiles(path, "*.md", SearchOption.AllDirectories)
+				.Where(f => !f.ToLower().EndsWith("normalized.md"));
 			foreach (var file in markdownFiles)
 			{
 				File(file, container, renderSettings);

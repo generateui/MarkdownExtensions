@@ -77,6 +77,11 @@ namespace MarkdownExtensions
 			var extensionBlocks = ContainerBlock.GetRecursivelyOfType<IExtensionBlock>();
 			foreach (var extensionBlock in extensionBlocks)
 			{
+				if (!_extensionByBlockType.ContainsKey(extensionBlock.GetType()))
+				{
+					// TODO: show error?
+					continue;
+				}
 				var extensionType = _extensionByBlockType[extensionBlock.GetType()];
 				var extension = (IExtension)container.GetInstance(extensionType);
 				_extensionByBlock[extensionBlock] = extension;
@@ -154,7 +159,7 @@ namespace MarkdownExtensions
 			var extensionBlocks = ContainerBlock.GetRecursivelyOfType<IExtensionBlock>();
 			foreach (var extensionBlock in extensionBlocks)
 			{
-				if (_blockErrors.ContainsKey(extensionBlock))
+				if (!_blockErrors.ContainsKey(extensionBlock))
 				{
 					// don't check for model errors if parsing didn't succeed
 					continue;

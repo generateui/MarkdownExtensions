@@ -40,14 +40,7 @@ namespace MarkdownExtensions.Extensions.Note
 					renderer.EnsureLine();
 				}
 
-				if (IsNote(obj))
-				{
-					renderer.Write("<p class='note' ").WriteAttributes(obj).Write(">");
-				}
-				else
-				{
-					renderer.Write("<p").WriteAttributes(obj).Write(">");
-				}
+				renderer.Write("<p class='note' ").WriteAttributes(obj).Write(">");
 
 			}
 			renderer.WriteLeafInline(obj);
@@ -60,18 +53,6 @@ namespace MarkdownExtensions.Extensions.Note
 
 				renderer.EnsureLine();
 			}
-		}
-
-		private bool IsNote(ParagraphBlock paragraphBlock)
-		{
-			foreach (Markdig.Syntax.Inlines.Inline inline in paragraphBlock.Inline)
-			{
-				if (inline.ToString().StartsWith("Note: "))
-				{
-					return true;
-				}
-			}
-			return false;
 		}
 	}
 }
