@@ -1,42 +1,43 @@
 ﻿# MarkdownExtensions
 Standardized extensions on top of Markdown
 
+## Features
+MarkdownExtensions builds on top of [Markdig](https://github.com/lunet-io/markdig). It offers  and extension library and extension implementations on the Markdown syntax. It has the following features:
+- include Javascript in resulting html
+- include CSS in resulting html
+- transform Markdown extension syntax into Markdown
+- perform validation of the extension syntax
+- optionally show syntax and model errors in generated html
+
+## Extensions
+MarkdownExtensions currently provides the following extensions:
+- **FolderFromDisk**: specify a folder on disk, render the folder contents
+- **FolderList**: Specify a folder structure with a nested list syntax and render as folder contents
+- **KeyboardKeys**: Write a keyboard combination and see the keyboard keys nicely rendered
+- **MarkdownLinks**: Link to a relative markdown file
+- **Snippet**: Refer to a heading in a target markdown file and render the contents of the heading paragraph
+- **TableOfContent**: Render a table of content on the left of the document in a `<nav>` html element
+- **XmlSnippet**: Refer using an XPath expression of a target xml file and render the resulting xml in a codeblock
+
+The following extensions are in development:
+- **Note**: Start the paragraph with `Note:` and render a yellow box with paragraph contents
+- **PanZoomImage**: Render an image within a box and having panning & zooming on that image
+- **MsSql**: Refer to a target table and render the table (queried from the database) as html
+- **GitHistory**: Render the history of a target git repo as a table
+- **Excel**: Render the contents of an excel sheet as a table
+- **EnterpriseArchitect**: Refer to object within an [Enterprise Architect](https://www.sparxsystems.eu/enterprise-architect/ea-purchase/) project and render it as html
+- **BpmnGraph**: Render target bpmn file of graph
+- **GitGraph**: Render target git repo history (using a custom syntax)
+
+Go here to see examples.
+
 ## Standardized extensions
-Many markdown extensions provide customized parsers for basically any pattern. Think emojis, link detectors for ${BugTracker}, specialized tables et cetera. While these are nice and solve problems, it's helpful to start with an extension using a standardized syntax. From there, a more sophisticated syntax can be impemented/developed, when it is proven the extension is useful.
-
-The library proposed the following "standardized" extension syntax:
-Blocks:
-<pre><code>
-```syntax-name
-{InternalSyntax}
+MarkdownExtensions allows easy implementation of block extensions:
+````
+```extension-name
+internal extension syntax
 ```
-</pre></code>
-Inlines:
-`[syntax-name:{InternalSyntax}]`
+````
 
-`syntax-name` is a prefix used to detect the extension. `InternalSyntax` is used by the extension to specify something that needs to be rendered.
-
-A simple example is the FolderList block extension, which uses the following syntax:
-<pre><code>
-```
-- [folder]
-	- [subfolder]
-	- file
-	- another_file.txt
-```
-</pre></code>
-rendering a folder-like tree. 
-
-A simple inline example is the MsSql extension, rendering a table from a database:
-`[ms-sql-table:Test:Table1]`
-
-## Ease of implementation
-Implementors therefore can focus first and foremost on the internal syntax. In the case of the MsSql extension, it may be that the implementer wants to add rendering hints. The implementer may then decide to move to a block extension, extend the syntax with a hint that relations/indices should not be rendered:
-<pre><code>
-```ms-sql-table
-database: Test
-table: Table1
-show-indexes: false
-show-relations: false
-```
-</pre></code>
+As well as easy implementation of inline extensions:
+`[extension-name:internal extension syntax]`

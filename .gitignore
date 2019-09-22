@@ -7,3 +7,4 @@
 /TestResults
 *.csproj.user
 /MyDocument.md
+/MarkdownExtensions/output

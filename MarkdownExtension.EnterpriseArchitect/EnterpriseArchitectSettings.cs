@@ -10,6 +10,10 @@ namespace MarkdownExtension.EnterpriseArchitect
 
         public void Parse(RenderSettings renderSettings, TomlTable toml)
 		{
+			if (toml == null)
+			{
+				return;
+			}
             bool hasEaSetting = toml.ContainsKey(ENTERPRISE_ARCHITECT);
 			if (!hasEaSetting)
 			{

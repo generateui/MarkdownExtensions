@@ -132,7 +132,7 @@ namespace MarkdownExtensions.Console
 			pipelineBuilder.Extensions.AddIfNotAlready<BpmnGraphExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<MarkdownLinkExtension>();
 			pipelineBuilder.Extensions.AddIfNotAlready<TableOfContentExtension>();
-			pipelineBuilder.Extensions.AddIfNotAlready<NoteExtension>();
+			//pipelineBuilder.Extensions.AddIfNotAlready<NoteExtension>();
 
 			var xmlSnippetExtension = container.GetInstance<XmlSnippetExtension>();
 			pipelineBuilder.Extensions.Add(xmlSnippetExtension);
@@ -173,7 +173,7 @@ namespace MarkdownExtensions.Console
 			renderer.RegisterBlock<ObjectTextBlock, ObjectTextExtension>();
 			renderer.RegisterBlock<DatamodelApiBlock, DatamodelApiExtension>();
 			renderer.RegisterBlock<TableOfContentBlock, TableOfContentExtension>();
-			renderer.RegisterBlock<NoteParagraphBlock, NoteExtension>();
+			//renderer.RegisterBlock<NoteParagraphBlock, NoteExtension>();
 			renderer.RegisterBlock<XmlSnippetBlock, XmlSnippetExtension>();
 
 			renderer.RegisterInline<KeyboardKeysInline, KeyboardKeysExtension>();
