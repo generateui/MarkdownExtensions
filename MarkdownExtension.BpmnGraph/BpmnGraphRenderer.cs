@@ -14,8 +14,8 @@ namespace MarkdownExtension.BpmnGraph
 			var bpmnXml = IO.File.ReadAllText(bpmnGraph.FileUri);
 			// Loading BPMN xml from filesystem results in a CORS error
 			sb.AppendLine($@"
-				<div class='box'>
-				  <div class='row content' id='canvas' style='height: 20em;'></div>
+				<div class='box' style='height: {bpmnGraph.Height};'>
+				  <div class='row content' id='canvas' ></div>
 				</div>
 				<script>
 					var nav = document.getElementById('nav');

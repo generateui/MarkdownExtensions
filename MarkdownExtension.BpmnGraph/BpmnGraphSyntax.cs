@@ -1,4 +1,5 @@
 ﻿using MarkdownExtensions;
+using System;
 
 namespace MarkdownExtension.BpmnGraph
 {
@@ -6,7 +7,25 @@ namespace MarkdownExtension.BpmnGraph
 	{
 		public IParseResult Parse(string text)
 		{
-			return new ParseSuccess(new BpmnGraph { FileUri = text.Trim() });
+			var lines = text.Split('\n');
+			var bpmnGraph = new BpmnGraph();
+			foreach (var line in lines)
+			{
+				var sanitized = line.Trim().ToLower();
+				if (sanitized.StartsWith("height: "))
+				{
+					bpmnGraph.Height = sanitized.Substring(8);
+				}
+				if (sanitized.StartsWith("file: "))
+				{
+					bpmnGraph.FileUri = sanitized.Substring(6);
+				}
+			}
+			if (bpmnGraph.FileUri != null)
+			{
+				return new ParseSuccess(bpmnGraph);
+			}
+			return new ParseFailure(0, "Expected a reference to a bpmn file");
 		}
 	}
 }
