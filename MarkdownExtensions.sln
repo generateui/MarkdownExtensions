@@ -35,7 +35,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownExtension.BpmnGraph
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{1E7374A1-6575-4014-85DD-D65493DA029E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wiki.Example", "Wiki.Example\Wiki.Example.csproj", "{67328A8D-5829-4608-BC20-C891B9737CB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wiki.Example", "Wiki.Example\Wiki.Example.csproj", "{67328A8D-5829-4608-BC20-C891B9737CB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD245127-7B97-4DC1-812A-593E7A040F65}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
