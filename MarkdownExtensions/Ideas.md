@@ -1,14 +1,17 @@
 ﻿# Ideas
 
 ## Extensions
-- Mermaid
+- diagrams
+	- Mermaid
+	- plantuml
+		- C# code to plantuml: https://github.com/pierre3/PlantUmlClassDiagramGenerator\
+	- nomnoml
+	- https://github.com/asciidoctor/asciidoctor-diagram
+	- blockdiag 
 - Links to any item in any program
 	- MS Paint icon
 	- MS Paint menu item
-- XML content item using xpath
-- blockdiag 
-- plantuml
-- C# code to plantuml: https://github.com/pierre3/PlantUmlClassDiagramGenerator\
+- ~~XML content item using xpath~~
 - Excel
 	- Excel vanilla table
 		- Just import contents of target worksheet range as table
@@ -137,18 +140,6 @@ Redmine update script
 	3. generate markdown or generate html
 - assumption: CommonMark.Net is able to geenrate markdown from "ast"
 - add recursive markdown as option?
-
-### Complete sequence
-1. Parse markdown. When encountering triple backtick or `[syntax:data]`, resolve markdown extension
-2. Parse extension syntax (record parse errors)
-3. Validate extension syntax (record validation errors)
-4. Generate markdown for all found extensions
-5. Stop when only markdown, html continue
-6. Parse ExtensionSyntax (record parse errors)
-7. validate ExtensionSyntax (record validation errors)
-8. Generate html for all html extensions
-
-Currently, step 1+2 are not combined (need to fork CommonMark.Net)
 
 ### TODO:
 - ~~release resources~~

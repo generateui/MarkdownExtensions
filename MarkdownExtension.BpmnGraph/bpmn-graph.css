@@ -1,7 +1,5 @@
 ﻿.box {
-	display: flex;
-	flex-flow: column;
-	height: 100%;
+	display: block;
 }
 .box .row {
 	border: 1px dotted grey;

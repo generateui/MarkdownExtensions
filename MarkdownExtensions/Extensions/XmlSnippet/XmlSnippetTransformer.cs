@@ -9,7 +9,7 @@ namespace MarkdownExtensions.Extensions.XmlSnippet
 {
 	public class XmlSnippetTransformer : TransformerBase<XmlSnippetBlock, XmlSnippet>
 	{
-		private RenderSettings _renderSettings;
+		private readonly RenderSettings _renderSettings;
 
 		public XmlSnippetTransformer(RenderSettings renderSettings)
 		{

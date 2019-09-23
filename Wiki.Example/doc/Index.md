@@ -15,6 +15,9 @@ This document is a showcase document of extensions implemented in MarkdownExtens
 - [Enterprise Architect](EnterpriseArchitect.md)
 - [Enterprise Architect datamodel API](EnterpriseArchitectDatamodelApi.md)
 - [Errors](Errors.md)
+	- nested list item
+	- another nested list item
+- [Markdig examples](MarkdigExamples.md)
 
 Link to the [Links] header.
 
@@ -86,6 +89,8 @@ Note: a paragraph starting with the text "Note:" will be rendered as a note.
 
 Note: a paragraph with a note in it will be rendered as a note.
 
+The next paragraph is just a normal paragraph.
+
 ## Xml snippet
 Uses an xpath query on a target xml document to retrieve an xml snippet. This xml content is then rendered as an xml codeblock.
 
@@ -99,4 +104,17 @@ xpath: /books/book[1]
 ```xml-snippet
 file: Example.xml
 xpath: /books/book[1]
+```
+
+## Bpmn graph
+````
+```bpmn-graph
+file: BpmnWorkflow.xml
+height: 400px
+```
+````
+
+```bpmn-graph
+file: BpmnWorkflow.xml
+height: 400px
 ```

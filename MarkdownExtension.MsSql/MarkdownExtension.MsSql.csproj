@@ -85,5 +85,8 @@
     <EmbeddedResource Include="Fields.sql" />
     <EmbeddedResource Include="Indexes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="License.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

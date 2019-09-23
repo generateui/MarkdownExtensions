@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="License.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="TestCases.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
