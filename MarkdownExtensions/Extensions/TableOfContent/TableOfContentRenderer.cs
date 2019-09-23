@@ -132,15 +132,16 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 		private readonly string _staticCss = @"
 			nav {
 				height: 100%;
-				width: 200px;
+				width: 240px;
 				position: fixed;
 				top: 0;
 				left: 0;
 				padding: 1em;
 				background-color: #eee;
+				overflow-y: auto;
 			}
 			main {
-				margin-left: 200px; /* Same as the width of the sidebar */
+				margin-left: 240px; /* Same as the width of the sidebar */
 				padding: 0px 10px;
 			}
 			nav div.title {

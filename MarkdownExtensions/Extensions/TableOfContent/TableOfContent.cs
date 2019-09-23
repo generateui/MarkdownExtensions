@@ -2,6 +2,8 @@
 
 namespace MarkdownExtensions.Extensions.TableOfContent
 {
+	// TODO: width of TOC panel
+	// TODO: visulaization behavior (left/right/top-included, collapsible)
 	public class TableOfContent
 	{
 		public NumberingStyle Level1 { get; set; } = NumberingStyle.None;
