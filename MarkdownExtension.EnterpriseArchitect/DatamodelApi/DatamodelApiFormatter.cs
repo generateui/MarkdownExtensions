@@ -28,19 +28,7 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				{
 					return false;
 				}
-				if (e.TaggedValues == null)
-				{
-					return false;
-				}
-				if (!e.TaggedValues.ContainsKey("IsMigrationApi"))
-				{
-					return false;
-				}
-				if (e.TaggedValues["IsMigrationApi"] != "True")
-				{
-					return false;
-				}
-				return true;
+				return e.TaggedValue("IsMigrationApi");
 			}
 			var path = new Path(model.PackagePath);
 			var tables = _eaProvider
@@ -81,17 +69,10 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				};
 				tableArraySchema.Items.Add(tableSchema);
 				var required = new List<string>();
+				// 
 				foreach (var attribute in table.Attributes)
 				{
-					if (attribute.TaggedValues == null)
-					{
-						continue;
-					}
-					if (!attribute.TaggedValues.ContainsKey("IsMigrationApi"))
-					{
-						continue;
-					}
-					if (attribute.TaggedValues["IsMigrationApi"] != "True")
+					if (!attribute.TaggedValue("IsMigrationApi"))
 					{
 						continue;
 					}
@@ -120,6 +101,15 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 						required.Add(attribute.Name);
 					}
 					tableSchema.Properties.Add(attribute.Name, columnSchema);
+				}
+				if (table.TaggedValue("IncludeCreatedDateTimeInMigrationApi"))
+				{
+					var createdDateTime = new JSchema
+					{
+						Type = JSchemaType.String,
+						Description = "Creation DateTime"
+					};
+					tableSchema.Properties.Add("CreatedDateTime", createdDateTime);
 				}
 				required.ForEach(r => tableSchema.Required.Add(r));
 				schema.Properties.Add(table.Name + "List", tableArraySchema);

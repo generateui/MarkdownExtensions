@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
 using Newtonsoft.Json;
 using static MarkdownExtension.EnterpriseArchitect.Plugin;
@@ -647,7 +648,32 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
             (value as Path).ToString();
     }
 
-    public class Diagram
+	public interface IHasTaggedValues
+	{
+		Dictionary<string, string> TaggedValues { get; }
+	}
+
+	public static class HasTaggedValuesExtensions
+	{
+		public static bool TaggedValue(this IHasTaggedValues hasTaggedValues, string taggedValueName)
+		{
+			if (hasTaggedValues.TaggedValues == null)
+			{
+				return false;
+			}
+			if (!hasTaggedValues.TaggedValues.ContainsKey(taggedValueName))
+			{
+				return false;
+			}
+			if (hasTaggedValues.TaggedValues[taggedValueName].ToLower() != "true")
+			{
+				return false;
+			}
+			return true;
+		}
+	}
+
+	public class Diagram
     {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -675,7 +701,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         [JsonProperty("diagrams")]
         public List<Diagram> Diagrams { get; set; }
     }
-    public class Element
+    public class Element : IHasTaggedValues
     {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -726,7 +752,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 		[JsonProperty("lane")]
 		public string Lane { get; set; }
 	}
-    public sealed class Attribute
+    public sealed class Attribute : IHasTaggedValues
     {
         [JsonProperty("id")]
         public int Id { get; set; }
