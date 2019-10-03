@@ -254,7 +254,7 @@ namespace MarkdownExtensions.Console
 			var document = $@"
 				<html>
 					<head>
-
+						{jsHeader}
 						{cssHeader}
 					</head>
 					<body>

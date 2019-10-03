@@ -3,10 +3,13 @@ using Markdig.Syntax;
 
 namespace MarkdownExtensions.Extensions.Note
 {
-	public class NoteParagraphBlock : ParagraphBlock, IExtensionBlock
+	public class NoteParagraphBlock : LeafBlock, IExtensionBlock
 	{
 		public NoteParagraphBlock(BlockParser parser) : base(parser)
 		{
+			ProcessInlines = true;
 		}
+
+		public int LastLine => Line + Lines.Count - 1;
 	}
 }

@@ -29,7 +29,13 @@ level1:
 ```toc
 level1: dezimal
 ```
-
+## Markdown Snippet
+```md-snippet
+=ZnippetExample.md:Header 1
+```
+```md-snippet
+SnippetExample.md:Header 1
+```
 ## Xml snippet
 ```xml-snippet
 file: doesnotexist.xml

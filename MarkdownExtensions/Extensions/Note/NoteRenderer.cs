@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
-using Markdig.Syntax;
 
 namespace MarkdownExtensions.Extensions.Note
 {
-	public class NoteRenderer : ParagraphRenderer, IRenderer
+	public class NoteRenderer : HtmlObjectRenderer<NoteParagraphBlock>, IRenderer<Note>
 	{
 		public IEnumerable<ICode> Css
 		{
@@ -31,7 +31,12 @@ namespace MarkdownExtensions.Extensions.Note
 		}
 		public IEnumerable<ICode> Javascript => null;
 
-		protected override void Write(HtmlRenderer renderer, ParagraphBlock obj)
+		public void Render(ExtensionHtmlRenderer renderer, Note model, IFormatState formatState)
+		{
+			renderer.RegisterDynamicCss(Css.First());
+		}
+
+		protected override void Write(HtmlRenderer renderer, NoteParagraphBlock obj)
 		{
 			if (!renderer.ImplicitParagraph && renderer.EnableHtmlForBlock)
 			{
@@ -39,9 +44,7 @@ namespace MarkdownExtensions.Extensions.Note
 				{
 					renderer.EnsureLine();
 				}
-
 				renderer.Write("<p class='note' ").WriteAttributes(obj).Write(">");
-
 			}
 			renderer.WriteLeafInline(obj);
 			if (!renderer.ImplicitParagraph)
@@ -50,7 +53,6 @@ namespace MarkdownExtensions.Extensions.Note
 				{
 					renderer.WriteLine("</p>");
 				}
-
 				renderer.EnsureLine();
 			}
 		}

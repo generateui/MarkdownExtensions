@@ -56,6 +56,10 @@ namespace MarkdownExtensions
 		{
 			Errors = errors;
 		}
+		public ValidationFailure(string errorMessage)
+		{
+			Errors = new List<IError> { new Error(errorMessage) };
+		}
 		public IEnumerable<IError> Errors { get; }
 	}
 	public class Valid : IErrors

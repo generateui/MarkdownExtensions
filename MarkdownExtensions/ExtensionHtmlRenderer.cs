@@ -157,9 +157,10 @@ namespace MarkdownExtensions
 		public void Validate(Container container)
 		{
 			var extensionBlocks = ContainerBlock.GetRecursivelyOfType<IExtensionBlock>();
+			var context = new ValidationContext(_renderSettings, Pipeline);
 			foreach (var extensionBlock in extensionBlocks)
 			{
-				if (!_blockErrors.ContainsKey(extensionBlock))
+				if (_blockErrors.ContainsKey(extensionBlock))
 				{
 					// don't check for model errors if parsing didn't succeed
 					continue;
@@ -172,7 +173,7 @@ namespace MarkdownExtensions
 					continue;
 				}
 				var model = _modelByBlock[extensionBlock];
-				IErrors validationResult = validator.Validate(model, _renderSettings);
+				IErrors validationResult = validator.Validate(model, context);
 				if (validationResult.Errors.Any())
 				{
 					_blockErrors.Add(extensionBlock, validationResult);
@@ -194,7 +195,7 @@ namespace MarkdownExtensions
 					continue;
 				}
 				var model = _modelByInline[extensionInline];
-				var validationResult = validator.Validate(model, _renderSettings);
+				var validationResult = validator.Validate(model, context);
 				if (validationResult.Errors.Any())
 				{
 					_inlineErrors.Add(extensionInline, validationResult);
@@ -410,12 +411,12 @@ namespace MarkdownExtensions
 
 		public void Transform()
 		{
-			foreach (var item in _transformerByBlock)
+			foreach (KeyValuePair<IExtensionBlock, ITransformer> item in _transformerByBlock)
 			{
 				var fencedCodeBlock = item.Key as FencedCodeBlock;
-				var extensionBlock = item.Key as IExtensionBlock;
-				var transformer = item.Value;
-				if (transformer != null)
+				IExtensionBlock extensionBlock = item.Key;
+				ITransformer transformer = item.Value;
+				if (transformer != null && !_blockErrors.ContainsKey(extensionBlock))
 				{
 					var model = GetBlockModel(fencedCodeBlock as IExtensionBlock);
 					if (!_blockErrors.ContainsKey(extensionBlock))
@@ -505,7 +506,7 @@ namespace MarkdownExtensions
 				var fileNames = new List<string>();
 				foreach (ICode javascript in _javascripts)
 				{
-					var fileName = $@"{javascript.LibraryName}-{javascript.LibraryVersion}.css";
+					var fileName = $@"{javascript.LibraryName}-{javascript.LibraryVersion}.js";
 					fileNames.Add(fileName);
 					var file = new File(javascriptFolder, fileName);
 					System.IO.File.WriteAllText(file.AbsolutePath, javascript.GetCode());

@@ -9,11 +9,12 @@ namespace MarkdownExtensions.Extensions.Snippet
 		{
 			Parser = new SnippetSyntax();
 			Transformer = new SnippetTransformer(renderSettings);
+			Validator = new SnippetValidator();
 		}
 
 		public IParser Parser { get; }
 		public IRenderer Renderer => null;
-		public IValidator Validator => null;
+		public IValidator Validator { get; }
 		public ITransformer Transformer { get; }
 
 		public static ExtensionName NAME => "Markdown snippets";

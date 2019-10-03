@@ -9,7 +9,8 @@ namespace MarkdownExtensions.Extensions.Snippet
 	{
 		public static string GetHeadingName(this ContainerInline containerInline)
 		{
-			// this should produce just the text of the heading inline
+			// this should produce just the text of the heading inline. Its probably broken 
+			// for more complex inline handling (i.e. "my **title**")
 			return containerInline.FirstChild.ToString();
 		}
 	}
@@ -18,14 +19,33 @@ namespace MarkdownExtensions.Extensions.Snippet
 		public static int GetHeadingLevel(this Block block)
 		{
 			ContainerBlock parent = block.Parent;
-			int index = parent.IndexOf(block);
-			for (int i = index; i > -1; i--)
+			if (parent != null)
 			{
-				if (parent[i] is HeadingBlock headingBlock)
+				int index = parent.IndexOf(block);
+				for (int i = index; i > -1; i--)
 				{
-					return headingBlock.Level;
+					if (parent[i] is HeadingBlock headingBlock)
+					{
+						return headingBlock.Level;
+					}
 				}
 			}
+			if (block is ContainerBlock containerBlock)
+			{
+				int level = 7;
+				foreach (var child in containerBlock)
+				{
+					if (child is HeadingBlock headingBlock)
+					{
+						if (headingBlock.Level < level)
+						{
+							level = headingBlock.Level;
+						}
+					}
+				}
+				return level == 7 ? 0 : level;
+			}
+
 			return 0;
 		}
 	}
@@ -33,6 +53,10 @@ namespace MarkdownExtensions.Extensions.Snippet
 	{
 		public static void IncreaseHeadingLevel(this ContainerBlock containerBlock, int levelDiff)
 		{
+			if (levelDiff == 0)
+			{
+				return;
+			}
 			foreach (Block child in containerBlock)
 			{
 				if (child is HeadingBlock headingBlock)
@@ -56,21 +80,28 @@ namespace MarkdownExtensions.Extensions.Snippet
 			string content = IO.File.ReadAllText(fullFilePath);
 			MarkdownDocument document = Markdown.Parse(content, extensionHtmlRenderer.Pipeline);
 
-			int level = block.GetHeadingLevel();
-			if (level > 0 && astNode.AsSiblingHeading)
+			MarkdownDocument blockToInsert = GetByHeadingName(document, astNode.HeadingName);
+			int contextLevel = block.GetHeadingLevel();
+			int levelDiff = 0;
+			int blockToInsertLevel = blockToInsert.GetHeadingLevel();
+			switch (astNode.InsertionMechanism)
 			{
-				level -= 1;
+				case InsertionMechanism.AsSibling: levelDiff = contextLevel - blockToInsertLevel; break;
+				case InsertionMechanism.AsChild: levelDiff = contextLevel - blockToInsertLevel + 1; break;
+				case InsertionMechanism.H1: levelDiff = 1 - blockToInsertLevel; break;
+				case InsertionMechanism.H2: levelDiff = 2 - blockToInsertLevel; break;
+				case InsertionMechanism.H3: levelDiff = 3 - blockToInsertLevel; break;
+				case InsertionMechanism.H4: levelDiff = 4 - blockToInsertLevel; break;
+				case InsertionMechanism.H5: levelDiff = 5 - blockToInsertLevel; break;
+				case InsertionMechanism.H6: levelDiff = 6 - blockToInsertLevel; break;
 			}
-			document.IncreaseHeadingLevel(level);
-			if (astNode.HeadingName != null)
-			{
-				document = GetByHeadingName(document, astNode.HeadingName);
-			}
-			Replace(block, document);
+			// what to do with child headings past 6? Bound to 6?
+			blockToInsert.IncreaseHeadingLevel(levelDiff);
+			Replace(block, blockToInsert);
 		}
 
 		// Note: this cannot be made an extension method as the parent is set
-		private MarkdownDocument GetByHeadingName(MarkdownDocument source, string name)
+		internal static MarkdownDocument GetByHeadingName(MarkdownDocument source, string name)
 		{
 			bool selecting = false;
 			int level = 0;
