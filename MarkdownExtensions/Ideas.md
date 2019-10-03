@@ -7,7 +7,7 @@
 		- C# code to plantuml: https://github.com/pierre3/PlantUmlClassDiagramGenerator\
 	- nomnoml
 	- https://github.com/asciidoctor/asciidoctor-diagram
-	- blockdiag 
+	- blockdiag
 - Links to any item in any program
 	- MS Paint icon
 	- MS Paint menu item
@@ -51,6 +51,14 @@
 	- render trello card
 - Unicode
 	- refer to unicode codeblocks
+
+## Validators
+- image uri
+	- checks if referenced image exists
+- markdown file link 
+	- checks if referenced markdown file exists
+- wiki markdown file completeness
+	- checks if every file in the wiki is used (no dead content)
 
 ## Engine
 - ~~internal Markdown representation~~

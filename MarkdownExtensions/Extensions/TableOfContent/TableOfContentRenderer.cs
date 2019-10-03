@@ -121,6 +121,14 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 					}}
 				");
 			}
+			sb.AppendLine($@"
+				nav {{
+					width: {toc.Width};
+				}}
+				main {{
+					padding-left: {toc.Width};
+				}}
+			");
 			var css = sb.ToString();
 			if (css != string.Empty)
 			{
@@ -132,7 +140,6 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 		private readonly string _staticCss = @"
 			nav {
 				height: 100%;
-				width: 240px;
 				position: fixed;
 				top: 0;
 				left: 0;
@@ -141,7 +148,6 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 				overflow-y: auto;
 			}
 			main {
-				margin-left: 240px; /* Same as the width of the sidebar */
 				padding: 0px 10px;
 			}
 			nav div.title {

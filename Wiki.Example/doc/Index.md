@@ -4,6 +4,7 @@ Level3: Decimal
 Level4: Decimal
 Level5: Decimal
 Level6: Decimal
+width: 300px
 ```
 
 # Index

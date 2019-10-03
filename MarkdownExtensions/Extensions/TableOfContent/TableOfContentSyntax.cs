@@ -1,4 +1,6 @@
-﻿namespace MarkdownExtensions.Extensions.TableOfContent
+﻿using MarkdownExtensions.GenericSyntax;
+
+namespace MarkdownExtensions.Extensions.TableOfContent
 {
 	internal class TableOfContentSyntax : IParser
 	{
@@ -45,6 +47,12 @@
 							case 5: toc.Level5 = numberingStyle; break;
 							case 6: toc.Level6 = numberingStyle; break;
 						}
+					}
+					if (line.StartsWith("width:"))
+					{
+						var widthText = line.Substring(6).Trim();
+						CssLenghtUnit width = CssLenghtUnit.Parse(widthText);
+						toc.Width = width;
 					}
 				}
 			}

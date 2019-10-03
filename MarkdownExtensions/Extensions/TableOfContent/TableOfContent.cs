@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MarkdownExtensions.GenericSyntax;
+using System.Collections.Generic;
 
 namespace MarkdownExtensions.Extensions.TableOfContent
 {
@@ -22,6 +23,8 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 			Level5 = NumberingStyle.None,
 			Level6 = NumberingStyle.None,
 		};
+
+		public CssLenghtUnit Width { get; set; } = new CssLenghtUnit(100, CssLength.px);
 	}
 	// not supported: circle, square, disc, disclosure-open, disclosure-closed
 	public class NumberingStyle
