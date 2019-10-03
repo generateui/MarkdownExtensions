@@ -73,7 +73,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 			{
 				AddContent($@" counter(h3counter, {toc.Level3.Name})");
 				sb.AppendLine($@"
-					nav a.nav-level-2 {{
+					nav a.nav-level-2, h2 {{
 						counter-reset: h3counter;
 					}}
 					nav a.nav-level-3:before, h3:before {{
@@ -86,7 +86,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 			{
 				AddContent($@" counter(h4counter, {toc.Level4.Name})");
 				sb.AppendLine($@"
-					nav a.nav-level-3 {{
+					nav a.nav-level-3, h3 {{
 						counter-reset: h4counter;
 					}}
 					nav a.nav-level-4:before, h4:before {{
@@ -99,7 +99,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 			{
 				AddContent($@" counter(h5counter, {toc.Level5.Name})");
 				sb.AppendLine($@"
-					nav a.nav-level-4 {{
+					nav a.nav-level-4, h4 {{
 						counter-reset: h5counter;
 					}}
 					nav a.nav-level-5:before, h5:before {{
@@ -112,7 +112,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 			{
 				AddContent($@" counter(h6counter, {toc.Level6.Name})");
 				sb.AppendLine($@"
-					nav a.nav-level-5 {{
+					nav a.nav-level-5, h5 {{
 						counter-reset: h6counter;
 					}}
 					nav a.nav-level-6:before, h6:before {{

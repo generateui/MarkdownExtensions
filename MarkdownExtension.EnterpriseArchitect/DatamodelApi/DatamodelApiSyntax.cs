@@ -6,8 +6,22 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 	{
 		public IParseResult Parse(string text)
 		{
-			var packagePath = text.Trim();
-			return new ParseSuccess(new DatamodelApi { PackagePath = packagePath });
+			var packagePath = text;//.Trim(); // breaks
+			var lines = packagePath.Split('\n');
+			var datamodelApi = new DatamodelApi();
+			foreach (var line in lines)
+			{
+				var sanitized = line.ToLower();
+				if (sanitized.StartsWith("package: "))
+				{
+					datamodelApi.PackagePath = line.Substring(9);
+				}
+				if (sanitized.StartsWith("filename: "))
+				{
+					datamodelApi.FileName = line.Substring(10);
+				}
+			}
+			return new ParseSuccess(datamodelApi);
 		}
 	}
 }

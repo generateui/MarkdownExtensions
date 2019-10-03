@@ -3,5 +3,6 @@
 	internal class DatamodelApi
 	{
 		public string PackagePath { get; set; }
+		public string FileName { get; set; }
 	}
 }
