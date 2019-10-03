@@ -57,6 +57,7 @@ C:\Windows\Help\Windows
 ```
 
 ## Snippets from other markdown files
+Inserts a heading with child block content from another markdown file. You can determine the heading of the snippet how it's inserted in the target document by specifying a relative heading (`>` and `=`) or an absolute heading (`#`, `##`, `###`, `####`, `#####`, `######`). In below examples, the snippets come from the [snippet example file](SnippetExample.md).
 ### Snippet placed as sibling
 ````
 ```md-snippet
@@ -75,6 +76,15 @@ C:\Windows\Help\Windows
 ````
 ```md-snippet
 >SnippetExample.md:Header 1
+```
+### Snippet absolutely placed
+````
+```md-snippet
+###SnippetExample.md:Header 2
+```
+````
+```md-snippet
+###SnippetExample.md:Header 2
 ```
 
 ## Keyboard keys

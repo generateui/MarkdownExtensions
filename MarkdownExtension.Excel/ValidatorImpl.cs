@@ -8,9 +8,10 @@ namespace MarkdownExtension.Excel
 {
 	public class ExcelTableValidator : ValidatorBase<ExcelTableSelection>
 	{
-		public override IErrors ValidateTyped(ExcelTableSelection excelSelection, RenderSettings renderSettings)
+		public override IErrors ValidateTyped(ExcelTableSelection excelSelection, ValidationContext context)
 		{
-			var fullFilePath = IO.Path.Combine(renderSettings.SourceFolder.Absolute.FullPath, excelSelection.FileName);
+			var sourceFolder = context.RenderSettings.SourceFolder;
+			var fullFilePath = IO.Path.Combine(sourceFolder.Absolute.FullPath, excelSelection.FileName);
 			if (!IO.File.Exists(fullFilePath))
 			{
 				return new ValidationFailure(new Error($@"File [{excelSelection.FileName}] not found, tried looking at [{fullFilePath}]"));

@@ -18,7 +18,7 @@ namespace MarkdownExtensions.Extensions.Note
 					Column = processor.Column,
 					Span = new SourceSpan(processor.Line.Start + 6, processor.Line.End)
 				});
-				return BlockState.Continue;
+				return BlockState.Break;
 			}
 			return BlockState.None;
 		}

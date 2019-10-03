@@ -13,7 +13,7 @@ namespace MarkdownExtension.EnterpriseArchitect.Diagram
 			_provider = provider;
 			_renderSettings = renderSettings;
 		}
-		public override IErrors ValidateTyped(Diagram tree, RenderSettings renderSettings)
+		public override IErrors ValidateTyped(Diagram tree, ValidationContext context)
 		{
 			if (tree.Path != null)
 			{

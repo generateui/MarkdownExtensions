@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MarkdownExtensions.Extensions.Note
 {
-	class Note
+	public class Note
 	{
 	}
 }

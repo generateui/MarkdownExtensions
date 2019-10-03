@@ -71,7 +71,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 		public static NumberingStyle LowerRoman = new NumberingStyle("lower-roman");
 		public static NumberingStyle Malayalam = new NumberingStyle("malayalam");
 		public static NumberingStyle Nongolian = new NumberingStyle("mongolian");
-		public static NumberingStyle Nyanmar = new NumberingStyle("myanmar");
+		public static NumberingStyle Myanmar = new NumberingStyle("myanmar");
 		public static NumberingStyle Oriya = new NumberingStyle("oriya");
 		public static NumberingStyle Persian = new NumberingStyle("persian");
 		public static NumberingStyle SimplifiedChineseFormal = new NumberingStyle("simp-chinese-formal");
@@ -135,7 +135,7 @@ namespace MarkdownExtensions.Extensions.TableOfContent
 				[LowerRoman.Name] = LowerRoman,
 				[Malayalam.Name] = Malayalam,
 				[Nongolian.Name] = Nongolian,
-				[Nyanmar.Name] = Nyanmar,
+				[Myanmar.Name] = Myanmar,
 				[Oriya.Name] = Oriya,
 				[Persian.Name] = Persian,
 				[SimplifiedChineseFormal.Name] = SimplifiedChineseFormal,
