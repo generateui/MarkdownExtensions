@@ -313,15 +313,17 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 	}
 	internal class EaProvider : IEaProvider
 	{
-        private RepositoryWrapper _repository;
-        private List<Element> _elements;
-        private readonly Lazy<JsonSerializer> _jsonSerializer = new Lazy<JsonSerializer>(() =>
+        private readonly RepositoryWrapper _repository;
+		private readonly Lazy<JsonSerializer> _jsonSerializer = new Lazy<JsonSerializer>(() =>
         {
-            var jsonSerializer = new JsonSerializer();
-            jsonSerializer.Converters.Add(new PathConverter());
+			var jsonSerializer = new JsonSerializer
+			{
+				Formatting = Formatting.Indented
+			};
+			jsonSerializer.Converters.Add(new PathConverter());
             return jsonSerializer;
         });
-        private IFolder _folder;
+        private readonly IFolder _folder;
 
         public EaProvider(RepositoryWrapper repository, RenderSettings renderSettings)
         {
@@ -605,6 +607,13 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 		}
 	}
 
+	/// <summary>
+	/// Represents an object within EA by the path within the object browser
+	/// </summary>
+	/// <remarks>
+	/// - paths are case sensitive - "ARS T&TT.SOSPES Permit" is different from "ARS T&TT.SOSPES PERMIT"
+	/// - immutable
+	/// </remarks>
 	[JsonConverter(typeof(PathConverter))]
     public class Path
     {

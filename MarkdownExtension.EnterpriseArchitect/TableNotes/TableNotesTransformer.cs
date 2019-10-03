@@ -52,6 +52,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					sb.AppendLine(notes);
 				}
 				bool hasFieldNotes = false;
+				sb.AppendLine($@"### Properties");
 				foreach (var taggedValue in table.TaggedValues)
 				{
 					if (string.IsNullOrEmpty(taggedValue.Value))
@@ -60,6 +61,8 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					}
 					sb.AppendLine($@"- **{taggedValue.Key}**: {taggedValue.Value}");
 				}
+
+				sb.AppendLine($@"### Attributes");
 				foreach (var attribute in table.Attributes)
 				{
 					if (string.IsNullOrEmpty(attribute.Notes))
@@ -68,7 +71,7 @@ namespace MarkdownExtension.EnterpriseArchitect.TableNotes
 					}
 					hasFieldNotes = true;
 					var notes = Helper.Converter(attribute.Notes, transform, extensionHtmlRenderer.Pipeline);
-					sb.AppendLine($@"### {attribute.Name}");
+					sb.AppendLine($@"#### {attribute.Name}");
 					sb.AppendLine(notes);
 				}
 				bool hasNotes = hasTableNotes || hasFieldNotes;

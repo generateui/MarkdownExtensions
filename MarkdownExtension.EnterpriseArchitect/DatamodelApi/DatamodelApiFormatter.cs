@@ -1,5 +1,7 @@
-﻿using MarkdownExtension.EnterpriseArchitect.EaProvider;
+﻿using Markdig.Syntax;
+using MarkdownExtension.EnterpriseArchitect.EaProvider;
 using MarkdownExtensions;
+using MarkdownExtensions.Extensions.Snippet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
@@ -22,6 +24,11 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 
 		public override void Render(ExtensionHtmlRenderer renderer, DatamodelApi model, IFormatState formatState)
 		{
+			var file = new File(_renderSettings.SourceFolder, model.FileName ?? "schema.json");
+			//if (file.Exists() && !_renderSettings.ForceRefreshData)
+			//{
+			//	return;
+			//}
 			bool IncludeTable(Element e)
 			{
 				if (e.Stereotype != "table" && e.Type != "Enumeration")
@@ -61,11 +68,15 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				{
 					Type = JSchemaType.Array
 				};
+				void transform(MarkdownDocument md) { md.IncreaseHeadingLevel(3); }
+				var sanitizedNotes = table.Notes.Replace("\\r\\n", "\n");
+				var notes = Helper.Converter2(table.Notes, transform, renderer.Pipeline);
 				var tableSchema = new JSchema
 				{
-					Description = table.Notes,
+					Description = notes,
 					Title = table.Name,
 					Type = JSchemaType.Object,
+					Format = "Date-time",
 				};
 				tableArraySchema.Items.Add(tableSchema);
 				var required = new List<string>();
@@ -78,19 +89,28 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 					}
 
 					bool isEnum = attribute.Name.EndsWith("EnumId");
+					var (schemaType, format) = ToJsonType(attribute);
 					var columnSchema = new JSchema
 					{
-						Type = isEnum ? JSchemaType.Integer | JSchemaType.String : ToJsonType(attribute),
+						Type = isEnum ? JSchemaType.Integer | JSchemaType.String : schemaType,
 						Description = attribute.Notes,
+						Format = format
 					};
 					if (isEnum)
 					{
-						var enumName = attribute.Name.Replace("EnumId", string.Empty);
-						var @enum = enums[enumName];
+						string enumName = attribute.Name.Replace("EnumId", string.Empty);
+						IList<JToken> @enum = enums[enumName];
 						foreach (var enumValue in @enum)
 						{
 							columnSchema.Enum.Add(enumValue);
 						}
+						//var enumValueComments = new JSchema
+						//{
+							
+						//};
+						//JToken derpy = "";
+						//enumValueComments.Properties.Add("enumValueName", (JToken)"");
+						//columnSchema.Properties.Add("meta:enum", enumValueComments);
 					}
 					if (attribute.Length != 0)
 					{
@@ -117,9 +137,7 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 			}
 			requiredTables.ForEach(rt => schema.Required.Add(rt));
 			renderer.Write(schema.ToString());
-			var folder = _renderSettings.GetExtensionFolder(FileNames.ENTERPRISE_ARCHITECT);
-			var file = System.IO.Path.Combine(folder.Absolute.FullPath, "schema.json");
-			using (var textWriter = System.IO.File.CreateText(file))
+			using (System.IO.StreamWriter textWriter = System.IO.File.CreateText(file.AbsolutePath))
 			using (var jsonWriter = new JsonTextWriter(textWriter))
 			{
 				jsonWriter.Formatting = Formatting.Indented;
@@ -128,21 +146,22 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 			}
 		}
 
-		private JSchemaType ToJsonType(EaProvider.Attribute attribute)
+		private (JSchemaType SchemaType, string Format) ToJsonType(EaProvider.Attribute attribute)
 		{
 			switch (attribute.Type)
 			{
-				case "int": return JSchemaType.Integer;
-				case "smallint": return JSchemaType.Integer;
-				case "tinyint": return JSchemaType.Integer;
-				case "decimal": return JSchemaType.Number;
-				case "nvarchar": return JSchemaType.String;
-				case "nvarchar(max)": return JSchemaType.String;
-				case "varchar": return JSchemaType.String;
-				case "datetime": return JSchemaType.String;
-				case "date": return JSchemaType.String;
-				case "bigint": return JSchemaType.Integer;
-				case "bit": return JSchemaType.Boolean;
+				case "int": return (JSchemaType.Integer, null);
+				case "smallint": return (JSchemaType.Integer, null);
+				case "tinyint": return (JSchemaType.Integer, null);
+				case "decimal": return (JSchemaType.Number, null);
+				case "nvarchar": return (JSchemaType.String, null);
+				case "nvarchar(max)": return (JSchemaType.String, null);
+				case "varchar": return (JSchemaType.String, null);
+				case "datetime": return (JSchemaType.String, "date-time");
+				case "date": return (JSchemaType.String, "date");
+				case "time": return (JSchemaType.String, "time");
+				case "bigint": return (JSchemaType.Integer, null);
+				case "bit": return (JSchemaType.Boolean, null);
 			}
 			throw new NotSupportedException();
 		}
