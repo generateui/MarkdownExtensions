@@ -14,7 +14,7 @@ namespace MarkdownExtensions.Extensions.XmlSnippet
 		{
 			_renderSettings = renderSettings;
 		}
-		public override IErrors ValidateTyped(XmlSnippet tree, RenderSettings renderSettings)
+		public override IErrors ValidateTyped(XmlSnippet tree, ValidationContext validationContext)
 		{
 			var errors = new List<IError>();
 			bool fileExists = true;

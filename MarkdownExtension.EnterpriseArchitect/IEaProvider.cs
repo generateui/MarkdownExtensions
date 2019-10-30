@@ -184,7 +184,7 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
         private readonly IFolder _folder;
 
         private Dictionary<string, Element> _elementsByName;
-        private List<Element> _elements;
+        private readonly Dictionary<string, List<Element>> _elementsByFilterName = new Dictionary<string, List<Element>>();
 		private readonly Dictionary<Path, IEnumerable<Element>> _elementsByPath = new Dictionary<Path, IEnumerable<Element>>();
 		private readonly Dictionary<Path, IEnumerable<Path>> _diagramPathsByPackagePath = new Dictionary<Path, IEnumerable<Path>>();
         private readonly RenderSettings _renderSettings;
@@ -240,15 +240,16 @@ namespace MarkdownExtension.EnterpriseArchitect.EaProvider
 
         public IEnumerable<Element> GetElements(Path packagePath, Func<Element, bool> filter, string filterName, bool recursive = false)
         {
-            if (_elements != null)
+            if (_elementsByFilterName.ContainsKey(filterName))
             {
-                return _elements;
+                return _elementsByFilterName[filterName];
             }
             var file = FileNames.GetElementsFiltered(_folder, packagePath, filterName);
             if (file.Exists())
             {
                 var elementList = _jsonSerializer.Value.DeserializeFromFile<ElementList>(file.AbsolutePath);
-                return _elements = elementList.Elements;
+                _elementsByFilterName[filterName] = elementList.Elements;
+                return elementList.Elements;
             }
             return null;
         }
