@@ -51,6 +51,11 @@
 	- render trello card
 - Unicode
 	- refer to unicode codeblocks
+- ToC
+	- filter on h1..h6
+	- resizable toc divider
+	- placement right/left/top
+
 
 ## Validators
 - image uri
@@ -59,6 +64,7 @@
 	- checks if referenced markdown file exists
 - wiki markdown file completeness
 	- checks if every file in the wiki is used (no dead content)
+- headings in a document with duplicate id
 
 ## Engine
 - ~~internal Markdown representation~~
