@@ -12,11 +12,15 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 			foreach (var line in lines)
 			{
 				var sanitized = line.ToLower();
-				if (sanitized.StartsWith("package: "))
-				{
-					datamodelApi.PackagePath = line.Substring(9);
-				}
-				if (sanitized.StartsWith("filename: "))
+                if (sanitized.StartsWith("package: "))
+                {
+                    datamodelApi.PackagePath = line.Substring(9);
+                }
+                if (sanitized.StartsWith("enums-package: "))
+                {
+                    datamodelApi.EnumsPackagePath = line.Substring(15);
+                }
+                if (sanitized.StartsWith("filename: "))
 				{
 					datamodelApi.FileName = line.Substring(10);
 				}

@@ -37,7 +37,11 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 				}
 				return e.TaggedValue("IsMigrationApi");
 			}
-			var path = new Path(model.PackagePath);
+            bool IncludeEnum(Element e)
+            {
+                return e.Type == "Enumeration" && e.TaggedValue("IsMigrationApi");
+            }
+            var path = new Path(model.PackagePath);
 			var tables = _eaProvider
 				.GetElements(path, IncludeTable, "DataModelApiTables", true);
 
@@ -49,7 +53,18 @@ namespace MarkdownExtension.EnterpriseArchitect.DatamodelApi
 			};
 			var enums = new Dictionary<string, IList<JToken>>();
 			var requiredTables = new List<string>();
-			foreach (var table in tables.Where(t => t.Type == "Enumeration"))
+            IEnumerable<Element> enumElements = null;
+            if (model.EnumsPackagePath != null)
+            {
+                var enumPath = new Path(model.EnumsPackagePath);
+                enumElements = _eaProvider.GetElements(enumPath, IncludeEnum, "DataModelApiEnums", true);
+            }
+            else
+            {
+                enumElements = tables.Where(t => t.Type == "Enumeration");
+            }
+
+            foreach (var table in enumElements)
 			{
 				var values = new List<JToken>();
 				foreach (var enumValue in table.Attributes)
